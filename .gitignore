@@ -63,3 +63,10 @@ sketch
 
 **/.vscode
 **/.idea
+
+.idea
+*.iws
+*.iml
+*.ipr
+
+out/
