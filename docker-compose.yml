@@ -1,0 +1,25 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - '8080:8080'
+    # env_file:
+    #   - ./backend/.env
+    volumes:
+      - ./backend:/app
+    environment:
+      SPRING_BOOT_DEVTOOLS_LIVERELOAD_ENABLED: true
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    # environment:
+    #   - API_URL=http://backend:8080
+    volumes:
+       - ./frontend:/app
+       - /app/node_modules
+    command: npm run dev
