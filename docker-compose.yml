@@ -11,6 +11,7 @@ services:
       - ./backend:/app
     environment:
       SPRING_BOOT_DEVTOOLS_LIVERELOAD_ENABLED: true
+    command: mvn spring-boot:run
   frontend:
     build:
       context: ./frontend
