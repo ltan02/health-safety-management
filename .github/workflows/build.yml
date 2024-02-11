@@ -38,13 +38,13 @@ jobs:
     - name: Install dependencies (Frontend)
       if: matrix.language == 'javascript'
       run: |
-        cd ${matrix.path}
+        cd "${{ matrix.path }}"
         npm install
 
     - name: Install dependencies (Backend)
       if: matrix.language == 'java'
       run: |
-        cd ${matrix.path}
+        cd "${{ matrix.path }}"
         mvn clean install
 
     - name: Initialize CodeQL
