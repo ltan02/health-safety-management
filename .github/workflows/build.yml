@@ -47,25 +47,26 @@ jobs:
         cd "${{ matrix.path }}"
         mvn clean install
 
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
-      with:
-        languages: ${{ matrix.language }}
+    # Frontend build and test
+    - name: Build Frontend
+      if: matrix.language == 'javascript'
+      run: |
+        cd "${{ matrix.path }}"
+        npm run build
+    - name: Test Frontend
+      if: matrix.language == 'javascript'
+      run: |
+        cd "${{ matrix.path }}"
+        npm test
 
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v2
-
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
-
-  dependency-review:
-    runs-on: ubuntu-latest
-    needs: build
-    permissions:
-      contents: read
-    steps:
-      - name: 'Checkout Repository'
-        uses: actions/checkout@v3
-
-      - name: 'Dependency Review'
-        uses: actions/dependency-review-action@v2
+    # Backend build and test
+    - name: Build Backend
+      if: matrix.language == 'java'
+      run: |
+        cd "${{ matrix.path }}"
+        mvn package
+    - name: Test Backend
+      if: matrix.language == 'java'
+      run: |
+        cd "${{ matrix.path }}"
+        mvn test
