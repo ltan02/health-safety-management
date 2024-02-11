@@ -26,8 +26,8 @@ This project is a comprehensive Health and Safety SaaS solution, developed speci
 1. **Clone the Repository**
 
 ```bash
-git clone https://yourprojectrepository.git
-cd yourprojectrepository
+git clone https://github.com/CPSC319-2023/Team-2-PWC-Team-ADC.git
+cd Team-2-PWC-
 ```
 
 2(a). **Local Development**
@@ -67,6 +67,9 @@ Contributions are welcome! To contribute:
 - Shivam Aggarwal
 - Sidaarth Santhosh
 - Weichong Zhao
+
+## Support
+For support, please open an issue in the repository or contact the project maintainers directly.
 
 ## License
 This project is licensed under the BSD-2-Clause license - see the LICENSE file for details.
