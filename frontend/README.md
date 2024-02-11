@@ -16,7 +16,7 @@ This frontend application, built with React and Vite, is designed to offer a fas
 1. Navigate to the frontend directory:
 
 ```bash
-  cd frontend
+cd frontend
 ```
 
 2. Install dependencies:

@@ -16,7 +16,7 @@ This backend application is developed using Java with the Spring Boot framework,
 1. Navigate to the backend directory:
 
 ```bash
-   cd backend
+cd backend
 ```
 
 2. Build the project with Maven:
