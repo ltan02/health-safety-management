@@ -10,4 +10,4 @@ COPY . .
 
 RUN mvn package
 
-CMD ["java", "-jar", "target/myapp.jar"]
+CMD ["sh", "-c", "java -jar -Dserver.port=$PORT target/myapp.jar"]
