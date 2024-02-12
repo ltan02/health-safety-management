@@ -8,10 +8,10 @@ services:
     ports:
       - '8080:8080'
     volumes:
-      - ./backend:/app
+      - ./backend:/opt/app
     environment:
-      SPRING_BOOT_DEVTOOLS_LIVERELOAD_ENABLED: true
-    command: mvn spring-boot:run
+      - SPRING_BOOT_DEVTOOLS_LIVERELOAD_ENABLED=true
+    command: ["./mvnw", "spring-boot:run"]
 
   frontend:
     build:
