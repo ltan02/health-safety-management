@@ -22,7 +22,7 @@ As project maintainers, we are responsible for enforcing the Code of Conduct. We
 
 ## Reporting Incidents
 
-If you experience or witness any behavior that violates the Code of Conduct, please report it to [contact email or other preferred reporting method]. All reports will be reviewed and handled with discretion and confidentiality.
+If you experience or witness any behavior that violates the Code of Conduct, please report it to `ltan0521[at]gmail.com`. All reports will be reviewed and handled with discretion and confidentiality.
 
 ## Attribution
 
