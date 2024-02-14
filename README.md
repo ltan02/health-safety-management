@@ -27,10 +27,20 @@ This project is a comprehensive Health and Safety SaaS solution, developed speci
 
 ```bash
 git clone https://github.com/CPSC319-2023/Team-2-PWC-Team-ADC.git
-cd Team-2-PWC-
+cd Team-2-PWC-ADC
 ```
 
-2(a). **Local Development**
+2. **Set up Google Cloud SDK**
+
+Follow steps here to download and setup Google Cloud SDK: https://cloud.google.com/sdk/docs/install
+
+3. **Authenticate with Google Cloud**
+
+```bash
+gcloud auth application-default login
+```
+
+4. **Local Development**
 
 For local development, access the backend services locally for faster development cycles:
 
@@ -42,7 +52,7 @@ cd frontend && npm install && npm start
 cd backend && mvn install && mvn spring-boot:run
 ```
 
-2(b). **Running with Docker**
+5. **Running with Docker**
 
 ```bash
 docker-compose up -d --build

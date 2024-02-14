@@ -7,7 +7,7 @@ We take the security of our project seriously. This document outlines our securi
 If you discover a security vulnerability in our APIs, we appreciate your cooperation in responsibly disclosing it to us. To report a security vulnerability, please follow these steps:
 
 1. **Do not** publicly disclose the vulnerability. Please keep it confidential until we have had sufficient time to address it.
-2. Email us at `team[at]ubclaunchpad.com` with the following details:
+2. Email us at `ltan0521[at]gmail.com` with the following details:
    - A detailed description of the vulnerability and the potential impact.
    - Steps to reproduce the vulnerability, if applicable.
    - Any additional information or resources that can help us understand and address the vulnerability.
