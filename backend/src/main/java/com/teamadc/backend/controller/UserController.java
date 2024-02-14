@@ -29,7 +29,7 @@ public class UserController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<List<User>> getUsers(
             @RequestParam(required = false) Role role,
             @RequestParam(required = false) String businessUnit) {

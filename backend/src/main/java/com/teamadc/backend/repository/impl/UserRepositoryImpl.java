@@ -91,4 +91,17 @@ public class UserRepositoryImpl implements UserRepository {
         }
         return users;
     }
+
+    @Override
+    public User findByEmail(String email) {
+        User user;
+        ApiFuture<QuerySnapshot> querySnapshot = firestore.collection("users").whereEqualTo("email", email).get();
+        try {
+            user = querySnapshot.get().getDocuments().get(0).toObject(User.class);
+        } catch (InterruptedException | ExecutionException e) {
+            logger.error("Error occurred when trying to find user with email: {}. Error: {}", email, e);
+            return null;
+        }
+        return user;
+    }
 }

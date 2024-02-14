@@ -11,4 +11,5 @@ public interface UserRepository {
     List<User> findAll();
     List<User> findByRole(Role role);
     List<User> findByBusinessUnit(String businessUnit);
+    User findByEmail(String email);
 }
