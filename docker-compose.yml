@@ -8,9 +8,11 @@ services:
     ports:
       - '8080:8080'
     volumes:
-      - ./backend:/opt/app
+#      - ./backend:/opt/app
+      - $HOME/.config/gcloud/application_default_credentials.json:/gcp/creds.json:ro
     environment:
       - SPRING_BOOT_DEVTOOLS_LIVERELOAD_ENABLED=true
+      - GOOGLE_APPLICATION_CREDENTIALS=/gcp/creds.json
     command: ["./mvnw", "spring-boot:run"]
 
   frontend:
@@ -22,4 +24,6 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
+    env_file:
+      - ./frontend/.env
     command: npm run dev
