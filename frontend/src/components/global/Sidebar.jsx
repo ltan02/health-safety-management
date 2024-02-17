@@ -22,7 +22,7 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
     setPageType(location.pathname.substring(1));
   }, [location]);
   
-
+  
   const renderList = (items) => (
     <Box
       sx={{
@@ -108,7 +108,7 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
             padding: "2rem",
           }}
         >
-          {renderList(SIDEBAR_CONTENTS[pageType])}
+          {renderList(SIDEBAR_CONTENTS[pageType] ?? SIDEBAR_CONTENTS[PAGE_TYPE.ADMIN])}
         </Box>
       </SwipeableDrawer>
     </Box>
