@@ -12,9 +12,11 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { PAGE_TYPE, SIDEBAR_CONTENTS, COLORS } from "../../constants";
 import { useLocation } from "react-router-dom";
 import { useState } from "react";
+import { useAuthContext } from "../../context/AuthContext";
 
 function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
   const toggleDrawer = (open) => () => handleSidebarToggle(open);
+  const [user] = useAuthContext();
   const [pageType, setPageType] = useState(PAGE_TYPE.ADMIN);
   let location = useLocation();
 
@@ -35,7 +37,7 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
       <Box
         sx={{
           display: "flex",
-          flexDirection: "row",
+          flexDirection: "column",
           alignItems: "center",
           gap: "2rem",
         }}
@@ -46,6 +48,7 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
             padding: "0px",
           }}
         />
+        <Typography fontSize={"1.5rem"}>{user.user?.email ?? 'Anonymous User'}</Typography>
       </Box>
       <List
         sx={{
@@ -79,6 +82,7 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
         ModalProps={{ keepMounted: true }}
         anchor="left"
         open={isOpen}
+        onOpen={toggleDrawer(true)}
         onClose={toggleDrawer(false)}
         variant="persistent"
         sx={{

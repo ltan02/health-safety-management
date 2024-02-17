@@ -7,11 +7,17 @@ import Container from "@mui/material/Container";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import Sidebar from "./Sidebar";
+import { useAuthContext } from "../../context/AuthContext";
 
 function Header() {
   const drawerWidth = 300;
+  const [user,  { signOut }] = useAuthContext();
   const navigate = useNavigate();
-  const [sidebarOpen, setSidebarOpen] = useState(false); // Assuming you want the sidebar to be closed initially
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const handleLogout = async () => {
+    signOut();
+  };
 
   const directTo = (path) => () => {
     navigate(path);
@@ -30,7 +36,7 @@ function Header() {
           <Sidebar
             drawerWidth={drawerWidth}
             isOpen={sidebarOpen}
-            handleSidebarToggle={setSidebarOpen} // Assuming Sidebar manages its own open/close state
+            handleSidebarToggle={setSidebarOpen}
           />
           <Box
             sx={{
@@ -80,8 +86,16 @@ function Header() {
               justifyContent: "center",
             }}
           >
-            <Button color="inherit">Login</Button>
-            <Button color="inherit">Logout</Button>
+            {user.email}
+            {!user.user ? (
+              <Button color="inherit" onClick={directTo("/login")}>
+                Login
+              </Button>
+            ) : (
+              <Button color="inherit" onClick={() => handleLogout()}>
+                Logout
+              </Button>
+            )}
           </Box>
         </Toolbar>
       </AppBar>
