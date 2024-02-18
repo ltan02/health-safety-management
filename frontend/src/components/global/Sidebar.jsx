@@ -9,7 +9,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Typography from "@mui/material/Typography";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import { PAGE_TYPE, SIDEBAR_CONTENTS, COLORS } from "../../constants";
+import { PAGE_TYPE, SIDEBAR_CONTENTS } from "../../constants/index.jsx";
 import { useLocation } from "react-router-dom";
 import { useState } from "react";
 import { useAuthContext } from "../../context/AuthContext";
@@ -21,7 +21,10 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
   let location = useLocation();
 
   useEffect(() => {
-    setPageType(location.pathname.substring(1));
+    const path = location.pathname.split("/")[1];
+    if (Object.values(PAGE_TYPE).includes(path)) {
+      setPageType(path);
+    }
   }, [location]);
   
   
@@ -58,16 +61,10 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
           width: "240px",
         }}
       >
-        {items.map((text) => (
-          <Button
-            variant="contained"
-            key={text}
-            sx={{
-              width: "100%",
-            }}
-          >
-            <Typography fontSize={"1.2rem"}>{text}</Typography>
-          </Button>
+        {Object.keys(items).map((id) => (
+          <div key={id}>
+            {items[id]}
+          </div>
         ))}
       </List>
     </Box>
