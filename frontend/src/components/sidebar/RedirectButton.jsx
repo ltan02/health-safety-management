@@ -9,9 +9,7 @@ const RedirectButton = ({ to, children }) => {
   const availablePaths = ["/admin/workflows", "/admin/report", "/admin/status", "/admin/management"]
 
   const handleClick = () => {
-    if (availablePaths.includes(to)) {
-      history(to);
-    }
+    history(to);
   };
 
   return (

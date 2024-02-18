@@ -21,7 +21,10 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
   let location = useLocation();
 
   useEffect(() => {
-    setPageType(location.pathname.substring(1));
+    const path = location.pathname.split("/")[1];
+    if (Object.values(PAGE_TYPE).includes(path)) {
+      setPageType(path);
+    }
   }, [location]);
   
   
