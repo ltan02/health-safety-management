@@ -6,8 +6,6 @@ import {matchPath} from "react-router-dom";
 const RedirectButton = ({ to, children }) => {
   let history = useNavigate();
 
-  const availablePaths = ["/admin/workflows", "/admin/report", "/admin/status", "/admin/management"]
-
   const handleClick = () => {
     history(to);
   };
