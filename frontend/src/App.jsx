@@ -6,8 +6,10 @@ import Root from "./routes/root";
 import Admin from "./pages/admin";
 import Incident from "./pages/incident";
 import Report from "./pages/report";
+import Login from "./pages/login";
 import { COLORS } from "./constants";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { AuthProvider } from "./context/AuthContext.jsx";
 
 const theme = createTheme({
   typography: {
@@ -36,13 +38,16 @@ function App() {
     <>
       <BrowserRouter>
         <ThemeProvider theme={theme}>
-          <Header />
-          <Routes>
-            <Route path="/" element={<Root />} />
-            <Route path="admin" element={<Admin />} />
-            <Route path="incident" element={<Incident />} />
-            <Route path="report" element={<Report />} />
-          </Routes>
+          <AuthProvider>
+            <Header />
+            <Routes>
+              <Route path="/" element={<Root />} />
+              <Route path="admin" element={<Admin />} />
+              <Route path="incident" element={<Incident />} />
+              <Route path="report" element={<Report />} />
+              <Route path="login" element={<Login />} />
+            </Routes>
+          </AuthProvider>
         </ThemeProvider>
       </BrowserRouter>
     </>
