@@ -14,6 +14,10 @@ import AdminWorkflow from "./pages/admin/workflows/index.jsx";
 import AdminManagement from "./pages/admin/management/index.jsx";
 import AdminReport from "./pages/admin/report/index.jsx";
 import AdminStatus from "./pages/admin/status/index.jsx";
+import IncidentForm from "./pages/incident/form/index.jsx";
+import ReportOverview from "./pages/report/overview/index.jsx";
+import ReportDashboard from "./pages/report/dashboard/index.jsx";
+import ReportPast from "./pages/report/past/index.jsx";
 
 const theme = createTheme({
   typography: {
@@ -53,8 +57,16 @@ function App() {
                 <Route path="report" element={<AdminReport />} />
                 <Route path="status" element={<AdminStatus />} />
               </Route>
-              <Route path="incident" element={<Incident />} />
-              <Route path="report" element={<Report />} />
+              <Route path="incident">
+                <Route index element={<Incident />} />
+                <Route path="form" element={<IncidentForm />} />
+              </Route>
+              <Route path="report">
+                <Route index element={<Report />} />
+                <Route path="overview" element={<ReportOverview />} />
+                <Route path="dashboard" element={<ReportDashboard />} />
+                <Route path="past" element={<ReportPast />} />
+              </Route>
               <Route path="login" element={<Login />} />
             </Routes>
           </AuthProvider>
