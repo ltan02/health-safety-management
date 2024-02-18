@@ -70,3 +70,5 @@ sketch
 *.ipr
 
 out/
+
+.DS_Store

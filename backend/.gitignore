@@ -34,3 +34,5 @@ build/
 
 *.json
 /application-secrets.yml
+
+.DS_Store
