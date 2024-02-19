@@ -1,8 +1,5 @@
 import React, { useState } from "react";
 import { Modal, Box, TextField, Button } from "@mui/material";
-import { DateTimePicker } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 function IncidentModal({ open, onClose, onSubmit, fields }) {
   // Form state and handlers
@@ -49,32 +46,16 @@ function IncidentModal({ open, onClose, onSubmit, fields }) {
       <Box sx={style}>
         <form onSubmit={handleSubmit}>
           {fields.map((field, index) => {
-            switch (field.type) {
-              case 'datetime':
-                return (
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DateTimePicker
-                      key={index}
-                      name={field.name}
-                      label={field.label}
-                      value={formState[field.name]}
-                      onChange={(date) => handleDateChange(date, field.name)}
-                    />
-                  </LocalizationProvider>
-                );
-              case 'text':
                 return (
                   <TextField
                     key={index}
                     name={field.name}
                     label={field.label}
                     value={formState[field.name]}
+                    type={field.type}
                     onChange={handleInputChange}
                   />
                 );
-              default:
-                return null;
-            }
           })}
 
           <Button type="submit" variant="contained" color="primary">

@@ -15,7 +15,7 @@ export const initialData = [
 
 export const initialFields = [
     {name: 'id', label: 'Incident ID', columnWidth: 90, type: 'text'},
-    {name: 'datetime', label: 'Date Time', columnWidth: 220, type: 'datetime'},
+    {name: 'datetime', label: 'Date Time', columnWidth: 220, type: 'datetime-local'},
     {name: 'location', label: 'Location', columnWidth: 150, type: 'text'},
     {name: 'reportedBy', label: 'Reported By', columnWidth: 150, type: 'text'},
     {name: 'employeesInvolved', label: 'Employees Involved', columnWidth: 150, type: 'text'},
