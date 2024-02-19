@@ -1,14 +1,10 @@
 import React, { useState } from "react";
 import { Button, Modal, Box, TextField } from "@mui/material";
-import IncidentModalPreview from "../../../components/incident/IncidentModalPreview";
 
 function IncidentForm({fields, setFields}) {
-  
-
-  const incidentFormContext = React.createContext();
 
   const [open, setOpen] = useState(false);
-  const [newField, setNewField] = useState({ name: '', label: '', columnWidth:  150, type: 'text' });
+  const [newField, setNewField] = useState({ name: '', label: '', columnWidth:   150, type: 'text' });
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -23,7 +19,7 @@ function IncidentForm({fields, setFields}) {
   const handleFieldSubmit = (event) => {
     event.preventDefault();
     addField(newField);
-    setNewField({ name: '', label: '', columnWidth:  150, type: 'text' });
+    setNewField({ name: '', label: '', columnWidth:   150, type: 'text' });
     handleClose();
   };
 
@@ -41,17 +37,30 @@ function IncidentForm({fields, setFields}) {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width:  400,
+    width:   400,
     bgcolor: 'background.paper',
     border: '2px solid #000',
-    boxShadow:  24,
-    p:  4,
+    boxShadow:   24,
+    p:   4,
   };
 
   return (
     <div>
       <Button onClick={handleOpen}>Add Field</Button>
-      <IncidentModalPreview fields={fields} />
+      <Box>
+        {fields.map((field, index) => (
+          <div key={index}>
+            <TextField
+              name={field.name}
+              label={field.label}
+            />
+            <Button onClick={() => removeField(field.name)}>
+              Delete Field
+            </Button>
+          </div>
+        ))}  
+      </Box>
+          
       <Modal open={open} onClose={handleClose}>
         <Box sx={style}>
           <form onSubmit={handleFieldSubmit}>
