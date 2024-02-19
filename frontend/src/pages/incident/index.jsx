@@ -4,7 +4,7 @@ import { initialData } from "./initialData";
 import IncidentModal from "../../components/incident/IncidentModal";
 import IncidentDataGrid from "../../components/incident/IncidentDataGrid";
 
-function Incident() {
+function Incident({fields}) {
   const [open, setOpen] = useState(false);
   const [rows, setRows] = useState(initialData); 
 
@@ -21,6 +21,8 @@ function Incident() {
     setRows(newRows); 
   };
 
+
+
   return (
     <>
       <Button onClick={handleOpen}>Add</Button>
@@ -28,6 +30,7 @@ function Incident() {
         open={open}
         onClose={handleClose}
         onSubmit={handleSubmit}
+        fields={fields}
       />
       <Button onClick={deleteSelectedRows} disabled={selectedRows.length ===  0}>
         Remove
@@ -35,6 +38,7 @@ function Incident() {
       <IncidentDataGrid
         rows={rows}
         onSelectionModelChange={handleSelectionModelChange}
+        fields={fields}
       />
     </>
   );
