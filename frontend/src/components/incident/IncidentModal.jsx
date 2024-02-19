@@ -17,10 +17,10 @@ function IncidentModal({ open, onClose, onSubmit, fields }) {
     });
   };
 
-  const handleDateChange = (value) => {
+  const handleDateChange = (date, fieldName) => {
     setFormState({
       ...formState,
-      ["datetime"]: value
+      [fieldName]: date
     });
   };
 
@@ -48,15 +48,34 @@ function IncidentModal({ open, onClose, onSubmit, fields }) {
     <Modal open={open} onClose={onClose}>
       <Box sx={style}>
         <form onSubmit={handleSubmit}>
-          {fields.map((field, index) => (
-            <TextField
-              key={index}
-              name={field.name}
-              label={field.label}
-              value={formState[field.name]}
-              onChange={handleInputChange}
-            />
-          ))} 
+          {fields.map((field, index) => {
+            switch (field.type) {
+              case 'datetime':
+                return (
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DateTimePicker
+                      key={index}
+                      name={field.name}
+                      label={field.label}
+                      value={formState[field.name]}
+                      onChange={(date) => handleDateChange(date, field.name)}
+                    />
+                  </LocalizationProvider>
+                );
+              case 'text':
+                return (
+                  <TextField
+                    key={index}
+                    name={field.name}
+                    label={field.label}
+                    value={formState[field.name]}
+                    onChange={handleInputChange}
+                  />
+                );
+              default:
+                return null;
+            }
+          })}
 
           <Button type="submit" variant="contained" color="primary">
             Add Incident

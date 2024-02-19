@@ -1,5 +1,8 @@
 import React, { useState } from "react";
-import { Button, Modal, Box, TextField } from "@mui/material";
+import { Button, Modal, Box, TextField, Select, MenuItem } from "@mui/material";
+import { DateTimePicker } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 function IncidentForm({fields, setFields}) {
 
@@ -48,17 +51,38 @@ function IncidentForm({fields, setFields}) {
     <div>
       <Button onClick={handleOpen}>Add Field</Button>
       <Box>
-        {fields.map((field, index) => (
-          <div key={index}>
-            <TextField
-              name={field.name}
-              label={field.label}
-            />
-            <Button onClick={() => removeField(field.name)}>
-              Delete Field
-            </Button>
-          </div>
-        ))}  
+        {fields.map((field, index) => {
+            switch (field.type) {
+              case 'datetime':
+                return (
+                  <div key={index}>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DateTimePicker
+                      name={field.name}
+                      label={field.label}
+                    />
+                  </LocalizationProvider>
+                  <Button onClick={() => removeField(field.name)}>
+                      Delete Field
+                  </Button>
+                  </div>
+                );
+              case 'text':
+                return (
+                  <div key={index}>
+                  <TextField
+                    name={field.name}
+                    label={field.label}
+                  />
+                  <Button onClick={() => removeField(field.name)}>
+                      Delete Field
+                  </Button>
+                  </div>
+                );
+              default:
+                return null;
+            }
+        })} 
       </Box>
           
       <Modal open={open} onClose={handleClose}>
@@ -82,12 +106,17 @@ function IncidentForm({fields, setFields}) {
               value={newField.columnWidth}
               onChange={handleFieldChange}
             />
-            <TextField
+            <div/>
+            <Select
               name="type"
               label="Field Type"
               value={newField.type}
               onChange={handleFieldChange}
-            />
+            >
+              <MenuItem value={'text'}>Text Field</MenuItem>
+              <MenuItem value={'datetime'}>Date Time Picker</MenuItem>
+            </Select>
+            <div/>
             <Button type="submit" variant="contained" color="primary">
               Add Field
             </Button>
