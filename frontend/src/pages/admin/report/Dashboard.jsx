@@ -12,54 +12,10 @@ import { Container, Grid} from "@mui/material";
 import Column from "./Column";
 import Task from "./Task";
 import { TextField } from "@mui/material";
+import { initialTasks, STATE, COLUMNS } from "./report_constants";
 
-const STATE = {
-  INPROGRESS: "INPROGRESS",
-  DONE: "DONE",
-  TODO: "TODO",
-};
-const columns = [
-  { id: STATE.TODO, title: "To Do" },
-  { id: STATE.INPROGRESS, title: "In Progress" },
-  { id: STATE.DONE, title: "Done" },
-];
 
-// assume that we can get the tasks from api something like this
-const initialTasks = [
-  {
-    id: "task1", //random things here
-    title: "Fix some issues",
-    assignee: "John Doe",
-    description: "There are some issues that need to be fixed",
-    status: STATE.INPROGRESS,
-    deadline: "2024-02-31:20:20:00",
-  },
-  {
-    id: "task2",
-    title: "Update workflows",
-    assignee: "Jane Smith",
-    description: "Update workflows",
-    status: STATE.INPROGRESS,
-    deadline: "2024-10-31:20:20:00",
-  },
-  {
-    id: "task3",
-    title: "Create a new workflows",
-    assignee: "Alice Johnson",
-    description: "Update workflows",
-    status: STATE.DONE,
-    deadline: "2024-01-30:20:20:00",
-  },
-  {
-    id: "task4",
-    title: "Add report",
-    assignee: "Bob Brown",
-    description:
-      "Implement the new communication feature as per the specifications.",
-    status: STATE.TODO,
-    deadline: "2024-12-31:20:20:00",
-  },
-];
+
 function Dashboard() {
   const [tasks, setTasks] = useState({});
   const [activeId, setActiveId] = useState(null);
@@ -185,7 +141,7 @@ function Dashboard() {
         onDragStart={handleStart}
       >
         <Grid container spacing={2}>
-          {columns.map((column) => (
+          {COLUMNS.map((column) => (
             <Grid item key={column.id} xs={12} sm={6} md={4}>
               <Column
                 id={column.id}
