@@ -105,6 +105,11 @@ function Dashboard() {
     setActiveId(null);
   }
 
+  function handleAddTask(task) {
+    tasks[task.column].push(task);
+    setTasks(tasks);
+  }
+
   useEffect(() => {
     setTasks({
       [STATE.TODO]: [
@@ -120,10 +125,8 @@ function Dashboard() {
   }, []);
 
   useEffect(() => {
-    if (!search) {
-      setVisibleTasks(tasks);
-    }
-  }, [search, tasks]);
+    setVisibleTasks(tasks);
+  }, [tasks]);
 
   return (
     <Container>
@@ -148,6 +151,7 @@ function Dashboard() {
                 title={column.title}
                 tasks={(visibleTasks && visibleTasks[column.id]) || []}
                 activeId={activeId}
+                handleAddTask={handleAddTask}
               />
             </Grid>
           ))}

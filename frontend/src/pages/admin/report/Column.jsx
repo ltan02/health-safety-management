@@ -9,12 +9,16 @@ import Task from "./Task";
 import AddIcon from "@mui/icons-material/Add";
 import AddTaskModal from "./AddTaskModal";
 
-function Column({ id, title, tasks, activeId }) {
+function Column({ id, title, tasks, activeId, handleAddTask }) {
   const { setNodeRef } = useDroppable({ id });
   const [openModal, setOpenModal] = useState(false);
 
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
+
+  const handleAdd = (task) => {
+    handleAddTask(task);
+  }
 
   return (
     <Container
@@ -57,7 +61,7 @@ function Column({ id, title, tasks, activeId }) {
           ))}
         </Box>
       </SortableContext>
-      <AddTaskModal openModal={openModal} handleCloseModal={handleCloseModal} />
+      <AddTaskModal openModal={openModal} handleCloseModal={handleCloseModal} column={id} handleAddTask={handleAdd} />
     </Container>
   );
 }
