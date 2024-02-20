@@ -173,7 +173,6 @@ function ReportDashboard() {
             <h1>Dashboard Reports</h1>
             <Grid container spacing={2}>
                 <Grid item xs={4}>
-
                     <BarChart
                         xAxis={[{scaleType: 'band', data: ['group A', 'group B', 'group C']}]}
                         series={[{data: [4, 3, 5]}, {data: [1, 6, 3]}, {data: [2, 5, 6]}]}
