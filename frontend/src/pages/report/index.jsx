@@ -2,7 +2,9 @@ import * as React from 'react';
 
 function Report() {
   return (
-      <div>Incident</div>
+      <div>
+        <h1>Incident</h1>
+      </div>
   )
 }
 
