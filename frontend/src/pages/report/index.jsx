@@ -1,6 +1,8 @@
+import * as React from 'react';
+
 function Report() {
   return (
-    <div>Report</div>
+      <div>Incident</div>
   )
 }
 
