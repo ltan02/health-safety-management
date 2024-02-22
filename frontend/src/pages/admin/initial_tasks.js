@@ -1,7 +1,8 @@
 export const STATE = {
-  INPROGRESS: "INPROGRESS",
-  DONE: "DONE",
-  TODO: "TODO",
+  INPROGRESS: "Awaiting Response",
+  DONE: "Done",
+  TODO: "Needs Review",
+  INACTIVE: "Inactive",
 };
 
 export const COLUMNS = [
@@ -13,15 +14,15 @@ export const COLUMNS = [
 // assume that we can get the tasks from api something like this
 export const initialTasks = [
   {
-    id: "task1", //random things here
+    id: "0001", //random things here
     title: "Fix some issues",
     assignee: "John Doe",
     description: "There are some issues that need to be fixed",
-    status: STATE.INPROGRESS,
+    status: STATE.INACTIVE,
     deadline: "2024-02-31:20:20:00",
   },
   {
-    id: "task2",
+    id: "0002",
     title: "Update workflows",
     assignee: "Jane Smith",
     description: "Update workflows",
@@ -29,7 +30,7 @@ export const initialTasks = [
     deadline: "2024-10-31:20:20:00",
   },
   {
-    id: "task3",
+    id: "0003",
     title: "Create a new workflows",
     assignee: "Alice Johnson",
     description: "Update workflows",
@@ -37,7 +38,7 @@ export const initialTasks = [
     deadline: "2024-01-30:20:20:00",
   },
   {
-    id: "task4",
+    id: "0004",
     title: "Add report",
     assignee: "Bob Brown",
     description:
