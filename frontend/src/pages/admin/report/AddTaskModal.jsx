@@ -3,7 +3,6 @@ import React from "react";
 import { Box, Modal, Typography, Button } from "@mui/material";
 import { TextField } from "@mui/material";
 import { useState } from "react";
-import { STATE } from "./report_constants";
 import {useId} from "react";
 
 function AddTaskModal({ openModal, handleCloseModal, column, handleAddTask }) {

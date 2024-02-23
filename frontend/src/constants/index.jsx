@@ -16,12 +16,12 @@ export const SIDEBAR_CONTENTS = {
       ["Report Board"]: (
         <RedirectButton to="/admin/report">Report Board</RedirectButton>
    ),
-    ["Columns and Statuses"]: (
-      <RedirectButton to="/admin/status">Columns and Statuses</RedirectButton>
-    ),
-    ["Workflow Management"]: (
-      <RedirectButton to="/admin/management">Workflow Management</RedirectButton>
-    ),
+    // ["Columns and Statuses"]: (
+    //   <RedirectButton to="/admin/status">Columns and Statuses</RedirectButton>
+    // ),
+    // ["Workflow Management"]: (
+    //   <RedirectButton to="/admin/management">Workflow Management</RedirectButton>
+    // ),
   },
   [PAGE_TYPE.INCIDENT]: {
     ["Incident Board"]: (
