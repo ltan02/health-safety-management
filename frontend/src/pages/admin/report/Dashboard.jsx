@@ -12,7 +12,7 @@ import { Container, Grid } from "@mui/material";
 import Column from "./Column";
 import Task from "./Task";
 import { TextField } from "@mui/material";
-import { initialTasks, STATE, COLUMNS } from "./report_constants";
+import { initialTasks, STATE, COLUMNS } from "../initial_tasks";
 
 function Dashboard() {
     const [tasks, setTasks] = useState({});
