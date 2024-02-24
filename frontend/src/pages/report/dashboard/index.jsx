@@ -1,9 +1,9 @@
 function ReportDashboard() {
     return (
-      <div>
-        <h1>Dashboard Reports</h1>
-      </div>
+        <div>
+            <h1>Dashboard Reports</h1>
+        </div>
     );
-  }
-  
-  export default ReportDashboard;
+}
+
+export default ReportDashboard;

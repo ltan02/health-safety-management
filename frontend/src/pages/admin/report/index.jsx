@@ -1,11 +1,11 @@
 import Dashboard from "./Dashboard";
 
-function AdminReport(){
+function AdminReport() {
     return (
         <div>
             <Dashboard />
         </div>
-    )
+    );
 }
 
 export default AdminReport;
