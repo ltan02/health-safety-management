@@ -19,7 +19,6 @@ const RoleSwitchModal = ({ children }) => {
     const handleClose = () => setShow(false);
     const handleOpen = () => setShow(true);
     const handleRoleSwitch = () => {
-        console.log(role);
         handleClose();
     };
 

@@ -12,6 +12,6 @@ export function isSafetyWarden(role) {
     return role === Roles.SafetyWarden;
 }
 
-export function isPrivilleged(role) {
+export function isPrivileged(role) {
     return isAdmin(role) || isSafetyWarden(role);
 }

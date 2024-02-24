@@ -65,7 +65,6 @@ function Dashboard() {
             .filter((index) => index !== -1)[0];
 
         if (sourceColumn && destinationColumn && over.id !== active.id) {
-            console.log(active.id);
             if (sourceColumn !== destinationColumn) {
                 tasks[sourceColumn][activeIndex].status = destinationColumn;
                 tasks[destinationColumn].push(tasks[sourceColumn][activeIndex]);

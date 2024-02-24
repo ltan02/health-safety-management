@@ -1,13 +1,13 @@
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import Sidebar from "./Sidebar";
 import { useAuthContext } from "../../context/AuthContext";
+import { isPrivileged } from "../../utils/permissions";
 
 function Header() {
     const drawerWidth = 300;
@@ -43,7 +43,7 @@ function Header() {
                             flexGrow: 1,
                         }}
                     >
-                        <Typography
+                        {/* <Typography
                             variant="h6"
                             component="div"
                             sx={{
@@ -53,26 +53,28 @@ function Header() {
                             }}
                         >
                             AppName
-                        </Typography>
-                        <Container
-                            sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                gap: "2rem",
-                                padding: "0px",
-                            }}
-                        >
-                            <Button color="inherit" onClick={directTo("/admin")}>
-                                Admin
-                            </Button>
-                            <Button color="inherit" onClick={directTo("/incident")}>
-                                Incident
-                            </Button>
-                            <Button color="inherit" onClick={directTo("/report")}>
-                                Report
-                            </Button>
-                        </Container>
+                        </Typography> */}
+                        {isPrivileged(user.role) && (
+                            <Container
+                                sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    gap: "2rem",
+                                    padding: "0px",
+                                }}
+                            >
+                                <Button color="inherit" onClick={directTo("/")}>
+                                    Admin
+                                </Button>
+                                <Button color="inherit" onClick={directTo("/incident")}>
+                                    Incident
+                                </Button>
+                                <Button color="inherit" onClick={directTo("/report")}>
+                                    Report
+                                </Button>
+                            </Container>
+                        )}
                     </Box>
                     <Box
                         sx={{
@@ -82,16 +84,10 @@ function Header() {
                             justifyContent: "center",
                         }}
                     >
-                        {user && user.email}
-                        {user === null ? (
-                            <Button color="inherit" onClick={directTo("/login")}>
-                                Login
-                            </Button>
-                        ) : (
-                            <Button color="inherit" onClick={() => handleLogout()}>
-                                Logout
-                            </Button>
-                        )}
+                        {user.email}
+                        <Button color="inherit" onClick={() => handleLogout()}>
+                            Logout
+                        </Button>
                     </Box>
                 </Toolbar>
             </AppBar>

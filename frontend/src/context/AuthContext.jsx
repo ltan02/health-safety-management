@@ -8,7 +8,7 @@ export function useAuthContext() {
 }
 
 export function AuthProvider({ children }) {
-    const [user, setUser] = useState(JSON.parse(sessionStorage.getItem("user")));
+    const [user, setUser] = useState(JSON.parse(sessionStorage.getItem("user")) ?? null);
     const { error, sendRequest } = useAxios();
 
     useEffect(() => {
@@ -16,8 +16,17 @@ export function AuthProvider({ children }) {
             if (user) {
                 const token = await user.getIdToken();
                 sessionStorage.setItem("token", token);
-                sessionStorage.setItem("user", JSON.stringify(user));
-                setUser(user);
+
+                try {
+                    const backendResponse = await sendRequest({
+                        url: `/users/${user.uid}`,
+                    });
+        
+                    sessionStorage.setItem("user", JSON.stringify(backendResponse));
+                    setUser(backendResponse);
+                } catch (e) {
+                    console.error("Fetching user error: ", e);
+                }
             } else {
                 sessionStorage.removeItem("token");
                 sessionStorage.removeItem("user");
@@ -35,8 +44,8 @@ export function AuthProvider({ children }) {
             sessionStorage.setItem("token", token);
 
             const backendResponse = await sendRequest({
-                url: `/users/${firebaseResponse.user.uid}`
-            })
+                url: `/users/${firebaseResponse.user.uid}`,
+            });
 
             sessionStorage.setItem("user", JSON.stringify(backendResponse));
             setUser(backendResponse);
@@ -47,7 +56,7 @@ export function AuthProvider({ children }) {
 
     const signUp = async (email, password, firstName, lastName, role) => {
         try {
-            const firebaseResponse = await auth.createUserWithEmailAndPassword(email, password)
+            const firebaseResponse = await auth.createUserWithEmailAndPassword(email, password);
             const backendResponse = await sendRequest({
                 url: "/auth/register",
                 method: "POST",
@@ -77,14 +86,6 @@ export function AuthProvider({ children }) {
         return !!sessionStorage.getItem("token");
     };
 
-    const getUserRole = () => {
-        const user = JSON.parse(sessionStorage.getItem("user"));
-        if (user && user.role) {
-            return user.role;
-        }
-        return undefined;
-    };
-
     const value = {
         user,
         token: sessionStorage.getItem("token"),
@@ -92,7 +93,6 @@ export function AuthProvider({ children }) {
         signOut,
         signUp,
         isUserLoggedIn,
-        getUserRole,
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

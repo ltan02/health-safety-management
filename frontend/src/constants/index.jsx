@@ -13,12 +13,12 @@ export const PAGE_TYPE = {
     REPORT: "report",
 };
 
-export const SIDEBAR_CONTENTS = {
+export const PRIVILEGED_SIDEBAR_CONTENTS = {
     [PAGE_TYPE.ADMIN]: {
-        ["Workflows"]: <RedirectButton to="/admin/workflows">Workflows</RedirectButton>,
-        ["Report Board"]: <RedirectButton to="/admin/report">Report Board</RedirectButton>,
-        ["Columns and Statuses"]: <RedirectButton to="/admin/status">Columns and Statuses</RedirectButton>,
-        ["Workflow Management"]: <RedirectButton to="/admin/management">Workflow Management</RedirectButton>,
+        ["Workflows"]: <RedirectButton to="/workflows">Workflows</RedirectButton>,
+        ["Report Board"]: <RedirectButton to="/">Report Board</RedirectButton>,
+        ["Columns and Statuses"]: <RedirectButton to="/status">Columns and Statuses</RedirectButton>,
+        ["Workflow Management"]: <RedirectButton to="/management">Workflow Management</RedirectButton>,
     },
     [PAGE_TYPE.INCIDENT]: {
         ["Incident Board"]: <RedirectButton to="/incident">Incident Board</RedirectButton>,
@@ -30,6 +30,13 @@ export const SIDEBAR_CONTENTS = {
         ["Overview"]: <RedirectButton to="/report/overview">Overview</RedirectButton>,
         ["Dashboard"]: <RedirectButton to="/report/dashboard">Dashboard</RedirectButton>,
         ["Past Reports"]: <RedirectButton to="/report/past">Past Reports</RedirectButton>,
+    },
+};
+
+export const EMPLOYEE_SIDEBAR_CONTENTS = {
+    [PAGE_TYPE.INCIDENT]: {
+        ["Incident Board"]: <RedirectButton to="/">Incident Board</RedirectButton>,
+        ["Form Customization"]: <RedirectButton to="/form">Form Customization</RedirectButton>,
     },
 };
 

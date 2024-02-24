@@ -8,15 +8,16 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Typography from "@mui/material/Typography";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import { PAGE_TYPE, SIDEBAR_CONTENTS } from "../../constants/index.jsx";
+import { PAGE_TYPE, PRIVILEGED_SIDEBAR_CONTENTS, EMPLOYEE_SIDEBAR_CONTENTS } from "../../constants/index.jsx";
 import { useLocation } from "react-router-dom";
 import { useState } from "react";
 import { useAuthContext } from "../../context/AuthContext";
+import { isPrivileged } from "../../utils/permissions.js";
 
 function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
     const toggleDrawer = (open) => () => handleSidebarToggle(open);
     const { user } = useAuthContext();
-    const [pageType, setPageType] = useState(PAGE_TYPE.ADMIN);
+    const [pageType, setPageType] = useState(isPrivileged(user.role) ? PAGE_TYPE.ADMIN : PAGE_TYPE.INCIDENT);
     let location = useLocation();
 
     useEffect(() => {
@@ -105,7 +106,9 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
                         padding: "2rem",
                     }}
                 >
-                    {renderList(SIDEBAR_CONTENTS[pageType] ?? SIDEBAR_CONTENTS[PAGE_TYPE.ADMIN])}
+                    {isPrivileged(user.role)
+                        ? renderList(PRIVILEGED_SIDEBAR_CONTENTS[pageType])
+                        : renderList(EMPLOYEE_SIDEBAR_CONTENTS[pageType])}
                 </Box>
             </SwipeableDrawer>
         </Box>
