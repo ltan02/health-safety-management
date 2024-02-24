@@ -18,6 +18,8 @@ import IncidentForm from "./pages/incident/form/index.jsx";
 import ReportOverview from "./pages/report/overview/index.jsx";
 import ReportDashboard from "./pages/report/dashboard/index.jsx";
 import ReportPast from "./pages/report/past/index.jsx";
+import { initialFields } from "./pages/incident/initialData.jsx";
+import { useState } from "react";
 
 const theme = createTheme({
   typography: {
@@ -42,6 +44,8 @@ const theme = createTheme({
 });
 
 function App() {
+  
+  const [incidentFields, setIncidentFields] = useState(initialFields);
   return (
     <>
       <BrowserRouter>
@@ -58,8 +62,8 @@ function App() {
                 <Route path="status" element={<AdminStatus />} />
               </Route>
               <Route path="incident">
-                <Route index element={<Incident />} />
-                <Route path="form" element={<IncidentForm />} />
+                <Route index element={<Incident fields={incidentFields}/>} />
+                <Route path="form" element={<IncidentForm fields={incidentFields} setFields={setIncidentFields}/>} />
               </Route>
               <Route path="report">
                 <Route index element={<Report />} />
