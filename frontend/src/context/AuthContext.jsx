@@ -83,7 +83,7 @@ export function AuthProvider({ children }) {
     };
 
     const isUserLoggedIn = () => {
-        return !!sessionStorage.getItem("token");
+        return !!sessionStorage.getItem("token") && !!sessionStorage.getItem("user");
     };
 
     const value = {

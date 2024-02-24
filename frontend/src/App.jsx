@@ -48,7 +48,9 @@ function App() {
     const getRoutesForRole = () => {
         if (!isUserLoggedIn()) return <Route path="/" element={<Login />} />;
 
-        const isPrivilegedUser = isUserLoggedIn && isPrivileged(user.role);
+        console.log(user);
+
+        const isPrivilegedUser = isUserLoggedIn() && isPrivileged(user.role);
         if (isPrivilegedUser) {
             return (
                 <>
