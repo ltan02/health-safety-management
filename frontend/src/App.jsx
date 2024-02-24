@@ -46,7 +46,6 @@ const theme = createTheme({
 function App() {
   
   const [incidentFields, setIncidentFields] = useState(initialFields);
-
   return (
     <>
       <BrowserRouter>

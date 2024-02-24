@@ -111,3 +111,4 @@ function IncidentForm({fields, setFields}) {
 }
 
 export default IncidentForm;
+
