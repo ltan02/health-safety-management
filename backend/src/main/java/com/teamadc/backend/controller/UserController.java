@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/users")
@@ -23,10 +24,14 @@ public class UserController {
 
     @GetMapping("/{userId}")
     public ResponseEntity<User> getUserById(@PathVariable String userId) {
-        User user = userService.getUserById(userId);
-        return Optional.ofNullable(user)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        try {
+            User user = userService.getUserById(userId);
+            return Optional.ofNullable(user)
+                    .map(ResponseEntity::ok)
+                    .orElseGet(() -> ResponseEntity.notFound().build());
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @GetMapping("/")
@@ -34,14 +39,18 @@ public class UserController {
             @RequestParam(required = false) Role role,
             @RequestParam(required = false) String businessUnit) {
         List<User> users;
-        if (role != null) {
-            users = userService.getUsersByRole(role);
-        } else if (businessUnit != null) {
-            users = userService.getUsersByBusinessUnit(businessUnit);
-        } else {
-            users = userService.getAllUsers();
+        try {
+            if (role != null) {
+                users = userService.getUsersByRole(role);
+            } else if (businessUnit != null) {
+                users = userService.getUsersByBusinessUnit(businessUnit);
+            } else {
+                users = userService.getAllUsers();
+            }
+            return ResponseEntity.ok(users);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
         }
-        return ResponseEntity.ok(users);
     }
 
 }

@@ -6,9 +6,9 @@ export const STATE = {
 };
 
 export const COLUMNS = [
-  { id: STATE.TODO, title: "Needs Review" },
-  { id: STATE.INPROGRESS, title: "Awaiting Response" },
-  { id: STATE.DONE, title: "Done" },
+    { id: STATE.TODO, title: "Needs Review" },
+    { id: STATE.INPROGRESS, title: "Awaiting Response" },
+    { id: STATE.DONE, title: "Done" },
 ];
 
 // assume that we can get the tasks from api something like this

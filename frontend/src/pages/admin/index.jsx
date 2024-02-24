@@ -1,8 +1,8 @@
 function Admin() {
-  return (
-    <div>
-      <p>Admin</p>
-    </div>
-  );
+    return (
+        <div>
+            <p>Admin</p>
+        </div>
+    );
 }
 export default Admin;

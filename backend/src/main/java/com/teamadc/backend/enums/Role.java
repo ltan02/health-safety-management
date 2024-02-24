@@ -3,9 +3,9 @@ package com.teamadc.backend.enums;
 public enum Role {
     ADMIN, SAFETY_WARDEN, EMPLOYEE;
 
-    private static final String adminString = "admin";
-    private static final String safetyWardenString = "safetyWarden";
-    private static final String employeeString = "employee";
+    private static final String adminString = "ADMIN";
+    private static final String safetyWardenString = "SAFETY_WARDEN";
+    private static final String employeeString = "EMPLOYEE";
 
     @Override
     public String toString() {
