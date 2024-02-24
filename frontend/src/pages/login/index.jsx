@@ -1,19 +1,19 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Container, Card, CardContent, Typography, TextField, Button } from "@mui/material";
-import { useState } from "react";
 import { useAuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 function Login() {
     const navigate = useNavigate();
-    const [user, { signIn }] = useAuthContext();
+    const { user, signIn } = useAuthContext();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+
     useEffect(() => {
-        if (user.user !== null) {
+        if (user !== null) {
             navigate("/");
         }
-    }, [user]);
+    }, [navigate, user]);
 
     const handleSubmit = () => {
         signIn(email, password);

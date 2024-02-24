@@ -1,7 +1,7 @@
 import RedirectButton from "../components/sidebar/RedirectButton";
 import RoleSwitchModal from "../components/sidebar/RoleSwitchModal";
 
-export const ROLES = {
+export const Roles = {
     Admin: "ADMIN",
     SafetyWarden: "SAFETY_WARDEN",
     Employee: "EMPLOYEE",

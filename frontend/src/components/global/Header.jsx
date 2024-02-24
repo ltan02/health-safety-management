@@ -11,7 +11,7 @@ import { useAuthContext } from "../../context/AuthContext";
 
 function Header() {
     const drawerWidth = 300;
-    const [user, { signOut }] = useAuthContext();
+    const { user, signOut } = useAuthContext();
     const navigate = useNavigate();
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -82,8 +82,8 @@ function Header() {
                             justifyContent: "center",
                         }}
                     >
-                        {user.email}
-                        {!user.user ? (
+                        {user && user.email}
+                        {user === null ? (
                             <Button color="inherit" onClick={directTo("/login")}>
                                 Login
                             </Button>

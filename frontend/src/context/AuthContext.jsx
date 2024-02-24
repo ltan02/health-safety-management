@@ -1,14 +1,15 @@
-import { createContext, useState, useContext, useEffect } from "react";
+import { useState, useEffect, createContext, useContext } from "react";
 import { auth } from "../firebase";
+import useAxios from "../hooks/useAxios";
 
 const AuthContext = createContext();
-
 export function useAuthContext() {
     return useContext(AuthContext);
 }
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(JSON.parse(sessionStorage.getItem("user")));
+    const { error, sendRequest } = useAxios();
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(async (user) => {
@@ -28,19 +29,41 @@ export function AuthProvider({ children }) {
     }, []);
 
     const signIn = async (email, password) => {
-        const res = await auth.signInWithEmailAndPassword(email, password);
-        const token = await res.user.getIdToken();
-        sessionStorage.setItem("token", token);
-        sessionStorage.setItem("user", JSON.stringify(res.user));
-        setUser(res.user);
+        try {
+            const firebaseResponse = await auth.signInWithEmailAndPassword(email, password);
+            const token = await firebaseResponse.user.getIdToken();
+            sessionStorage.setItem("token", token);
+
+            const backendResponse = await sendRequest({
+                url: `/users/${firebaseResponse.user.uid}`
+            })
+
+            sessionStorage.setItem("user", JSON.stringify(backendResponse));
+            setUser(backendResponse);
+        } catch (e) {
+            console.error("SignIn error: ", e);
+        }
     };
 
-    const signUp = async (email, password) => {
-        const res = await auth.createUserWithEmailAndPassword(email, password);
-        const token = await res.user.getIdToken();
-        sessionStorage.setItem("token", token);
-        sessionStorage.setItem("user", JSON.stringify(res.user));
-        setUser(res.user);
+    const signUp = async (email, password, firstName, lastName, role) => {
+        try {
+            const firebaseResponse = await auth.createUserWithEmailAndPassword(email, password)
+            const backendResponse = await sendRequest({
+                url: "/auth/register",
+                method: "POST",
+                body: { id: firebaseResponse.user.uid, email, firstName, lastName, role },
+            });
+
+            if (error) {
+                console.error("Failed to register user to firebase. " + error);
+            }
+
+            sessionStorage.setItem("token", firebaseResponse.getIdToken());
+            sessionStorage.setItem("user", JSON.stringify(backendResponse));
+            setUser(backendResponse);
+        } catch (e) {
+            console.error("SignUp error: ", e);
+        }
     };
 
     const signOut = async () => {

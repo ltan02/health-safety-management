@@ -15,7 +15,7 @@ import { useAuthContext } from "../../context/AuthContext";
 
 function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
     const toggleDrawer = (open) => () => handleSidebarToggle(open);
-    const [user] = useAuthContext();
+    const { user } = useAuthContext();
     const [pageType, setPageType] = useState(PAGE_TYPE.ADMIN);
     let location = useLocation();
 
@@ -49,7 +49,7 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
                         padding: "0px",
                     }}
                 />
-                <Typography fontSize={"1.5rem"}>{user.user?.email ?? "Anonymous User"}</Typography>
+                <Typography fontSize={"1.5rem"}>{user?.email ?? "Anonymous User"}</Typography>
             </Box>
             <List
                 sx={{

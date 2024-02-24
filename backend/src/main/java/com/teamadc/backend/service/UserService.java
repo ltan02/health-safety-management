@@ -49,18 +49,13 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public User registerUser(String email, String password, String firstName, String lastName, Role userRole) throws FirebaseAuthException, InterruptedException, ExecutionException {
-        logger.info("Attempting to register a new user with email: {}", email);
+    public User registerUser(String id, String email, String firstName, String lastName, Role userRole) throws FirebaseAuthException, InterruptedException, ExecutionException {
+        logger.info(String.format("Attempting to register a new user with id: %s", id));
 
-        UserRecord.CreateRequest request = new UserRecord.CreateRequest()
-                .setEmail(email)
-                .setPassword(password);
-        UserRecord userRecord = FirebaseAuth.getInstance().createUser(request);
-
-        User newUser = new User(userRecord.getUid(), email, userRole, "test", firstName, lastName);
+        User newUser = new User(id, email, userRole, "demo", firstName, lastName);
         userRepository.save(newUser);
 
-        logger.info("Successfully registered user with UID: {}", userRecord.getUid());
+        logger.info(String.format("Successfully registered user with id: %s", id));
         return newUser;
     }
 

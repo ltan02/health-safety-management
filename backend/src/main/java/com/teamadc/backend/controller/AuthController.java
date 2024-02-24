@@ -28,7 +28,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody AuthRequest request) {
         try {
-            User response = userService.registerUser(request.getEmail(), request.getPassword(), request.getFirstName(), request.getLastName(), request.getRole());
+            User response = userService.registerUser(request.getId(), request.getEmail(), request.getFirstName(), request.getLastName(), request.getRole());
             return ResponseEntity.ok(response);
         } catch (FirebaseAuthException | InterruptedException | ExecutionException e) {
             logger.debug(String.format("Registration failed for user with email: %s. Error: %s", request.getEmail(), e));
