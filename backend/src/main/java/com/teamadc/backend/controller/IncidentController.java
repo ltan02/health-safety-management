@@ -1,7 +1,9 @@
 package com.teamadc.backend.controller;
 
+import com.teamadc.backend.dto.request.CommentRequest;
 import com.teamadc.backend.dto.request.CustomFieldRequest;
 import com.teamadc.backend.dto.request.IncidentRequest;
+import com.teamadc.backend.model.Comment;
 import com.teamadc.backend.model.Incident;
 import com.teamadc.backend.service.IncidentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +55,7 @@ public class IncidentController {
     @PostMapping("/{incidentId}")
     public ResponseEntity<Incident> updateIncident(@PathVariable String incidentId, @RequestBody IncidentRequest request) {
         List<CustomFieldRequest> customFieldsRequest = request.getCustomFields();
-        Incident incident = new Incident(incidentId, request.getTimestamp(), request.getIncidentCategory(), request.getReporter(), request.getEmployeesInvolved());
+        Incident incident = new Incident(incidentId, request.getTimestamp(), request.getIncidentCategory(), request.getReporter(), request.getEmployeesInvolved(), request.getEmployeeIncidentStatus(), request.getSafetyWardenIncidentStatus(), request.getComments());
 
         for (CustomFieldRequest field : customFieldsRequest) {
             incident.setCustomField(field.getFieldName(), field.getValue());
@@ -87,5 +89,30 @@ public class IncidentController {
         }
     }
 
+    @PostMapping("/{incidentId}/comments")
+    public ResponseEntity<Incident> addComment(@PathVariable String incidentId, @RequestBody CommentRequest commentReq) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = (String) authentication.getPrincipal();
 
+        try {
+            Comment comment = new Comment(null, uid, commentReq.getContent());
+            Incident incident = incidentService.addComment(incidentId, comment);
+            return ResponseEntity.ok(incident);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PostMapping("/{incidentId}/comments/{commentId}")
+    public ResponseEntity<Incident> addComment(@PathVariable String incidentId, @PathVariable String commentId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = (String) authentication.getPrincipal();
+
+        try {
+            Incident incident = incidentService.deleteComment(incidentId, commentId);
+            return ResponseEntity.ok(incident);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 }
