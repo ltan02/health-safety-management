@@ -29,6 +29,9 @@ export default function useAxios() {
               Accept: "application/json",
           };
 
+          console.log(baseUrl);
+          console.log(`${baseUrl}${url}`);
+
           const config = {
               method,
               url: `${baseUrl}${url}`,
