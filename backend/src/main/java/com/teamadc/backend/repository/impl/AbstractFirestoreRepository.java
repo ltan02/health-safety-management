@@ -1,14 +1,13 @@
 package com.teamadc.backend.repository.impl;
 
 import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.QuerySnapshot;
+import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -29,10 +28,25 @@ public abstract class AbstractFirestoreRepository<T> {
     }
 
     public T save(T entity) throws InterruptedException, ExecutionException {
-        ApiFuture<DocumentReference> future = firestore.collection(this.getCollectionName().toLowerCase()).add(entity);
-        DocumentReference documentReference = future.get();
-        ApiFuture<DocumentSnapshot> snapshotFuture = documentReference.get();
-        DocumentSnapshot documentSnapshot = snapshotFuture.get();
+        String id;
+        try {
+            Method getIdMethod = clazz.getMethod("getId");
+            id = (String) getIdMethod.invoke(entity);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            id = null;
+        }
+
+        DocumentReference docRef;
+
+        if (id != null && !id.trim().isEmpty()) {
+            docRef = firestore.collection(getCollectionName().toLowerCase()).document(id);
+            ApiFuture<WriteResult> writeResult = docRef.set(entity);
+        } else {
+            ApiFuture<DocumentReference> future = firestore.collection(getCollectionName().toLowerCase()).add(entity);
+            docRef = future.get();
+        }
+
+        DocumentSnapshot documentSnapshot = docRef.get().get();
         if (documentSnapshot.exists()) {
             return documentSnapshot.toObject(clazz);
         } else {
