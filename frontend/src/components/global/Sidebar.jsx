@@ -26,7 +26,7 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
             setPageType(path);
         }
         if (path === "") {
-            setPageType(PAGE_TYPE.ADMIN);
+            setPageType(PAGE_TYPE.INCIDENT);
         }
     }, [location]);
 
