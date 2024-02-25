@@ -1,32 +1,69 @@
 package com.teamadc.backend.dto.request;
 
+import com.teamadc.backend.enums.EmployeeIncidentStatus;
+import com.teamadc.backend.enums.SafetyWardenIncidentStatus;
+import com.teamadc.backend.model.Comment;
+
 import java.util.List;
 
 public class IncidentRequest {
     private String id;
-    private String timestamp;
+    private String incidentDate;
     private String incidentCategory;
     private String reporter;
     private List<String> employeesInvolved;
     private List<CustomFieldRequest> customFields;
+    private EmployeeIncidentStatus employeeIncidentStatus;
+    private SafetyWardenIncidentStatus safetyWardenIncidentStatus;
+    private List<Comment> comments;
 
     public IncidentRequest() {}
 
-    public IncidentRequest(String timestamp, String incidentCategory, String reporter, List<String> employeesInvolved, List<CustomFieldRequest> customFields) {
-        this.timestamp = timestamp;
+    public IncidentRequest(String incidentDate, String incidentCategory, String reporter, List<String> employeesInvolved, List<CustomFieldRequest> customFields, EmployeeIncidentStatus employeeIncidentStatus, SafetyWardenIncidentStatus safetyWardenIncidentStatus, List<Comment> comments) {
+        this.incidentDate = incidentDate;
         this.incidentCategory = incidentCategory;
         this.reporter = reporter;
         this.employeesInvolved = employeesInvolved;
         this.customFields = customFields;
+        this.employeeIncidentStatus = employeeIncidentStatus;
+        this.safetyWardenIncidentStatus = safetyWardenIncidentStatus;
+        this.comments = comments;
     }
 
-    public IncidentRequest(String id, String timestamp, String incidentCategory, String reporter, List<String> employeesInvolved, List<CustomFieldRequest> customFields) {
+    public IncidentRequest(String id, String incidentDate, String incidentCategory, String reporter, List<String> employeesInvolved, List<CustomFieldRequest> customFields, EmployeeIncidentStatus employeeIncidentStatus, SafetyWardenIncidentStatus safetyWardenIncidentStatus, List<Comment> comments) {
         this.id = id;
-        this.timestamp = timestamp;
+        this.incidentDate = incidentDate;
         this.incidentCategory = incidentCategory;
         this.reporter = reporter;
         this.employeesInvolved = employeesInvolved;
         this.customFields = customFields;
+        this.employeeIncidentStatus = employeeIncidentStatus;
+        this.safetyWardenIncidentStatus = safetyWardenIncidentStatus;
+        this.comments = comments;
+    }
+
+    public EmployeeIncidentStatus getEmployeeIncidentStatus() {
+        return this.employeeIncidentStatus;
+    }
+
+    public void setEmployeeIncidentStatus(EmployeeIncidentStatus employeeIncidentStatus) {
+        this.employeeIncidentStatus = employeeIncidentStatus;
+    }
+
+    public SafetyWardenIncidentStatus getSafetyWardenIncidentStatus() {
+        return this.safetyWardenIncidentStatus;
+    }
+
+    public void setSafetyWardenIncidentStatus(SafetyWardenIncidentStatus safetyWardenIncidentStatus) {
+        this.safetyWardenIncidentStatus = safetyWardenIncidentStatus;
+    }
+
+    public List<Comment> getComments() {
+        return this.comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 
     public String getId() {
@@ -53,12 +90,12 @@ public class IncidentRequest {
         this.employeesInvolved = employeesInvolved;
     }
 
-    public String getTimestamp() {
-        return this.timestamp;
+    public String getIncidentDate() {
+        return this.incidentDate;
     }
 
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
+    public void setIncidentDate(String incidentDate) {
+        this.incidentDate = incidentDate;
     }
 
     public String getIncidentCategory() {

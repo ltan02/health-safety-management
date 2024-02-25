@@ -67,6 +67,7 @@ function IncidentDataGrid({ rows, onSelectionModelChange, fields }) {
             slots={{
                 toolbar: CustomToolbar,
             }}
+            getRowId={(row) => row?.id}
             slotProps={{
                 toolbar: {
                     value: searchText,

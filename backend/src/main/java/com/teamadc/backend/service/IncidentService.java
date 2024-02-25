@@ -1,5 +1,6 @@
 package com.teamadc.backend.service;
 
+import com.teamadc.backend.model.Comment;
 import com.teamadc.backend.model.Incident;
 import com.teamadc.backend.repository.GenericRepository;
 import org.slf4j.Logger;
@@ -35,5 +36,31 @@ public class IncidentService {
     public List<Incident> getIncidents(String uid) throws InterruptedException, ExecutionException {
         List<Incident> incidents = incidentRepository.findAll();
         return incidents.stream().filter(incident -> incident.getReporter().equals(uid)).toList();
+    }
+
+    public Incident addComment(String incidentId, Comment comment) throws InterruptedException, ExecutionException {
+        Incident incident = incidentRepository.findById(incidentId);
+
+        List<Comment> comments = incident.getComments();
+        comments.add(comment);
+
+        incident.setComments(comments);
+
+        incidentRepository.save(incident);
+
+        return incident;
+    }
+
+    public Incident deleteComment(String incidentId, String commentId) throws InterruptedException, ExecutionException {
+        Incident incident = incidentRepository.findById(incidentId);
+
+        List<Comment> comments = incident.getComments();
+        comments.removeIf(comment -> comment.getId().equals(commentId));
+
+        incident.setComments(comments);
+
+        incidentRepository.save(incident);
+
+        return incident;
     }
 }
