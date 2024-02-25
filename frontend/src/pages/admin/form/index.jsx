@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button, Modal, Box, TextField, Select, MenuItem } from "@mui/material";
 
-function IncidentForm({ fields, setFields }) {
+function AdminForm({ fields, setFields }) {
     const [open, setOpen] = useState(false);
     const [newField, setNewField] = useState({ name: "", label: "", columnWidth: 150, type: "text" });
 
@@ -93,5 +93,5 @@ function IncidentForm({ fields, setFields }) {
     );
 }
 
-export default IncidentForm;
+export default AdminForm;
 
