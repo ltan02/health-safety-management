@@ -25,6 +25,9 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
         if (Object.values(PAGE_TYPE).includes(path)) {
             setPageType(path);
         }
+        if (path === "") {
+            setPageType(PAGE_TYPE.ADMIN);
+        }
     }, [location]);
 
     const renderList = (items) => (
