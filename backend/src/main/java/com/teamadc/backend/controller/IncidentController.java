@@ -25,7 +25,7 @@ public class IncidentController {
     @PostMapping
     public ResponseEntity<Incident> createIncident(@RequestBody IncidentRequest request) {
         List<CustomFieldRequest> customFieldsRequest = request.getCustomFields();
-        Incident incident = new Incident(null, request.getTimestamp(), request.getIncidentCategory(), request.getReporter(), request.getEmployeesInvolved());
+        Incident incident = new Incident(null, request.getIncidentDate(), request.getIncidentCategory(), request.getReporter(), request.getEmployeesInvolved());
 
         for (CustomFieldRequest field : customFieldsRequest) {
             incident.setCustomField(field.getFieldName(), field.getValue());
@@ -55,7 +55,7 @@ public class IncidentController {
     @PostMapping("/{incidentId}")
     public ResponseEntity<Incident> updateIncident(@PathVariable String incidentId, @RequestBody IncidentRequest request) {
         List<CustomFieldRequest> customFieldsRequest = request.getCustomFields();
-        Incident incident = new Incident(incidentId, request.getTimestamp(), request.getIncidentCategory(), request.getReporter(), request.getEmployeesInvolved(), request.getEmployeeIncidentStatus(), request.getSafetyWardenIncidentStatus(), request.getComments());
+        Incident incident = new Incident(incidentId, request.getIncidentDate(), request.getIncidentCategory(), request.getReporter(), request.getEmployeesInvolved(), request.getEmployeeIncidentStatus(), request.getSafetyWardenIncidentStatus(), request.getComments());
 
         for (CustomFieldRequest field : customFieldsRequest) {
             incident.setCustomField(field.getFieldName(), field.getValue());

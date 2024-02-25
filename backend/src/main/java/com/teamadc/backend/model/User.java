@@ -1,8 +1,10 @@
 package com.teamadc.backend.model;
 
+import com.google.cloud.firestore.annotation.DocumentId;
 import com.teamadc.backend.enums.Role;
 
 public class User {
+    @DocumentId
     private String id;
     private String email;
     private Role role;

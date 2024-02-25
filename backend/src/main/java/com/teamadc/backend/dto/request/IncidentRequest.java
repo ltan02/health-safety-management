@@ -8,7 +8,7 @@ import java.util.List;
 
 public class IncidentRequest {
     private String id;
-    private String timestamp;
+    private String incidentDate;
     private String incidentCategory;
     private String reporter;
     private List<String> employeesInvolved;
@@ -19,8 +19,8 @@ public class IncidentRequest {
 
     public IncidentRequest() {}
 
-    public IncidentRequest(String timestamp, String incidentCategory, String reporter, List<String> employeesInvolved, List<CustomFieldRequest> customFields, EmployeeIncidentStatus employeeIncidentStatus, SafetyWardenIncidentStatus safetyWardenIncidentStatus, List<Comment> comments) {
-        this.timestamp = timestamp;
+    public IncidentRequest(String incidentDate, String incidentCategory, String reporter, List<String> employeesInvolved, List<CustomFieldRequest> customFields, EmployeeIncidentStatus employeeIncidentStatus, SafetyWardenIncidentStatus safetyWardenIncidentStatus, List<Comment> comments) {
+        this.incidentDate = incidentDate;
         this.incidentCategory = incidentCategory;
         this.reporter = reporter;
         this.employeesInvolved = employeesInvolved;
@@ -30,9 +30,9 @@ public class IncidentRequest {
         this.comments = comments;
     }
 
-    public IncidentRequest(String id, String timestamp, String incidentCategory, String reporter, List<String> employeesInvolved, List<CustomFieldRequest> customFields, EmployeeIncidentStatus employeeIncidentStatus, SafetyWardenIncidentStatus safetyWardenIncidentStatus, List<Comment> comments) {
+    public IncidentRequest(String id, String incidentDate, String incidentCategory, String reporter, List<String> employeesInvolved, List<CustomFieldRequest> customFields, EmployeeIncidentStatus employeeIncidentStatus, SafetyWardenIncidentStatus safetyWardenIncidentStatus, List<Comment> comments) {
         this.id = id;
-        this.timestamp = timestamp;
+        this.incidentDate = incidentDate;
         this.incidentCategory = incidentCategory;
         this.reporter = reporter;
         this.employeesInvolved = employeesInvolved;
@@ -90,12 +90,12 @@ public class IncidentRequest {
         this.employeesInvolved = employeesInvolved;
     }
 
-    public String getTimestamp() {
-        return this.timestamp;
+    public String getIncidentDate() {
+        return this.incidentDate;
     }
 
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
+    public void setIncidentDate(String incidentDate) {
+        this.incidentDate = incidentDate;
     }
 
     public String getIncidentCategory() {
