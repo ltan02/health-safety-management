@@ -64,21 +64,29 @@ function Dashboard() {
             })
             .filter((index) => index !== -1)[0];
 
-        if (sourceColumn && destinationColumn && over.id !== active.id) {
-            if (sourceColumn !== destinationColumn) {
-                tasks[sourceColumn][activeIndex].status = destinationColumn;
-                tasks[destinationColumn].push(tasks[sourceColumn][activeIndex]);
+        if (sourceColumn && over.id !== active.id) {
+
+            // if empty column
+            if (destinationColumn === undefined) {
+                tasks[over.id].push(tasks[sourceColumn][activeIndex]);
                 tasks[sourceColumn].splice(activeIndex, 1);
-                sourceColumn = destinationColumn;
-            } else if (overIndex != -1) {
-                activeIndex = Object.entries(tasks)
-                    .map(([, subs]) => {
-                        return subs.findIndex((task) => task.id === active.id);
-                    })
-                    .filter((index) => index !== -1)[0];
-                const temp = tasks[sourceColumn][activeIndex];
-                tasks[sourceColumn][activeIndex] = tasks[destinationColumn][overIndex];
-                tasks[destinationColumn][overIndex] = temp;
+                sourceColumn = over.id;
+            } else {
+                if (sourceColumn !== destinationColumn) {
+                    tasks[sourceColumn][activeIndex].status = destinationColumn;
+                    tasks[destinationColumn].push(tasks[sourceColumn][activeIndex]);
+                    tasks[sourceColumn].splice(activeIndex, 1);
+                    sourceColumn = destinationColumn;
+                } else if (overIndex != -1) {
+                    activeIndex = Object.entries(tasks)
+                        .map(([, subs]) => {
+                            return subs.findIndex((task) => task.id === active.id);
+                        })
+                        .filter((index) => index !== -1)[0];
+                    const temp = tasks[sourceColumn][activeIndex];
+                    tasks[sourceColumn][activeIndex] = tasks[destinationColumn][overIndex];
+                    tasks[destinationColumn][overIndex] = temp;
+                }
             }
         }
         if (over && STATE[over.id]) {
