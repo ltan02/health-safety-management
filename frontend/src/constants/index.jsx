@@ -15,14 +15,14 @@ export const PAGE_TYPE = {
 
 export const PRIVILEGED_SIDEBAR_CONTENTS = {
     [PAGE_TYPE.ADMIN]: {
-        ["Workflows"]: <RedirectButton to="/workflows">Workflows</RedirectButton>,
-        ["Report Board"]: <RedirectButton to="/">Report Board</RedirectButton>,
+        ["Workflows"]: <RedirectButton to="/">Workflows</RedirectButton>,
+        ["Form Customization"]: <RedirectButton to="/form">Form Customization</RedirectButton>,
         ["Columns and Statuses"]: <RedirectButton to="/status">Columns and Statuses</RedirectButton>,
         ["Workflow Management"]: <RedirectButton to="/management">Workflow Management</RedirectButton>,
     },
     [PAGE_TYPE.INCIDENT]: {
         ["Incident Board"]: <RedirectButton to="/incident">Incident Board</RedirectButton>,
-        ["Form Customization"]: <RedirectButton to="/incident/form">Form Customization</RedirectButton>,
+        ["Incident Report"]: <RedirectButton to="/incident/report">Incident Report</RedirectButton>,
     },
     [PAGE_TYPE.REPORT]: {
         ["Role"]: <RoleSwitchModal>Role</RoleSwitchModal>,

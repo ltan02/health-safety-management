@@ -11,13 +11,14 @@ import AdminWorkflow from "./pages/admin/workflows/index.jsx";
 import AdminManagement from "./pages/admin/management/index.jsx";
 import AdminReport from "./pages/admin/report/index.jsx";
 import AdminStatus from "./pages/admin/status/index.jsx";
-import IncidentForm from "./pages/incident/form/index.jsx";
+import AdminForm from "./pages/admin/form/index.jsx";
 import ReportOverview from "./pages/report/overview/index.jsx";
 import ReportDashboard from "./pages/report/dashboard/index.jsx";
 import ReportPast from "./pages/report/past/index.jsx";
 import { initialFields } from "./pages/incident/initialData.jsx";
 import { useState } from "react";
 import { isPrivileged } from "./utils/permissions.js";
+import IncidentReport from "./pages/incident/report/index.jsx";
 
 const theme = createTheme({
     typography: {
@@ -53,16 +54,16 @@ function App() {
             return (
                 <>
                     <Route path="/">
-                        <Route index element={<AdminReport />} />
-                        <Route path="workflows" element={<AdminWorkflow />} />
+                        <Route index element={<AdminWorkflow />} />
                         <Route path="management" element={<AdminManagement />} />
+                        <Route path="form" element={<AdminForm fields={incidentFields} setFields={setIncidentFields} />} />
                         <Route path="status" element={<AdminStatus />} />
                     </Route>
                     <Route path="incident">
                         <Route index element={<Incident fields={incidentFields} />} />
                         <Route
-                            path="form"
-                            element={<IncidentForm fields={incidentFields} setFields={setIncidentFields} />}
+                            path="report"
+                            element={<IncidentReport fields={incidentFields} setFields={setIncidentFields} />}
                         />
                     </Route>
                     <Route path="report">
