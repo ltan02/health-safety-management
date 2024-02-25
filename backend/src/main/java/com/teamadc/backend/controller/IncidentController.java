@@ -3,6 +3,7 @@ package com.teamadc.backend.controller;
 import com.teamadc.backend.dto.request.CommentRequest;
 import com.teamadc.backend.dto.request.CustomFieldRequest;
 import com.teamadc.backend.dto.request.IncidentRequest;
+import com.teamadc.backend.dto.response.BasicIncidentResponse;
 import com.teamadc.backend.model.Comment;
 import com.teamadc.backend.model.Incident;
 import com.teamadc.backend.service.IncidentService;
@@ -12,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -40,13 +42,19 @@ public class IncidentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Incident>> getIncidents() {
+    public ResponseEntity<List<BasicIncidentResponse>> getIncidents() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = (String) authentication.getPrincipal();
 
         try {
             List<Incident> incidents = incidentService.getIncidents(uid);
-            return ResponseEntity.ok(incidents);
+
+            List<BasicIncidentResponse> response = new ArrayList<>();
+            for (Incident incident : incidents) {
+                response.add(new BasicIncidentResponse(incident.getId(), String.format("%s on %s", incident.getIncidentCategory(), incident.getIncidentDate()), incident.getReporter(), incident.getEmployeesInvolved()));
+            }
+
+            return ResponseEntity.ok(response);
         } catch (InterruptedException | ExecutionException e) {
             return ResponseEntity.internalServerError().build();
         }

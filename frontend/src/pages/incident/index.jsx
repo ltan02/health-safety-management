@@ -1,16 +1,42 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@mui/material";
-import { initialData } from "./initialData";
 import IncidentModal from "../../components/incident/IncidentModal";
 import IncidentDataGrid from "../../components/incident/IncidentDataGrid";
+import useAxios from "../../hooks/useAxios";
 
 function Incident({ fields }) {
     const [open, setOpen] = useState(false);
-    const [rows, setRows] = useState(initialData);
+    const [rows, setRows] = useState([]);
+    const { sendRequest } = useAxios();
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const incidents = await sendRequest({ url: "/incidents" });
+            
+            const userIds = [...new Set(incidents.flatMap(incident => [incident.reporter, ...incident.employeesInvolved]))];
+            
+            const userPromises = userIds.map(id => sendRequest({ url: `/users/${id}` }));
+            const users = await Promise.all(userPromises);
+            const userMap = users.reduce((acc, user) => {
+                acc[user.id] = `${user.firstName} ${user.lastName}`;
+                return acc;
+            }, {});
+
+            const incidentsWithNames = incidents.map(incident => ({
+                ...incident,
+                id: incident.id,
+                reporter: userMap[incident.reporter],
+                employeesInvolved: incident.employeesInvolved.map(e => userMap[e]).join(", "),
+            }));
+
+            setRows(incidentsWithNames);
+        };
+
+        fetchData();
+    }, []);
 
     const [selectedRows, setSelectedRows] = useState([]);
 
-    // Modal and DataGrid handlers
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
     const handleSelectionModelChange = (newSelection) => {
@@ -19,6 +45,11 @@ function Incident({ fields }) {
     const deleteSelectedRows = () => {
         const newRows = rows.filter((row) => !selectedRows.includes(row.id));
         setRows(newRows);
+    };
+
+    const handleSubmit = (newRow) => {
+        setRows([...rows, newRow]);
+        handleClose();
     };
 
     return (
@@ -31,11 +62,6 @@ function Incident({ fields }) {
             <IncidentDataGrid rows={rows} onSelectionModelChange={handleSelectionModelChange} fields={fields} />
         </>
     );
-
-    function handleSubmit(newRow) {
-        setRows([...rows, newRow]);
-        handleClose();
-    }
 }
 
 export default Incident;
