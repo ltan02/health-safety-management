@@ -7,6 +7,7 @@ import {
     useSensors,
     DragOverlay,
     defaultDropAnimation,
+    rectIntersection,
 } from "@dnd-kit/core";
 import Column from "./Column";
 import IncidentSearchInput from "./IncidentSearchInput";
@@ -30,12 +31,14 @@ function Dashboard() {
               .find((task) => task.id === activeId)
         : null;
 
+    const handleAddTask = (task) => console.log(task);
+
     return (
         <Container maxWidth="false" disableGutters>
             <IncidentSearchInput onSearch={filterTasks} />
             <DndContext
                 sensors={useSensors(useSensor(PointerSensor))}
-                collisionDetection={closestCorners}
+                collisionDetection={rectIntersection}
                 onDragEnd={handleDragEnd}
                 onDragOver={handleDragOver}
                 onDragStart={handleDragStart}
@@ -46,26 +49,33 @@ function Dashboard() {
                         overflowX: "auto",
                         gap: 2,
                         p: 2,
-                        minHeight: "calc(100vh - 200px)", 
+                        minHeight: "calc(100vh - 200px)",
                         alignItems: "stretch",
                     }}
                 >
                     {columns.map((column) => (
-                        <Box key={column.id} sx={{ minWidth: 300, width: "20%", flexGrow: 1, flexShrink: 0, display: "flex" }}>
+                        <Box
+                            key={column.id}
+                            sx={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: 2,
+                            }}
+                        >
                             <Column
                                 id={column.id}
                                 title={column.title}
                                 tasks={tasks[column.id] || []}
                                 activeId={activeId}
-                                sx={{ flexGrow: 1 }}
+                                handleAddTask={handleAddTask}
                             />
                         </Box>
                     ))}
                 </Box>
+                <DragOverlay dropAnimation={defaultDropAnimation}>
+                    {activeTask && <Task id={activeId} task={activeTask} />}
+                </DragOverlay>
             </DndContext>
-            <DragOverlay dropAnimation={defaultDropAnimation}>
-                {activeTask && <Task id={activeId} task={activeTask} />}
-            </DragOverlay>
         </Container>
     );
 }

@@ -20,6 +20,8 @@ function Column({ id, title, tasks, activeId, handleAddTask }) {
                 padding: 2,
                 borderRadius: 1,
                 minHeight: "100%",
+                width: "350px",
+                minWidth: "350px",
                 margin: 2,
                 boxShadow: 2,
             }}

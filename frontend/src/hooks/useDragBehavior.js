@@ -1,25 +1,30 @@
 import { useState } from "react";
 import { useAuthContext } from "../context/AuthContext";
 import { isPrivileged } from "../utils/permissions";
+import useAxios from "./useAxios";
 import { ADMIN_STATE, EMPLOYEE_STATE } from "../constants/board";
 
 const useDragBehavior = (tasks, setTasks) => {
     const [activeId, setActiveId] = useState(null);
     const { user } = useAuthContext();
+    const { sendRequest } = useAxios();
 
     const handleDragStart = (event) => {
         setActiveId(event.active.id);
     };
 
     const handleDragOver = ({ active, over }) => {
-        if (!over || active.id === over.id) return;
+        if (!over) return;
 
+        const states = isPrivileged(user.role) ? ADMIN_STATE : EMPLOYEE_STATE;
         const sourceColumn = Object.keys(tasks).find((column) => tasks[column].some((task) => task.id === active.id));
-        const destinationColumn = Object.keys(tasks).find((column) =>
-            tasks[column].some((task) => task.id === over.id),
-        );
+        let destinationColumn = over.id;
 
         if (!sourceColumn || !destinationColumn) return;
+
+        if (Object.keys(states).indexOf(destinationColumn) < 0) {
+            destinationColumn = Object.keys(tasks).find((column) => tasks[column].some((task) => task.id === over.id));
+        }
 
         setTasks((prevTasks) => {
             const newTasks = { ...prevTasks };
@@ -36,46 +41,50 @@ const useDragBehavior = (tasks, setTasks) => {
                     activeTask,
                 );
             } else {
-                newTasks[destinationColumn].splice(targetIndex + 1, 0, activeTask);
+                const updatedTask = {
+                    ...activeTask,
+                    employeeIncidentStatus: isPrivileged(user.role)
+                        ? activeTask.employeeIncidentStatus
+                        : destinationColumn,
+                    safetyWardenIncidentStatus: isPrivileged(user.role)
+                        ? destinationColumn
+                        : activeTask.safetyWardenIncidentStatus,
+                };
+
+                newTasks[destinationColumn].splice(targetIndex, 0, updatedTask);
             }
 
             return newTasks;
         });
     };
 
-    const handleDragEnd = (event) => {
-        const { active, over } = event;
-        const state = isPrivileged(user.role) ? ADMIN_STATE : EMPLOYEE_STATE;
+    const handleDragEnd = ({ active, over }) => {
+        if (!over) return;
 
-        if (!over) {
-            setActiveId(null);
-            return;
+        const states = isPrivileged(user.role) ? ADMIN_STATE : EMPLOYEE_STATE;
+        let destinationColumn = over.id;
+
+        if (!destinationColumn) return;
+
+        if (Object.keys(states).indexOf(destinationColumn) < 0) {
+            destinationColumn = Object.keys(tasks).find((column) => tasks[column].some((task) => task.id === over.id));
         }
 
-        const activeTask = Object.values(tasks)
-            .flat()
-            .find((task) => task.id === active.id);
-        if (!activeTask) return;
-
-        const statusField = isPrivileged(user.role) ? "safetyWardenIncidentStatus" : "employeeIncidentStatus";
-        const sourceColumnId = activeTask[statusField];
-        const destinationColumnId = over.id;
-
-        if (!state[destinationColumnId]) {
-            setActiveId(null);
-            return;
-        }
-
-        setTasks((prevTasks) => {
-            const updatedTasks = { ...prevTasks };
-
-            if (sourceColumnId !== destinationColumnId) {
-                updatedTasks[sourceColumnId] = updatedTasks[sourceColumnId].filter((task) => task.id !== active.id);
-                const updatedTask = { ...activeTask, [statusField]: destinationColumnId };
-                updatedTasks[destinationColumnId] = [...updatedTasks[destinationColumnId], updatedTask];
-            }
-
-            return updatedTasks;
+        const activeTask = tasks[destinationColumn].find((task) => task.id === active.id);
+        const updatedTask = {
+            ...activeTask,
+            employeeIncidentStatus: isPrivileged(user.role) ? activeTask.employeeIncidentStatus : destinationColumn,
+            safetyWardenIncidentStatus: isPrivileged(user.role)
+                ? destinationColumn
+                : activeTask.safetyWardenIncidentStatus,
+        };
+        sendRequest({
+            url: `/incidents/${activeTask.id}`,
+            method: "POST",
+            body: {
+                employeeIncidentStatus: updatedTask.employeeIncidentStatus,
+                safetyWardenIncidentStatus: updatedTask.safetyWardenIncidentStatus,
+            },
         });
 
         setActiveId(null);
