@@ -9,7 +9,6 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useAuthContext } from "./context/AuthContext.jsx";
 import AdminWorkflow from "./pages/admin/workflows/index.jsx";
 import AdminManagement from "./pages/admin/management/index.jsx";
-import AdminReport from "./pages/admin/report/index.jsx";
 import AdminStatus from "./pages/admin/status/index.jsx";
 import AdminForm from "./pages/admin/form/index.jsx";
 import ReportOverview from "./pages/report/overview/index.jsx";
@@ -77,10 +76,10 @@ function App() {
         } else {
             return (
                 <>
-                    <Route index element={<AdminReport />} />
+                    <Route index element={<Incident fields={incidentFields} />} />
                     <Route
-                        path="/form"
-                        element={<AdminManagement />}
+                        path="/report"
+                        element={<IncidentReport fields={incidentFields} setFields={setIncidentFields} />}
                     />
                 </>
             );

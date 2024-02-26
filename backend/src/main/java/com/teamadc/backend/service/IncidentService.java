@@ -35,7 +35,7 @@ public class IncidentService {
 
     public List<Incident> getIncidents(String uid) throws InterruptedException, ExecutionException {
         List<Incident> incidents = incidentRepository.findAll();
-        return incidents.stream().filter(incident -> incident.getReporter().equals(uid)).toList();
+        return incidents.stream().filter(incident -> incident.getReporter().equals(uid) || incident.getEmployeesInvolved().contains(uid)).toList();
     }
 
     public Incident addComment(String incidentId, Comment comment) throws InterruptedException, ExecutionException {

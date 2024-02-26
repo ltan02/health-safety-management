@@ -1,0 +1,27 @@
+export const EMPLOYEE_STATE = {
+    REPORT_SUBMITTED: "REPORT_SUBMITTED",
+    REVIEW_NEEDED: "REVIEW_NEEDED",
+    REVISIONS_IN_PROGRESS: "REVISIONS_IN_PROGRESS",
+    REVIEW_COMPLETED: "REVIEW_COMPLETED",
+};
+
+export const EMPLOYEE_COLUMNS = [
+    { id: EMPLOYEE_STATE.REPORT_SUBMITTED, title: "Report Submitted" },
+    { id: EMPLOYEE_STATE.REVIEW_NEEDED, title: "Review Needed" },
+    { id: EMPLOYEE_STATE.REVISIONS_IN_PROGRESS, title: "Revisions in Progress" },
+    { id: EMPLOYEE_STATE.REVIEW_COMPLETED, title: "Review Completed" },
+];
+
+export const ADMIN_STATE = {
+    PENDING_REVIEW: "PENDING_REVIEW",
+    COMMENT_REQUESTED: "COMMENT_REQUESTED",
+    COMMENTS_ADDRESSED: "COMMENTS_ADDRESSED",
+    COMPLETED_REPORTS: "COMPLETED_REPORTS",
+};
+
+export const ADMIN_COLUMNS = [
+  { id: ADMIN_STATE.PENDING_REVIEW, title: "Pending Review" },
+  { id: ADMIN_STATE.COMMENT_REQUESTED, title: "Comment Requested" },
+  { id: ADMIN_STATE.COMMENTS_ADDRESSED, title: "Comments Addressed" },
+  { id: ADMIN_STATE.COMPLETED_REPORTS, title: "Completed Reports" },
+];

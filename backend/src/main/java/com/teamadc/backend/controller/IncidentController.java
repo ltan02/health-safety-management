@@ -51,7 +51,7 @@ public class IncidentController {
 
             List<BasicIncidentResponse> response = new ArrayList<>();
             for (Incident incident : incidents) {
-                response.add(new BasicIncidentResponse(incident.getId(), String.format("%s on %s", incident.getIncidentCategory(), incident.getIncidentDate()), incident.getReporter(), incident.getEmployeesInvolved()));
+                response.add(new BasicIncidentResponse(incident.getId(), String.format("%s on %s", incident.getIncidentCategory(), incident.getIncidentDate()), incident.getReporter(), incident.getEmployeesInvolved(), incident.getEmployeeIncidentStatus(), incident.getSafetyWardenIncidentStatus()));
             }
 
             return ResponseEntity.ok(response);
