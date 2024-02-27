@@ -33,7 +33,7 @@ function Task({ id, task }) {
                         fontSize={16}
                         sx={{ color: "#3a3a3a" }}
                     >
-                        {task.title}
+                        {`${task.incidentCategory} on ${task.incidentDate}`}
                     </Typography>
                     <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
                         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>

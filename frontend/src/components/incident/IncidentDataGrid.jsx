@@ -1,73 +1,56 @@
 import { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
+import { IconButton, TextField } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
-import { IconButton, TextField } from "@mui/material";
 
-// Define a custom toolbar component
-function CustomToolbar({ value, onChange, clearSearch }) {
-    return (
-        <div>
-            <TextField
-                value={value}
-                onChange={onChange}
-                placeholder="Search by Incident ID"
-                InputProps={{
-                    startAdornment: <SearchIcon fontSize="small" />,
-                    endAdornment: (
-                        <IconButton
-                            title="Clear"
-                            aria-label="Clear"
-                            size="small"
-                            style={{ visibility: value ? "visible" : "hidden" }}
-                            onClick={clearSearch}
-                        >
-                            <ClearIcon fontSize="small" />
-                        </IconButton>
-                    ),
-                }}
-            />
-        </div>
-    );
-}
+const CustomToolbar = ({ value, onChange, clearSearch }) => (
+    <div style={{ padding: "8px" }}>
+        <TextField
+            variant="outlined"
+            size="small"
+            value={value}
+            onChange={onChange}
+            placeholder="Search..."
+            InputProps={{
+                startAdornment: <SearchIcon fontSize="small" />,
+                endAdornment: (
+                    <IconButton
+                        title="Clear"
+                        aria-label="Clear"
+                        size="small"
+                        onClick={clearSearch}
+                        style={{ visibility: value ? "visible" : "hidden" }}
+                    >
+                        <ClearIcon fontSize="small" />
+                    </IconButton>
+                ),
+            }}
+        />
+    </div>
+);
 
-function IncidentDataGrid({ rows, onSelectionModelChange, fields }) {
-    // Search Handlers
+const IncidentDataGrid = ({ rows, columns, onRowClick }) => {
     const [searchText, setSearchText] = useState("");
     const [filteredRows, setFilteredRows] = useState(rows);
 
     useEffect(() => {
-        setFilteredRows(rows);
-    }, [rows]);
+        if (searchText && searchText !== "") {
+            const searchRegex = new RegExp(searchText, "i");
+            setFilteredRows(rows.filter((row) => searchRegex.test(row.incidentId.toString())));
+        } else {
+            setFilteredRows(rows);
+        }
+    }, [rows, searchText]);
 
-    const handleSearchChange = (event) => {
-        setSearchText(event.target.value);
-        const searchRegex = new RegExp(event.target.value, "i");
-        const newFilteredRows = rows.filter((row) => searchRegex.test(row.id.toString()));
-        setFilteredRows(newFilteredRows);
-    };
-
-    const clearSearch = () => {
-        setSearchText("");
-        setFilteredRows(rows);
-    };
-
-    const columns = fields.map((field) => ({
-        field: field.name,
-        headerName: field.label,
-        width: field.columnWidth,
-    }));
+    const handleSearchChange = (event) => setSearchText(event.target.value);
+    const clearSearch = () => setSearchText("");
 
     return (
         <DataGrid
-            checkboxSelection
             rows={filteredRows}
             columns={columns}
-            onRowSelectionModelChange={onSelectionModelChange}
-            slots={{
-                toolbar: CustomToolbar,
-            }}
-            getRowId={(row) => row?.id}
+            slots={{ Toolbar: CustomToolbar }}
             slotProps={{
                 toolbar: {
                     value: searchText,
@@ -75,8 +58,12 @@ function IncidentDataGrid({ rows, onSelectionModelChange, fields }) {
                     clearSearch: clearSearch,
                 },
             }}
+            getRowId={(row) => row.id}
+            autoHeight
+            disableSelectionOnClick
+            onRowClick={onRowClick}
         />
     );
-}
+};
 
 export default IncidentDataGrid;

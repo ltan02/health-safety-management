@@ -14,8 +14,6 @@ import AdminForm from "./pages/admin/form/index.jsx";
 import ReportOverview from "./pages/report/overview/index.jsx";
 import ReportDashboard from "./pages/report/dashboard/index.jsx";
 import ReportPast from "./pages/report/past/index.jsx";
-import { initialFields } from "./pages/incident/initialData.jsx";
-import { useState } from "react";
 import { isPrivileged } from "./utils/permissions.js";
 import IncidentReport from "./pages/incident/report/index.jsx";
 
@@ -42,7 +40,6 @@ const theme = createTheme({
 });
 
 function App() {
-    const [incidentFields, setIncidentFields] = useState(initialFields);
     const { isUserLoggedIn, user } = useAuthContext();
 
     const getRoutesForRole = () => {
@@ -55,15 +52,12 @@ function App() {
                     <Route path="/">
                         <Route index element={<AdminWorkflow />} />
                         <Route path="management" element={<AdminManagement />} />
-                        <Route path="form" element={<AdminForm fields={incidentFields} setFields={setIncidentFields} />} />
+                        <Route path="form" element={<AdminForm />} />
                         <Route path="status" element={<AdminStatus />} />
                     </Route>
                     <Route path="incident">
-                        <Route index element={<Incident fields={incidentFields} />} />
-                        <Route
-                            path="report"
-                            element={<IncidentReport fields={incidentFields} setFields={setIncidentFields} />}
-                        />
+                        <Route index element={<Incident />} />
+                        <Route path="report" element={<IncidentReport />} />
                     </Route>
                     <Route path="report">
                         <Route index element={<Report />} />
@@ -76,11 +70,8 @@ function App() {
         } else {
             return (
                 <>
-                    <Route index element={<Incident fields={incidentFields} />} />
-                    <Route
-                        path="/report"
-                        element={<IncidentReport fields={incidentFields} setFields={setIncidentFields} />}
-                    />
+                    <Route index element={<Incident />} />
+                    <Route path="/report" element={<IncidentReport />} />
                 </>
             );
         }

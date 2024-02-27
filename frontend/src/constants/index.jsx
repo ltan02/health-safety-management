@@ -22,7 +22,7 @@ export const PRIVILEGED_SIDEBAR_CONTENTS = {
     },
     [PAGE_TYPE.INCIDENT]: {
         ["Incident Board"]: <RedirectButton to="/incident">Incident Board</RedirectButton>,
-        ["Incident Report"]: <RedirectButton to="/incident/report">Incident Report</RedirectButton>,
+        ["Incident Reports"]: <RedirectButton to="/incident/report">Incident Reports</RedirectButton>,
     },
     [PAGE_TYPE.REPORT]: {
         ["Role"]: <RoleSwitchModal>Role</RoleSwitchModal>,
@@ -36,7 +36,7 @@ export const PRIVILEGED_SIDEBAR_CONTENTS = {
 export const EMPLOYEE_SIDEBAR_CONTENTS = {
     [PAGE_TYPE.INCIDENT]: {
         ["Incident Board"]: <RedirectButton to="/">Incident Board</RedirectButton>,
-        ["Incident Report"]: <RedirectButton to="/report">Incident Report</RedirectButton>,
+        ["Incident Reports"]: <RedirectButton to="/report">Incident Reports</RedirectButton>,
     },
 };
 
