@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { Button } from "@mui/material";
-import { initialData } from "../initialData";
 import IncidentModal from "../../../components/incident/IncidentModal";
 import IncidentDataGrid from "../../../components/incident/IncidentDataGrid";
 
 function IncidentReport({ fields }) {
     const [open, setOpen] = useState(false);
-    const [rows, setRows] = useState(initialData);
+    const [rows, setRows] = useState([]);
 
     const [selectedRows, setSelectedRows] = useState([]);
 

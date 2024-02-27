@@ -10,19 +10,20 @@ function Column({ id, title, tasks, activeId, handleAddTask }) {
     const { setNodeRef } = useDroppable({ id });
     const [openModal, setOpenModal] = useState(false);
 
-    const handleOpenModal = () => setOpenModal(true);
-    const handleCloseModal = () => setOpenModal(false);
-
-    const handleAdd = (task) => {
-        handleAddTask(task);
-    };
+    const toggleModal = () => setOpenModal(!openModal);
 
     return (
         <Container
             ref={setNodeRef}
             sx={{
-                padding: 0,
+                bgcolor: "grey.200",
+                padding: 2,
+                borderRadius: 1,
+                minHeight: "100%",
+                width: "350px",
+                minWidth: "350px",
                 margin: 2,
+                boxShadow: 2,
             }}
         >
             <Box
@@ -33,35 +34,21 @@ function Column({ id, title, tasks, activeId, handleAddTask }) {
                     marginBottom: 2,
                 }}
             >
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Typography variant="h6" fontWeight={600}>
-                        {title}
-                    </Typography>
-                    <Chip label={tasks.length} size="small" />
-                </Box>
-                <IconButton onClick={handleOpenModal} color="primary" size="large">
+                <Typography variant="h6" fontWeight={600} sx={{ flexGrow: 1 }}>
+                    {title} <Chip label={tasks.length} size="small" />
+                </Typography>
+                <IconButton onClick={toggleModal} color="primary">
                     <AddIcon />
                 </IconButton>
             </Box>
             <SortableContext id={id} items={tasks.map((task) => task.id)} strategy={rectSortingStrategy}>
-                <Box sx={{ marginTop: 2 }}>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                     {tasks.map((task) => (
-                        <Box key={task.id} sx={{ margin: 1 }}>
-                            {task.id === activeId ? (
-                                <Task id={task.id} task={task} invisible />
-                            ) : (
-                                <Task id={task.id} task={task} />
-                            )}
-                        </Box>
+                        <Task key={task.id} id={task.id} task={task} invisible={task.id === activeId} />
                     ))}
                 </Box>
             </SortableContext>
-            <AddTaskModal
-                openModal={openModal}
-                handleCloseModal={handleCloseModal}
-                column={id}
-                handleAddTask={handleAdd}
-            />
+            <AddTaskModal open={openModal} onClose={toggleModal} columnId={id} handleAddTask={handleAddTask} />
         </Container>
     );
 }

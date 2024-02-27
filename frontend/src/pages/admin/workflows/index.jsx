@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Box, TextField, Container, Typography, Paper } from "@mui/material";
 import WorkflowTab from "./WorkflowTab";
 import Workflow from "./Workflow";
-import { initialTasks, STATE } from "../initial_tasks";
 
 export default function AdminWorkflow() {
     const [tasks, setTasks] = useState([]);
@@ -11,13 +10,13 @@ export default function AdminWorkflow() {
     const [search, setSearch] = useState("");
 
     useEffect(() => {
-        setTasks(initialTasks);
+        setTasks([]);
     }, []);
 
     useEffect(() => {
         const filteredTasks = search ? tasks.filter((task) => task.title.toLowerCase().includes(search)) : tasks;
-        setActiveTasks(filteredTasks.filter((task) => task.status !== STATE.INACTIVE));
-        setInactiveTasks(filteredTasks.filter((task) => task.status === STATE.INACTIVE));
+        // setActiveTasks(filteredTasks.filter((task) => task.status !== STATE.INACTIVE));
+        // setInactiveTasks(filteredTasks.filter((task) => task.status === STATE.INACTIVE));
     }, [tasks, search]);
 
     function handleSearch(event) {

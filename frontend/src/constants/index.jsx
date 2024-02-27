@@ -36,7 +36,7 @@ export const PRIVILEGED_SIDEBAR_CONTENTS = {
 export const EMPLOYEE_SIDEBAR_CONTENTS = {
     [PAGE_TYPE.INCIDENT]: {
         ["Incident Board"]: <RedirectButton to="/">Incident Board</RedirectButton>,
-        ["Form Customization"]: <RedirectButton to="/form">Form Customization</RedirectButton>,
+        ["Incident Report"]: <RedirectButton to="/report">Incident Report</RedirectButton>,
     },
 };
 

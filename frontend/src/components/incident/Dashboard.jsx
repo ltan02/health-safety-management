@@ -1,167 +1,85 @@
-import { useState, useEffect } from "react";
+import { Container, Box } from "@mui/material";
 import {
     DndContext,
-    closestCorners,
     PointerSensor,
     useSensor,
     useSensors,
     DragOverlay,
     defaultDropAnimation,
+    rectIntersection,
 } from "@dnd-kit/core";
-import { Container, Grid } from "@mui/material";
 import Column from "./Column";
+import IncidentSearchInput from "./IncidentSearchInput";
 import Task from "./Task";
-import { TextField } from "@mui/material";
-import { initialTasks, STATE, COLUMNS } from "./initial_tasks";
+import useTasks from "../../hooks/useTasks";
+import useDragBehavior from "../../hooks/useDragBehavior";
+import { useAuthContext } from "../../context/AuthContext";
+import { isPrivileged } from "../../utils/permissions";
+import { ADMIN_COLUMNS, EMPLOYEE_COLUMNS } from "../../constants/board";
 
 function Dashboard() {
-    const [tasks, setTasks] = useState({});
-    const [activeId, setActiveId] = useState(null);
-    const [search, setSearch] = useState("");
-    const [visibleTasks, setVisibleTasks] = useState(null);
-    const sensors = useSensors(useSensor(PointerSensor));
-    const dropAnimation = {
-        ...defaultDropAnimation,
-    };
+    const { tasks, filterTasks, setTasks } = useTasks();
+    const { activeId, handleDragStart, handleDragOver, handleDragEnd } = useDragBehavior(tasks, setTasks);
+    const { user } = useAuthContext();
 
-    function handleSearch(event) {
-        const q = event.target.value.toLowerCase();
-        setSearch(q);
+    const columns = isPrivileged(user.role) ? ADMIN_COLUMNS : EMPLOYEE_COLUMNS;
 
-        if (!q) {
-            setVisibleTasks(tasks);
-            return;
-        }
-        const filteredTasks = Object.keys(tasks).reduce((acc, status) => {
-            acc[status] = tasks[status].filter((task) => task.title.toLowerCase().includes(q));
-            return acc;
-        }, {});
-        setVisibleTasks(filteredTasks);
-    }
+    const activeTask = activeId
+        ? Object.values(tasks)
+              .flat()
+              .find((task) => task.id === activeId)
+        : null;
 
-    function handleDragOver(event) {
-        const { active, over } = event;
-
-        // Calculate the source and destination columns and the index of the task to be moved
-        // i will make this as hook later but not now
-        let sourceColumn = Object.keys(tasks).find((column) => {
-            return tasks[column].find((task) => task.id === active.id);
-        });
-
-        let destinationColumn = Object.keys(tasks).find((column) => {
-            return tasks[column].find((task) => task.id === over?.id);
-        });
-
-        let overIndex = Object.entries(tasks)
-            .map(([, subs]) => {
-                return subs.findIndex((task) => task.id === over?.id);
-            })
-            .filter((index) => index !== -1)[0];
-
-        let activeIndex = Object.entries(tasks)
-            .map(([, subs]) => {
-                return subs.findIndex((task) => task.id === active.id);
-            })
-            .filter((index) => index !== -1)[0];
-
-        if (sourceColumn && over.id !== active.id) {
-
-            // if empty column
-            if (destinationColumn === undefined) {
-                tasks[over.id].push(tasks[sourceColumn][activeIndex]);
-                tasks[sourceColumn].splice(activeIndex, 1);
-                sourceColumn = over.id;
-            } else {
-                if (sourceColumn !== destinationColumn) {
-                    tasks[sourceColumn][activeIndex].status = destinationColumn;
-                    tasks[destinationColumn].push(tasks[sourceColumn][activeIndex]);
-                    tasks[sourceColumn].splice(activeIndex, 1);
-                    sourceColumn = destinationColumn;
-                } else if (overIndex != -1) {
-                    activeIndex = Object.entries(tasks)
-                        .map(([, subs]) => {
-                            return subs.findIndex((task) => task.id === active.id);
-                        })
-                        .filter((index) => index !== -1)[0];
-                    const temp = tasks[sourceColumn][activeIndex];
-                    tasks[sourceColumn][activeIndex] = tasks[destinationColumn][overIndex];
-                    tasks[destinationColumn][overIndex] = temp;
-                }
-            }
-        }
-        if (over && STATE[over.id]) {
-            const status = over.id;
-            tasks[sourceColumn][activeIndex].status = status;
-            tasks[status].push(tasks[sourceColumn][activeIndex]);
-            tasks[sourceColumn].splice(activeIndex, 1);
-            sourceColumn = status;
-        }
-
-        setTasks(tasks);
-    }
-
-    function handleStart(event) {
-        const { active } = event;
-        setActiveId(active.id);
-    }
-
-    function handleDragEnd() {
-        setActiveId(null);
-    }
-
-    function handleAddTask(task) {
-        tasks[task.column].push(task);
-        setTasks(tasks);
-    }
-
-    useEffect(() => {
-        setTasks({
-            [STATE.TODO]: [...initialTasks.filter((task) => task.status === STATE.TODO)],
-            [STATE.INPROGRESS]: [...initialTasks.filter((task) => task.status === STATE.INPROGRESS)],
-            [STATE.DONE]: [...initialTasks.filter((task) => task.status === STATE.DONE)],
-        });
-    }, []);
-
-    useEffect(() => {
-        setVisibleTasks(tasks);
-    }, [tasks]);
+    const handleAddTask = (task) => console.log(task);
 
     return (
-        <Container>
-            <TextField value={search} onChange={handleSearch} variant="standard" placeholder="Search" />
+        <Container maxWidth="false" disableGutters>
+            <IncidentSearchInput onSearch={filterTasks} />
             <DndContext
-                sensors={sensors}
-                collisionDetection={closestCorners}
+                sensors={useSensors(
+                    useSensor(PointerSensor, {
+                        activationConstraint: {
+                            distance: 4,
+                        },
+                    }),
+                )}
+                collisionDetection={rectIntersection}
                 onDragEnd={handleDragEnd}
                 onDragOver={handleDragOver}
-                onDragStart={handleStart}
+                onDragStart={handleDragStart}
             >
-                <Grid container spacing={2}>
-                    {COLUMNS.map((column) => (
-                        <Grid item key={column.id} xs={12} sm={6} md={4}>
+                <Box
+                    sx={{
+                        display: "flex",
+                        overflowX: "auto",
+                        gap: 2,
+                        p: 2,
+                        minHeight: "calc(100vh - 200px)",
+                        alignItems: "stretch",
+                    }}
+                >
+                    {columns.map((column) => (
+                        <Box
+                            key={column.id}
+                            sx={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: 2,
+                            }}
+                        >
                             <Column
                                 id={column.id}
                                 title={column.title}
-                                tasks={(visibleTasks && visibleTasks[column.id]) || []}
+                                tasks={tasks[column.id] || []}
                                 activeId={activeId}
                                 handleAddTask={handleAddTask}
                             />
-                        </Grid>
+                        </Box>
                     ))}
-                    <DragOverlay dropAnimation={dropAnimation}>
-                        {activeId &&
-                            Object.values(tasks)
-                                .flat()
-                                .find((task) => task.id === activeId) && (
-                                <Task
-                                    id={activeId}
-                                    task={Object.values(tasks)
-                                        .flat()
-                                        .find((task) => task.id === activeId)}
-                                />
-                            )}
-                    </DragOverlay>
-                </Grid>
+                </Box>
+                <DragOverlay dropAnimation={defaultDropAnimation}>
+                    {activeTask && <Task id={activeId} task={activeTask} />}
+                </DragOverlay>
             </DndContext>
         </Container>
     );
