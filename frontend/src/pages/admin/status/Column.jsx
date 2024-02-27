@@ -1,21 +1,11 @@
 import { useState } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
-import { Container, Typography, Box, Chip, IconButton } from "@mui/material";
+import { Container, Typography, Box, Chip } from "@mui/material";
 import Task from "./Task";
-import AddIcon from "@mui/icons-material/Add";
-import AddTaskModal from "./AddTaskModal";
 
-function Column({ id, title, tasks, activeId, handleAddTask }) {
+function Column({ id, title, tasks, activeId }) {
     const { setNodeRef } = useDroppable({ id });
-    const [openModal, setOpenModal] = useState(false);
-
-    const handleOpenModal = () => setOpenModal(true);
-    const handleCloseModal = () => setOpenModal(false);
-
-    const handleAdd = (task) => {
-        handleAddTask(task);
-    };
 
     return (
         <Container
@@ -34,14 +24,11 @@ function Column({ id, title, tasks, activeId, handleAddTask }) {
                 }}
             >
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Typography variant="h6" fontWeight={600}>
+                    <Typography variant="h7" fontWeight={600}>
                         {title}
                     </Typography>
                     <Chip label={tasks.length} size="small" />
                 </Box>
-                <IconButton onClick={handleOpenModal} color="primary" size="large">
-                    <AddIcon />
-                </IconButton>
             </Box>
             <SortableContext id={id} items={tasks.map((task) => task.id)} strategy={rectSortingStrategy}>
                 <Box sx={{ marginTop: 2 }}>
@@ -56,12 +43,6 @@ function Column({ id, title, tasks, activeId, handleAddTask }) {
                     ))}
                 </Box>
             </SortableContext>
-            <AddTaskModal
-                openModal={openModal}
-                handleCloseModal={handleCloseModal}
-                column={id}
-                handleAddTask={handleAdd}
-            />
         </Container>
     );
 }

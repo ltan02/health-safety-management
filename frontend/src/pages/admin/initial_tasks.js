@@ -6,9 +6,9 @@ export const STATE = {
 };
 
 export const COLUMNS = [
-    { id: STATE.TODO, title: "Needs Review" },
-    { id: STATE.INPROGRESS, title: "Awaiting Response" },
-    { id: STATE.DONE, title: "Done" },
+  { id: STATE.TODO, title: "Needs Review" },
+  { id: STATE.INPROGRESS, title: "Awaiting Response" },
+  { id: STATE.DONE, title: "Done" },
 ];
 
 // assume that we can get the tasks from api something like this
@@ -45,5 +45,36 @@ export const initialTasks = [
       "Implement the new communication feature as per the specifications.",
     status: STATE.TODO,
     deadline: "2024-12-31:20:20:00",
+  },
+];
+
+export const initialWorkflows = [
+  {
+    id: "0001", //random things here
+    title: "Fix some issues",
+    projectIncluded: [
+      "Project 1",
+    ],
+    schemeIncluded: [
+      "Workflow Scheme 1",
+    ],
+    lastUpdated: "2024-02-31:20:20:00",
+    active: true,
+  },
+  {
+    id: "0002",
+    title: "Workflow 2",
+    projectIncluded: [],
+    schemeIncluded: [],
+    lastUpdated: "2024-10-31:20:20:00",
+    active: false,
+  },
+  {
+    id: "0003",
+    title: "Workflow 3",
+    projectIncluded: [],
+    schemeIncluded: [],
+    lastUpdated: "2024-10-31:20:20:00",
+    active: false,
   },
 ];
