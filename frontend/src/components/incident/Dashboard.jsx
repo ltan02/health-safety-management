@@ -1,7 +1,6 @@
 import { Container, Box } from "@mui/material";
 import {
     DndContext,
-    closestCorners,
     PointerSensor,
     useSensor,
     useSensors,
@@ -37,7 +36,13 @@ function Dashboard() {
         <Container maxWidth="false" disableGutters>
             <IncidentSearchInput onSearch={filterTasks} />
             <DndContext
-                sensors={useSensors(useSensor(PointerSensor))}
+                sensors={useSensors(
+                    useSensor(PointerSensor, {
+                        activationConstraint: {
+                            distance: 4,
+                        },
+                    }),
+                )}
                 collisionDetection={rectIntersection}
                 onDragEnd={handleDragEnd}
                 onDragOver={handleDragOver}

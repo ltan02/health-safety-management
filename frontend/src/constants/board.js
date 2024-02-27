@@ -14,14 +14,14 @@ export const EMPLOYEE_COLUMNS = [
 
 export const ADMIN_STATE = {
     PENDING_REVIEW: "PENDING_REVIEW",
-    COMMENT_REQUESTED: "COMMENT_REQUESTED",
+    COMMENTS_REQUESTED: "COMMENTS_REQUESTED",
     COMMENTS_ADDRESSED: "COMMENTS_ADDRESSED",
     COMPLETED_REPORTS: "COMPLETED_REPORTS",
 };
 
 export const ADMIN_COLUMNS = [
   { id: ADMIN_STATE.PENDING_REVIEW, title: "Pending Review" },
-  { id: ADMIN_STATE.COMMENT_REQUESTED, title: "Comment Requested" },
+  { id: ADMIN_STATE.COMMENTS_REQUESTED, title: "Comments Requested" },
   { id: ADMIN_STATE.COMMENTS_ADDRESSED, title: "Comments Addressed" },
   { id: ADMIN_STATE.COMPLETED_REPORTS, title: "Completed Reports" },
 ];

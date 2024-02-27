@@ -14,9 +14,7 @@ export default function useTasks() {
         const fetchTasks = async () => {
             const incidents = await sendRequest({ url: "/incidents" });
 
-            const userIds = [
-                ...new Set(incidents.flatMap((incident) => [incident.reporter, ...incident.employeesInvolved])),
-            ];
+            const userIds = [...new Set(incidents.flatMap((incident) => [incident.reporter]))];
             const users = await Promise.all(userIds.map((id) => sendRequest({ url: `/users/${id}` })));
 
             const userMap = users.reduce((acc, user) => ({ ...acc, [user.id]: user }), {});
@@ -33,10 +31,7 @@ export default function useTasks() {
 
                 const incidentWithUserDetails = {
                     ...incident,
-                    reporterName: `${userMap[incident.reporter].firstName} ${userMap[incident.reporter].lastName}`,
-                    employeesInvolvedNames: incident.employeesInvolved
-                        .map((id) => `${userMap[id].firstName} ${userMap[id].lastName}`)
-                        .join(", "),
+                    reporter: userMap[incident.reporter],
                 };
 
                 acc[statusKey].push(incidentWithUserDetails);

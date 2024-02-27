@@ -1,12 +1,12 @@
+import { useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Box, Card, CardContent, Typography, IconButton } from "@mui/material";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
-import DateRangeIcon from "@mui/icons-material/DateRange";
+import { Box, Card, CardContent, Typography, Avatar } from "@mui/material";
+import IncidentDetailModal from "./IncidentDetailModal";
 
 function Task({ id, task }) {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const style = {
         transform: CSS.Transform.toString(transform),
@@ -17,45 +17,37 @@ function Task({ id, task }) {
         cursor: "pointer",
     };
 
-    const borderCompletion = 90;
+    const handleOpenModal = () => {
+        setIsModalOpen(true);
+    };
 
     return (
-        <Card sx={style} id={task.id} ref={setNodeRef} {...attributes} {...listeners}>
-            <CardContent>
-                <Typography
-                    gutterBottom
-                    variant="h6"
-                    component="div"
-                    fontWeight={600}
-                    fontSize={20}
-                    sx={{ color: "#3a3a3a" }}
-                >
-                    {task.title}
-                </Typography>
-                <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                        <IconButton size="small">
-                            <AccountCircleIcon />
-                        </IconButton>
-                        <Typography variant="body2" sx={{ color: "#4a4a4a" }}>
-                            {task.reporterName}
-                        </Typography>
+        <>
+            <Card sx={style} id={task.id} ref={setNodeRef} {...attributes} {...listeners} onClick={handleOpenModal}>
+                <CardContent>
+                    <Typography
+                        gutterBottom
+                        variant="h6"
+                        component="div"
+                        fontWeight={500}
+                        fontSize={16}
+                        sx={{ color: "#3a3a3a" }}
+                    >
+                        {task.title}
+                    </Typography>
+                    <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                            <Avatar sx={{ bgcolor: "blue", width: "30px", height: "30px", fontSize: "14px" }}>
+                                {`${task.reporter.firstName[0]}${task.reporter.lastName[0]}`}
+                            </Avatar>
+                        </Box>
                     </Box>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                        <IconButton size="small">
-                            {borderCompletion > 100 ? (
-                                <LocalFireDepartmentIcon sx={{ color: "red" }} />
-                            ) : (
-                                <DateRangeIcon />
-                            )}
-                        </IconButton>
-                        <Typography variant="body2" sx={{ color: borderCompletion > 90 ? "red" : "black" }}>
-                            {"Scheduled Date Here"}
-                        </Typography>
-                    </Box>
-                </Box>
-            </CardContent>
-        </Card>
+                </CardContent>
+            </Card>
+            {isModalOpen && (
+                <IncidentDetailModal incidentId={task.id} open={isModalOpen} onClose={() => setIsModalOpen(false)} />
+            )}
+        </>
     );
 }
 

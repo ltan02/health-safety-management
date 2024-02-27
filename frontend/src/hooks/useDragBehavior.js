@@ -34,24 +34,26 @@ const useDragBehavior = (tasks, setTasks) => {
 
             newTasks[sourceColumn] = newTasks[sourceColumn].filter((task) => task.id !== active.id);
 
-            if (sourceColumn === destinationColumn) {
-                newTasks[destinationColumn].splice(
-                    movingTaskIndex < targetIndex ? targetIndex : targetIndex,
-                    0,
-                    activeTask,
-                );
-            } else {
-                const updatedTask = {
-                    ...activeTask,
-                    employeeIncidentStatus: isPrivileged(user.role)
-                        ? activeTask.employeeIncidentStatus
-                        : destinationColumn,
-                    safetyWardenIncidentStatus: isPrivileged(user.role)
-                        ? destinationColumn
-                        : activeTask.safetyWardenIncidentStatus,
-                };
+            if (!newTasks[destinationColumn].some((task) => task.id === active.id)) {
+                if (sourceColumn === destinationColumn) {
+                    newTasks[destinationColumn].splice(
+                        movingTaskIndex < targetIndex ? targetIndex : targetIndex,
+                        0,
+                        activeTask,
+                    );
+                } else {
+                    const updatedTask = {
+                        ...activeTask,
+                        employeeIncidentStatus: isPrivileged(user.role)
+                            ? activeTask.employeeIncidentStatus
+                            : destinationColumn,
+                        safetyWardenIncidentStatus: isPrivileged(user.role)
+                            ? destinationColumn
+                            : activeTask.safetyWardenIncidentStatus,
+                    };
 
-                newTasks[destinationColumn].splice(targetIndex, 0, updatedTask);
+                    newTasks[destinationColumn].splice(targetIndex, 0, updatedTask);
+                }
             }
 
             return newTasks;
