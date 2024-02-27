@@ -37,6 +37,16 @@ export default function useAxios() {
           };
 
           const response = await axios(config);
+          if (response.status === 401 || response.status === 403) {
+                const newToken = await refreshToken();
+                if (newToken) {
+                    token = newToken;
+                    headers.Authorization = `Bearer ${token}`;
+                    config.headers = headers;
+                    return axios(config);
+                }
+          }
+
           return response.data;
       } catch (err) {
           if (err.response && err.response.status === 401) {

@@ -76,10 +76,10 @@ function App() {
         } else {
             return (
                 <>
-                    <Route index element={<AdminWorkflow />} />
+                    <Route index element={<Incident fields={incidentFields} />} />
                     <Route
-                        path="/form"
-                        element={<AdminManagement />}
+                        path="/report"
+                        element={<IncidentReport fields={incidentFields} setFields={setIncidentFields} />}
                     />
                 </>
             );

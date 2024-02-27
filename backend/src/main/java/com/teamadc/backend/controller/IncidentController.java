@@ -51,7 +51,7 @@ public class IncidentController {
 
             List<BasicIncidentResponse> response = new ArrayList<>();
             for (Incident incident : incidents) {
-                response.add(new BasicIncidentResponse(incident.getId(), String.format("%s on %s", incident.getIncidentCategory(), incident.getIncidentDate()), incident.getReporter(), incident.getEmployeesInvolved()));
+                response.add(new BasicIncidentResponse(incident.getId(), String.format("%s on %s", incident.getIncidentCategory(), incident.getIncidentDate()), incident.getReporter(), incident.getEmployeesInvolved(), incident.getEmployeeIncidentStatus(), incident.getSafetyWardenIncidentStatus()));
             }
 
             return ResponseEntity.ok(response);
@@ -62,15 +62,27 @@ public class IncidentController {
 
     @PostMapping("/{incidentId}")
     public ResponseEntity<Incident> updateIncident(@PathVariable String incidentId, @RequestBody IncidentRequest request) {
-        List<CustomFieldRequest> customFieldsRequest = request.getCustomFields();
-        Incident incident = new Incident(incidentId, request.getIncidentDate(), request.getIncidentCategory(), request.getReporter(), request.getEmployeesInvolved(), request.getEmployeeIncidentStatus(), request.getSafetyWardenIncidentStatus(), request.getComments());
-
-        for (CustomFieldRequest field : customFieldsRequest) {
-            incident.setCustomField(field.getFieldName(), field.getValue());
-        }
-
         try {
-            Incident updatedIncident = incidentService.createOrUpdateIncident(incident);
+            Incident existingIncident = incidentService.getIncidentById(incidentId);
+            if (existingIncident == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            if (request.getIncidentDate() != null) existingIncident.setIncidentDate(request.getIncidentDate());
+            if (request.getIncidentCategory() != null) existingIncident.setIncidentCategory(request.getIncidentCategory());
+            if (request.getReporter() != null) existingIncident.setReporter(request.getReporter());
+            if (request.getEmployeesInvolved() != null) existingIncident.setEmployeesInvolved(request.getEmployeesInvolved());
+            if (request.getEmployeeIncidentStatus() != null) existingIncident.setEmployeeIncidentStatus(request.getEmployeeIncidentStatus());
+            if (request.getSafetyWardenIncidentStatus() != null) existingIncident.setSafetyWardenIncidentStatus(request.getSafetyWardenIncidentStatus());
+            if (request.getComments() != null) existingIncident.setComments(request.getComments());
+
+            if (request.getCustomFields() != null) {
+                for (CustomFieldRequest field : request.getCustomFields()) {
+                    existingIncident.setCustomField(field.getFieldName(), field.getValue());
+                }
+            }
+
+            Incident updatedIncident = incidentService.createOrUpdateIncident(existingIncident);
             return ResponseEntity.ok(updatedIncident);
         } catch (InterruptedException | ExecutionException e) {
             return ResponseEntity.internalServerError().build();

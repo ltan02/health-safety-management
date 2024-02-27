@@ -19,26 +19,26 @@ public class IncidentRequest {
 
     public IncidentRequest() {}
 
-    public IncidentRequest(String incidentDate, String incidentCategory, String reporter, List<String> employeesInvolved, List<CustomFieldRequest> customFields, EmployeeIncidentStatus employeeIncidentStatus, SafetyWardenIncidentStatus safetyWardenIncidentStatus, List<Comment> comments) {
+    public IncidentRequest(String incidentDate, String incidentCategory, String reporter, List<String> employeesInvolved, List<CustomFieldRequest> customFields, String employeeIncidentStatus, String safetyWardenIncidentStatus, List<Comment> comments) {
         this.incidentDate = incidentDate;
         this.incidentCategory = incidentCategory;
         this.reporter = reporter;
         this.employeesInvolved = employeesInvolved;
         this.customFields = customFields;
-        this.employeeIncidentStatus = employeeIncidentStatus;
-        this.safetyWardenIncidentStatus = safetyWardenIncidentStatus;
+        this.employeeIncidentStatus = EmployeeIncidentStatus.stringToStatus(employeeIncidentStatus);
+        this.safetyWardenIncidentStatus = SafetyWardenIncidentStatus.stringToStatus(safetyWardenIncidentStatus);
         this.comments = comments;
     }
 
-    public IncidentRequest(String id, String incidentDate, String incidentCategory, String reporter, List<String> employeesInvolved, List<CustomFieldRequest> customFields, EmployeeIncidentStatus employeeIncidentStatus, SafetyWardenIncidentStatus safetyWardenIncidentStatus, List<Comment> comments) {
+    public IncidentRequest(String id, String incidentDate, String incidentCategory, String reporter, List<String> employeesInvolved, List<CustomFieldRequest> customFields, String employeeIncidentStatus, String safetyWardenIncidentStatus, List<Comment> comments) {
         this.id = id;
         this.incidentDate = incidentDate;
         this.incidentCategory = incidentCategory;
         this.reporter = reporter;
         this.employeesInvolved = employeesInvolved;
         this.customFields = customFields;
-        this.employeeIncidentStatus = employeeIncidentStatus;
-        this.safetyWardenIncidentStatus = safetyWardenIncidentStatus;
+        this.employeeIncidentStatus = EmployeeIncidentStatus.stringToStatus(employeeIncidentStatus);
+        this.safetyWardenIncidentStatus = SafetyWardenIncidentStatus.stringToStatus(safetyWardenIncidentStatus);
         this.comments = comments;
     }
 
@@ -46,16 +46,16 @@ public class IncidentRequest {
         return this.employeeIncidentStatus;
     }
 
-    public void setEmployeeIncidentStatus(EmployeeIncidentStatus employeeIncidentStatus) {
-        this.employeeIncidentStatus = employeeIncidentStatus;
+    public void setEmployeeIncidentStatus(String employeeIncidentStatus) {
+        this.employeeIncidentStatus = EmployeeIncidentStatus.stringToStatus(employeeIncidentStatus);
     }
 
     public SafetyWardenIncidentStatus getSafetyWardenIncidentStatus() {
         return this.safetyWardenIncidentStatus;
     }
 
-    public void setSafetyWardenIncidentStatus(SafetyWardenIncidentStatus safetyWardenIncidentStatus) {
-        this.safetyWardenIncidentStatus = safetyWardenIncidentStatus;
+    public void setSafetyWardenIncidentStatus(String safetyWardenIncidentStatus) {
+        this.safetyWardenIncidentStatus = SafetyWardenIncidentStatus.stringToStatus(safetyWardenIncidentStatus);
     }
 
     public List<Comment> getComments() {

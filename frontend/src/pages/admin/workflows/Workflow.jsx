@@ -11,32 +11,30 @@ import TableContainer from "@mui/material/TableContainer";
 import TableRow from "@mui/material/TableRow";
 import TableHead from "@mui/material/TableHead";
 
-import { STATE } from "../initial_tasks";
-
-function getStatusIcon(status) {
-  switch (status) {
-    case STATE.DONE:
-      return <CheckCircleOutlineIcon color="success" />;
-    case STATE.INPROGRESS:
-      return <PlayCircleOutlineIcon color="secondary" />;
-    case STATE.TODO:
-      return <HourglassEmptyIcon color="error" />;
-    case STATE.INACTIVE:
-    default:
-      return <ReportProblemOutlinedIcon color="action" />;
-  }
-}
+// function getStatusIcon(status) {
+//   switch (status) {
+//     case STATE.DONE:
+//       return <CheckCircleOutlineIcon color="success" />;
+//     case STATE.INPROGRESS:
+//       return <PlayCircleOutlineIcon color="secondary" />;
+//     case STATE.TODO:
+//       return <HourglassEmptyIcon color="error" />;
+//     case STATE.INACTIVE:
+//     default:
+//       return <ReportProblemOutlinedIcon color="action" />;
+//   }
+// }
 
 function dateToString(date) {
-  return new Date(date).toLocaleDateString();
+    return new Date(date).toLocaleDateString();
 }
 
 function CustomCell({ title }) {
-  return (
-    <TableCell>
-      <Typography variant="subtitle2">{title}</Typography>
-    </TableCell>
-  );
+    return (
+        <TableCell>
+            <Typography variant="subtitle2">{title}</Typography>
+        </TableCell>
+    );
 }
 function Workflow({ workflows = [] }) {
   return (

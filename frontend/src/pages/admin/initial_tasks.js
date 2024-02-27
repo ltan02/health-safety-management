@@ -78,3 +78,4 @@ export const initialWorkflows = [
     active: false,
   },
 ];
+
