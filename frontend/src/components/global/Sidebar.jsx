@@ -22,11 +22,15 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
 
     useEffect(() => {
         const path = location.pathname.split("/")[1];
-        if (Object.values(PAGE_TYPE).includes(path)) {
-            setPageType(path);
-        }
-        if (path === "") {
-            setPageType(isPrivileged(user.role) ? PAGE_TYPE.ADMIN : PAGE_TYPE.INCIDENT);
+        if (isPrivileged(user.role)) {
+            if (Object.values(PAGE_TYPE).includes(path)) {
+                setPageType(path);
+            }
+            if (path === "") {
+                setPageType(PAGE_TYPE.ADMIN);
+            }
+        } else {
+            setPageType(PAGE_TYPE.INCIDENT);
         }
     }, [location]);
 
