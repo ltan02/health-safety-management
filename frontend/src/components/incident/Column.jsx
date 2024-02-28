@@ -44,7 +44,7 @@ function Column({ id, title, tasks, activeId, handleAddTask }) {
             <SortableContext id={id} items={tasks.map((task) => task.id)} strategy={rectSortingStrategy}>
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                     {tasks.map((task) => (
-                        <Task key={task.id} id={task.id} task={task} invisible={task.id === activeId} />
+                        <Task key={task.id} id={task.id} task={task} />
                     ))}
                 </Box>
             </SortableContext>
