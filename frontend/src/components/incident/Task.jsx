@@ -4,7 +4,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Box, Card, CardContent, Typography, Avatar } from "@mui/material";
 import IncidentDetailModal from "./IncidentDetailModal";
 
-function Task({ id, task }) {
+function Task({ id, task, onRefresh }) {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -45,7 +45,15 @@ function Task({ id, task }) {
                 </CardContent>
             </Card>
             {isModalOpen && (
-                <IncidentDetailModal incidentId={task.id} open={isModalOpen} onClose={() => setIsModalOpen(false)} />
+                <IncidentDetailModal
+                    incidentId={task.id}
+                    open={isModalOpen}
+                    onClose={() => {
+                        setIsModalOpen(false);
+                        onRefresh();
+                    }}
+                    onRefresh={onRefresh}
+                />
             )}
         </>
     );
