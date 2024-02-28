@@ -11,96 +11,77 @@ import {
 import { Container, Grid } from "@mui/material";
 import Column from "./Column";
 import Task from "./Task";
-import { TextField, Paper } from "@mui/material";
 import UnassignedColumn from "./UnassignedColumn";
+import { STATE } from "../initial_tasks";
 
-function Dashboard({ initialTasks, columns, state }) {
+function Dashboard({ initialWorkflows, columns, state }) {
   const [tasks, setTasks] = useState({});
   const [activeId, setActiveId] = useState(null);
-  const [search, setSearch] = useState("");
-  const [visibleTasks, setVisibleTasks] = useState(null);
   const [workflowColumns, setWorkflowColumns] = useState(columns);
   const sensors = useSensors(useSensor(PointerSensor));
   const dropAnimation = {
     ...defaultDropAnimation,
   };
 
-  function handleSearch(event) {
-    const q = event.target.value.toLowerCase();
-    setSearch(q);
-
-    if (!q) {
-      setVisibleTasks(tasks);
-      return;
-    }
-    const filteredTasks = Object.keys(tasks).reduce((acc, status) => {
-      acc[status] = tasks[status].filter((task) =>
-        task.title.toLowerCase().includes(q)
-      );
-      return acc;
-    }, {});
-    setVisibleTasks(filteredTasks);
+  function handleRenameColumn(columnId, name) {
+    const newColumns = workflowColumns.map((column) => {
+      if (column.id === columnId) {
+        column.title = name;
+      }
+      return column;
+    });
+    setWorkflowColumns(newColumns);
   }
 
   function handleDragOver(event) {
     const { active, over } = event;
-
     // Calculate the source and destination columns and the index of the task to be moved
     // i will make this as hook later but not now
-    let sourceColumn = Object.keys(tasks).find((column) => {
-      return tasks[column].find((task) => task.id === active.id);
+    let newTasks = JSON.parse(JSON.stringify(tasks));
+    let sourceColumn = Object.keys(newTasks).find((column) => {
+      return newTasks[column].find((task) => task.id === active.id);
     });
 
-    let destinationColumn = Object.keys(tasks).find((column) => {
-      return tasks[column].find((task) => task.id === over?.id);
+    let destinationColumn = Object.keys(newTasks).find((column) => {
+      return newTasks[column].find((task) => task.id === over?.id);
     });
 
-    let overIndex = Object.entries(tasks)
+    let overIndex = Object.entries(newTasks)
       .map(([, subs]) => {
         return subs.findIndex((task) => task.id === over?.id);
       })
       .filter((index) => index !== -1)[0];
 
-    let activeIndex = Object.entries(tasks)
+    let activeIndex = Object.entries(newTasks)
       .map(([, subs]) => {
         return subs.findIndex((task) => task.id === active.id);
       })
       .filter((index) => index !== -1)[0];
-
     if (sourceColumn && over.id !== active.id) {
-      // if empty column
       if (destinationColumn === undefined) {
-        tasks[over.id].push(tasks[sourceColumn][activeIndex]);
-        tasks[sourceColumn].splice(activeIndex, 1);
+        newTasks[over.id].push(newTasks[sourceColumn][activeIndex]);
+        newTasks[sourceColumn].splice(activeIndex, 1);
         sourceColumn = over.id;
       } else {
         if (sourceColumn !== destinationColumn) {
-          tasks[sourceColumn][activeIndex].status = destinationColumn;
-          tasks[destinationColumn].push(tasks[sourceColumn][activeIndex]);
-          tasks[sourceColumn].splice(activeIndex, 1);
+          newTasks[sourceColumn][activeIndex].status = destinationColumn;
+          newTasks[destinationColumn].push(newTasks[sourceColumn][activeIndex]);
+          newTasks[sourceColumn].splice(activeIndex, 1);
           sourceColumn = destinationColumn;
         } else if (overIndex != -1) {
-          activeIndex = Object.entries(tasks)
+          activeIndex = Object.entries(newTasks)
             .map(([, subs]) => {
               return subs.findIndex((task) => task.id === active.id);
             })
             .filter((index) => index !== -1)[0];
-          const temp = tasks[sourceColumn][activeIndex];
-          tasks[sourceColumn][activeIndex] =
-            tasks[destinationColumn][overIndex];
-          tasks[destinationColumn][overIndex] = temp;
+          const temp = newTasks[sourceColumn][activeIndex];
+          newTasks[sourceColumn][activeIndex] =
+            newTasks[destinationColumn][overIndex];
+          newTasks[destinationColumn][overIndex] = temp;
         }
       }
     }
-    if (over && state[over.id]) {
-      const status = over.id;
-      tasks[sourceColumn][activeIndex].status = status;
-      tasks[status].push(tasks[sourceColumn][activeIndex]);
-      tasks[sourceColumn].splice(activeIndex, 1);
-      sourceColumn = status;
-    }
-
-    setTasks(tasks);
+    setTasks(newTasks);
   }
 
   function handleStart(event) {
@@ -114,30 +95,18 @@ function Dashboard({ initialTasks, columns, state }) {
 
   useEffect(() => {
     setTasks({
-      [state.TODO]: [
-        ...initialTasks.filter((task) => task.status === state.TODO),
-      ],
+      [state.TODO]: [...initialWorkflows.filter((task) => task.name === state.TODO)],
       [state.INPROGRESS]: [
-        ...initialTasks.filter((task) => task.status === state.INPROGRESS),
+        ...initialWorkflows.filter((task) => task.name === state.INPROGRESS),
       ],
-      [state.DONE]: [
-        ...initialTasks.filter((task) => task.status === state.DONE),
-      ],
+      [state.DONE]: [...initialWorkflows.filter((task) => task.name === state.DONE)],
+      [state.UNASSIGNED]: [...initialWorkflows.filter((task) => task.name === state.UNASSIGNED)],
     });
+    console.log(initialWorkflows)
   }, []);
-
-  useEffect(() => {
-    setVisibleTasks(tasks);
-  }, [tasks]);
 
   return (
     <Container>
-      <TextField
-        value={search}
-        onChange={handleSearch}
-        variant="standard"
-        placeholder="Search"
-      />
       <DndContext
         sensors={sensors}
         collisionDetection={closestCorners}
@@ -145,53 +114,40 @@ function Dashboard({ initialTasks, columns, state }) {
         onDragOver={handleDragOver}
         onDragStart={handleStart}
       >
-        <Grid container spacing={2}>
-          <Grid container spacing={2}>
-            {/* Unassigned Column */}
-            <Grid item xs={12} sm={6} md={2} lg={3}>
-              <UnassignedColumn
-                id="unassigned"
-                title="Unassigned"
-                tasks={(visibleTasks && visibleTasks["unassigned"]) || []}
-                activeId={activeId}
-              />
-            </Grid>
-
-            {/* Other Columns */}
-            {workflowColumns.map((column) => (
-              <Grid item xs={12} sm={6} md={2} lg={3} key={column.id}>
-                <Column
-                  id={column.id}
-                  title={column.title}
-                  tasks={(visibleTasks && visibleTasks[column.id]) || []}
-                  activeId={activeId}
-                />
-              </Grid>
-            ))}
+        <Grid container direction="row">
+          <Grid item>
+            <UnassignedColumn
+              id={STATE.UNASSIGNED}
+              title="Unassigned"
+              tasks={(tasks && tasks[state.UNASSIGNED]) || []}
+              activeId={activeId}
+            />
           </Grid>
-          <DragOverlay dropAnimation={dropAnimation}>
-            {activeId && (
-              <Task
-                id={activeId}
-                task={Object.values(tasks)
-                  .flat()
-                  .find((task) => task.id === activeId)}
-              />
-            )}
-          </DragOverlay>
+          <Grid item style={{ overflowX: "auto", flex: 1 }}>
+            <Grid container direction="row" wrap="nowrap"  spacing={2}>
+              {workflowColumns.map((column) => (
+                <Grid key={column.id} item>
+                  <Column
+                    id={column.id}
+                    title={column.title}
+                    tasks={(tasks && tasks[column.id]) || []}
+                    activeId={activeId}
+                    handleRenameColumn={handleRenameColumn}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          </Grid>
         </Grid>
         <DragOverlay dropAnimation={dropAnimation}>
-          {activeId &&
-            Object.values(tasks)
-              .flat()
-              .find((task) => task.id === activeId) && (
-              <Task
-                id={activeId}
-                task={Object.values(tasks)
-                  .flat()
-                  .find((task) => task.id === activeId)}
-              />
-            )}
+          {activeId && (
+            <Task
+              id={activeId}
+              task={Object.values(tasks)
+                .flat()
+                .find((task) => task.id === activeId)}
+            />
+          )}
         </DragOverlay>
       </DndContext>
     </Container>

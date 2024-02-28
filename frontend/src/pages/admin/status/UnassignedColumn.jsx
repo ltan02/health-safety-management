@@ -13,8 +13,13 @@ function Column({ id, title, tasks, activeId }) {
         <Container
             ref={setNodeRef}
             sx={{
-                padding: 0,
+                bgcolor: "grey.200",
+                padding: 2,
+                borderRadius: 1,
+                minHeight: "100%",
+                width: "350px",
                 margin: 2,
+                boxShadow: 2,
             }}
         >
             <Box
