@@ -81,14 +81,6 @@ function Dashboard({ initialWorkflows, columns, state }) {
         }
       }
     }
-    console.log(tasks);
-    // if (over && state[over.id]) {
-    //   const status = over.id;
-    //   newTasks[sourceColumn][activeIndex].status = status;
-    //   newTasks[status].push(newTasks[sourceColumn][activeIndex]);
-    //   newTasks[sourceColumn].splice(activeIndex, 1);
-    //   sourceColumn = status;
-    // }
     setTasks(newTasks);
   }
 
