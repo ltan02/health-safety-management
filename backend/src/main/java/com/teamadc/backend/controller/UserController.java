@@ -34,7 +34,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<List<User>> getUsers(
             @RequestParam(required = false) Role role,
             @RequestParam(required = false) String businessUnit) {

@@ -13,25 +13,15 @@ import java.util.*;
 public class Incident {
     @DocumentId
     private String id;
-
     private String incidentDate;
-
     private String incidentCategory;
-
     private String reporter;
-
     private List<String> employeesInvolved;
-
     private Map<String, Object> customFields;
-
     private EmployeeIncidentStatus employeeIncidentStatus;
-
     private SafetyWardenIncidentStatus safetyWardenIncidentStatus;
-
     private List<Comment> comments;
-
     private Date createdAt;
-
     private Date lastUpdatedAt;
 
     public Incident() {}

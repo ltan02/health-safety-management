@@ -23,7 +23,7 @@ const modalStyle = {
     p: 4,
 };
 
-export default function IncidentDetailModal({ incidentId, open, onClose }) {
+export default function IncidentDetailModal({ incidentId, open, onClose, onRefresh }) {
     const { sendRequest } = useAxios();
     const { user } = useAuthContext();
 
@@ -80,6 +80,10 @@ export default function IncidentDetailModal({ incidentId, open, onClose }) {
             return newIncident;
         });
         setIncidentState(newStateId);
+
+        if (onRefresh) {
+            onRefresh();
+        }
     };
 
     return (
@@ -239,8 +243,12 @@ export default function IncidentDetailModal({ incidentId, open, onClose }) {
                             </Box>
                         </Box>
                         <Box>
-                        <Typography color="#808080" fontSize="14px">{`Created ${dateToDaysAgo(convertToPacificTime(incident.createdAt))}`}</Typography>
-                        <Typography color="#808080" fontSize="14px">{`Updated ${dateToDaysAgo(convertToPacificTime(incident.lastUpdatedAt))}`}</Typography>
+                            <Typography color="#808080" fontSize="14px">{`Created ${dateToDaysAgo(
+                                convertToPacificTime(incident.createdAt),
+                            )}`}</Typography>
+                            <Typography color="#808080" fontSize="14px">{`Updated ${dateToDaysAgo(
+                                convertToPacificTime(incident.lastUpdatedAt),
+                            )}`}</Typography>
                         </Box>
                     </Box>
                 </Box>
