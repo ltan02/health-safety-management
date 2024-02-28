@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -51,7 +52,7 @@ public class IncidentController {
 
             List<BasicIncidentResponse> response = new ArrayList<>();
             for (Incident incident : incidents) {
-                response.add(new BasicIncidentResponse(incident.getId(), String.format("%s on %s", incident.getIncidentCategory(), incident.getIncidentDate()), incident.getReporter(), incident.getEmployeesInvolved(), incident.getEmployeeIncidentStatus(), incident.getSafetyWardenIncidentStatus()));
+                response.add(new BasicIncidentResponse(incident.getId(), incident.getIncidentDate(), incident.getIncidentCategory(), incident.getReporter(), incident.getEmployeesInvolved(), incident.getEmployeeIncidentStatus(), incident.getSafetyWardenIncidentStatus()));
             }
 
             return ResponseEntity.ok(response);
@@ -75,6 +76,8 @@ public class IncidentController {
             if (request.getEmployeeIncidentStatus() != null) existingIncident.setEmployeeIncidentStatus(request.getEmployeeIncidentStatus());
             if (request.getSafetyWardenIncidentStatus() != null) existingIncident.setSafetyWardenIncidentStatus(request.getSafetyWardenIncidentStatus());
             if (request.getComments() != null) existingIncident.setComments(request.getComments());
+
+            existingIncident.setLastUpdatedAt(new Date());
 
             if (request.getCustomFields() != null) {
                 for (CustomFieldRequest field : request.getCustomFields()) {

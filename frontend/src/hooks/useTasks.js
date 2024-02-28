@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import useAxios from "./useAxios";
 import { useAuthContext } from "../context/AuthContext";
 import { isPrivileged } from "../utils/permissions";
@@ -10,48 +10,48 @@ export default function useTasks() {
     const { user } = useAuthContext();
     const { sendRequest } = useAxios();
 
-    useEffect(() => {
-        const fetchTasks = async () => {
-            const incidents = await sendRequest({ url: "/incidents" });
+    const fetchTasks = useCallback(async () => {
+        const incidents = await sendRequest({ url: "/incidents" });
 
-            const userIds = [...new Set(incidents.flatMap((incident) => [incident.reporter]))];
-            const users = await Promise.all(userIds.map((id) => sendRequest({ url: `/users/${id}` })));
+        const userIds = [...new Set(incidents.flatMap((incident) => [incident.reporter]))];
+        const users = await Promise.all(userIds.map((id) => sendRequest({ url: `/users/${id}` })));
 
-            const userMap = users.reduce((acc, user) => ({ ...acc, [user.id]: user }), {});
+        const userMap = users.reduce((acc, user) => ({ ...acc, [user.id]: user }), {});
 
-            let newTasks = incidents.reduce((acc, incident) => {
-                const status = isPrivileged(user.role)
-                    ? incident.safetyWardenIncidentStatus
-                    : incident.employeeIncidentStatus;
-                const statusKey = status || "unknown";
+        let newTasks = incidents.reduce((acc, incident) => {
+            const status = isPrivileged(user.role)
+                ? incident.safetyWardenIncidentStatus
+                : incident.employeeIncidentStatus;
+            const statusKey = status || "unknown";
 
-                if (!acc[statusKey]) {
-                    acc[statusKey] = [];
-                }
+            if (!acc[statusKey]) {
+                acc[statusKey] = [];
+            }
 
-                const incidentWithUserDetails = {
-                    ...incident,
-                    reporter: userMap[incident.reporter],
-                };
+            const incidentWithUserDetails = {
+                ...incident,
+                reporter: userMap[incident.reporter],
+            };
 
-                acc[statusKey].push(incidentWithUserDetails);
+            acc[statusKey].push(incidentWithUserDetails);
 
-                return acc;
-            }, {});
+            return acc;
+        }, {});
 
-            const allStatuses = isPrivileged(user.role) ? ADMIN_COLUMNS : EMPLOYEE_COLUMNS;
-            allStatuses.forEach((column) => {
-                if (!(column.id in newTasks)) {
-                    newTasks[column.id] = [];
-                }
-            });
+        const allStatuses = isPrivileged(user.role) ? ADMIN_COLUMNS : EMPLOYEE_COLUMNS;
+        allStatuses.forEach((column) => {
+            if (!(column.id in newTasks)) {
+                newTasks[column.id] = [];
+            }
+        });
 
-            setTasks(newTasks);
-            setFilteredTasks(newTasks);
-        };
-
-        fetchTasks();
+        setTasks(newTasks);
+        setFilteredTasks(newTasks);
     }, []);
+
+    useEffect(() => {
+        fetchTasks();
+    }, [fetchTasks]);
 
     const filterTasks = (searchQuery) => {
         if (!searchQuery) {
@@ -68,5 +68,5 @@ export default function useTasks() {
         setFilteredTasks(filtered);
     };
 
-    return { tasks, filteredTasks, setTasks, filterTasks };
+    return { tasks, filteredTasks, setTasks, filterTasks, fetchTasks };
 }

@@ -1,5 +1,10 @@
 package com.teamadc.backend.dto.request;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class CustomFieldRequest {
     private String fieldName;
     private Object value;
@@ -11,19 +16,4 @@ public class CustomFieldRequest {
         this.value = value;
     }
 
-    public String getFieldName() {
-        return this.fieldName;
-    }
-
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
-    }
-
-    public Object getValue() {
-        return this.value;
-    }
-
-    public void setValue(Object value) {
-        this.value = value;
-    }
 }

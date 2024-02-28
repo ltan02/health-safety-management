@@ -3,18 +3,36 @@ package com.teamadc.backend.dto.request;
 import com.teamadc.backend.enums.EmployeeIncidentStatus;
 import com.teamadc.backend.enums.SafetyWardenIncidentStatus;
 import com.teamadc.backend.model.Comment;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
+@Getter
 public class IncidentRequest {
+    @Setter
     private String id;
+
+    @Setter
     private String incidentDate;
+
+    @Setter
     private String incidentCategory;
+
+    @Setter
     private String reporter;
+
+    @Setter
     private List<String> employeesInvolved;
+
+    @Setter
     private List<CustomFieldRequest> customFields;
+
     private EmployeeIncidentStatus employeeIncidentStatus;
+
     private SafetyWardenIncidentStatus safetyWardenIncidentStatus;
+
+    @Setter
     private List<Comment> comments;
 
     public IncidentRequest() {}
@@ -42,75 +60,11 @@ public class IncidentRequest {
         this.comments = comments;
     }
 
-    public EmployeeIncidentStatus getEmployeeIncidentStatus() {
-        return this.employeeIncidentStatus;
-    }
-
     public void setEmployeeIncidentStatus(String employeeIncidentStatus) {
         this.employeeIncidentStatus = EmployeeIncidentStatus.stringToStatus(employeeIncidentStatus);
     }
 
-    public SafetyWardenIncidentStatus getSafetyWardenIncidentStatus() {
-        return this.safetyWardenIncidentStatus;
-    }
-
     public void setSafetyWardenIncidentStatus(String safetyWardenIncidentStatus) {
         this.safetyWardenIncidentStatus = SafetyWardenIncidentStatus.stringToStatus(safetyWardenIncidentStatus);
-    }
-
-    public List<Comment> getComments() {
-        return this.comments;
-    }
-
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
-    }
-
-    public String getId() {
-        return this.id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getReporter() {
-        return this.reporter;
-    }
-
-    public void setReporter(String reporter) {
-        this.reporter = reporter;
-    }
-
-    public List<String> getEmployeesInvolved() {
-        return this.employeesInvolved;
-    }
-
-    public void setEmployeesInvolved(List<String> employeesInvolved) {
-        this.employeesInvolved = employeesInvolved;
-    }
-
-    public String getIncidentDate() {
-        return this.incidentDate;
-    }
-
-    public void setIncidentDate(String incidentDate) {
-        this.incidentDate = incidentDate;
-    }
-
-    public String getIncidentCategory() {
-        return this.incidentCategory;
-    }
-
-    public void setIncidentCategory(String incidentCategory) {
-        this.incidentCategory = incidentCategory;
-    }
-
-    public List<CustomFieldRequest> getCustomFields() {
-        return this.customFields;
-    }
-
-    public void setCustomFields(List<CustomFieldRequest> customFields) {
-        this.customFields = customFields;
     }
 }

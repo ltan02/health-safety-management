@@ -6,7 +6,7 @@ import Task from "./Task";
 import AddIcon from "@mui/icons-material/Add";
 import AddTaskModal from "./AddTaskModal";
 
-function Column({ id, title, tasks, activeId, handleAddTask }) {
+function Column({ id, title, tasks, activeId, handleAddTask, employees, onRefresh }) {
     const { setNodeRef } = useDroppable({ id });
     const [openModal, setOpenModal] = useState(false);
 
@@ -48,7 +48,7 @@ function Column({ id, title, tasks, activeId, handleAddTask }) {
                     ))}
                 </Box>
             </SortableContext>
-            <AddTaskModal open={openModal} onClose={toggleModal} columnId={id} handleAddTask={handleAddTask} />
+            <AddTaskModal open={openModal} onClose={toggleModal} columnId={id} handleAddTask={handleAddTask} allEmployees={employees} />
         </Container>
     );
 }

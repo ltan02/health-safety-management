@@ -1,16 +1,5 @@
 import { useState, useEffect, Fragment } from "react";
-import {
-    Modal,
-    Box,
-    Typography,
-    CardContent,
-    Select,
-    MenuItem,
-    IconButton,
-    Grid,
-    Avatar,
-    TextareaAutosize,
-} from "@mui/material";
+import { Modal, Box, Typography, Select, MenuItem, IconButton, Grid, Avatar, TextareaAutosize } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import useAxios from "../../hooks/useAxios";
 import { useAuthContext } from "../../context/AuthContext";
@@ -18,6 +7,8 @@ import { isPrivileged } from "../../utils/permissions";
 import { ADMIN_COLUMNS, EMPLOYEE_COLUMNS } from "../../constants/board";
 import { formatCamelCaseToNormalText } from "../../utils/textFormat";
 import Profile from "../users/Profile";
+import { convertToPacificTime } from "../../utils/date";
+import { dateToDaysAgo } from "../../utils/date";
 
 const modalStyle = {
     position: "absolute",
@@ -32,7 +23,7 @@ const modalStyle = {
     p: 4,
 };
 
-export default function IncidentDetailModal({ incidentId, open, onClose }) {
+export default function IncidentDetailModal({ incidentId, open, onClose, onRefresh }) {
     const { sendRequest } = useAxios();
     const { user } = useAuthContext();
 
@@ -89,6 +80,10 @@ export default function IncidentDetailModal({ incidentId, open, onClose }) {
             return newIncident;
         });
         setIncidentState(newStateId);
+
+        if (onRefresh) {
+            onRefresh();
+        }
     };
 
     return (
@@ -212,6 +207,12 @@ export default function IncidentDetailModal({ incidentId, open, onClose }) {
                             <Box sx={{ mt: 2, px: 2, pb: 2 }}>
                                 <Grid container spacing={2} sx={{ rowGap: 2 }}>
                                     <Grid item xs={6}>
+                                        <Typography>Date of Incident</Typography>
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        {incident && <Typography>{incident.incidentDate}</Typography>}
+                                    </Grid>
+                                    <Grid item xs={6}>
                                         <Typography>Category</Typography>
                                     </Grid>
                                     <Grid item xs={6}>
@@ -240,6 +241,14 @@ export default function IncidentDetailModal({ incidentId, open, onClose }) {
                                     </Grid>
                                 </Grid>
                             </Box>
+                        </Box>
+                        <Box>
+                            <Typography color="#808080" fontSize="14px">{`Created ${dateToDaysAgo(
+                                convertToPacificTime(incident.createdAt),
+                            )}`}</Typography>
+                            <Typography color="#808080" fontSize="14px">{`Updated ${dateToDaysAgo(
+                                convertToPacificTime(incident.lastUpdatedAt),
+                            )}`}</Typography>
                         </Box>
                     </Box>
                 </Box>

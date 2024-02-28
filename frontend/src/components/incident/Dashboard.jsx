@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Container, Box } from "@mui/material";
 import {
     DndContext,
@@ -16,11 +17,15 @@ import useDragBehavior from "../../hooks/useDragBehavior";
 import { useAuthContext } from "../../context/AuthContext";
 import { isPrivileged } from "../../utils/permissions";
 import { ADMIN_COLUMNS, EMPLOYEE_COLUMNS } from "../../constants/board";
+import useAxios from "../../hooks/useAxios";
 
 function Dashboard() {
-    const { tasks, filterTasks, setTasks } = useTasks();
+    const { tasks, filterTasks, setTasks, fetchTasks } = useTasks();
     const { activeId, handleDragStart, handleDragOver, handleDragEnd } = useDragBehavior(tasks, setTasks);
     const { user } = useAuthContext();
+    const { sendRequest } = useAxios();
+
+    const [employees, setEmployees] = useState([]);
 
     const columns = isPrivileged(user.role) ? ADMIN_COLUMNS : EMPLOYEE_COLUMNS;
 
@@ -30,7 +35,46 @@ function Dashboard() {
               .find((task) => task.id === activeId)
         : null;
 
-    const handleAddTask = (task) => console.log(task);
+    const handleAddTask = async (task) => {
+        const directMapping = {
+            timeOfIncident: "incidentDate",
+            category: "incidentCategory",
+            employeesInvolved: "employeesInvolved",
+        };
+
+        const incident = {
+            reporter: user.id,
+            incidentDate: task.timeOfIncident,
+            incidentCategory: task.category,
+            employeesInvolved: task.employeesInvolved,
+            customFields: [],
+        };
+
+        for (const key in task) {
+            if (Object.prototype.hasOwnProperty.call(task, key) && !directMapping[key]) {
+                incident.customFields.push({
+                    fieldName: key,
+                    value: task[key],
+                });
+            }
+        }
+
+        await sendRequest({ url: "/incidents", method: "POST", body: incident });
+        fetchTasks();
+    };
+
+    const refreshDashboard = () => {
+        fetchTasks();
+    };
+
+    useEffect(() => {
+        const fetchEmployees = async () => {
+            const res = await sendRequest({ url: "/users" });
+            setEmployees(res);
+        };
+
+        fetchEmployees();
+    }, []);
 
     return (
         <Container maxWidth="false" disableGutters>
@@ -73,12 +117,14 @@ function Dashboard() {
                                 tasks={tasks[column.id] || []}
                                 activeId={activeId}
                                 handleAddTask={handleAddTask}
+                                employees={employees}
+                                onRefresh={refreshDashboard}
                             />
                         </Box>
                     ))}
                 </Box>
                 <DragOverlay dropAnimation={defaultDropAnimation}>
-                    {activeTask && <Task id={activeId} task={activeTask} />}
+                    {activeTask && <Task id={activeId} task={activeTask} onRefresh={refreshDashboard} />}
                 </DragOverlay>
             </DndContext>
         </Container>
