@@ -36,73 +36,61 @@ function CustomCell({ title }) {
         </TableCell>
     );
 }
-
-function Workflow({ tasks = [] }) {
-    return (
-        <div>
-            {tasks.length === 0 ? (
-                <Typography variant="h4" gutterBottom>
-                    No Data
-                </Typography>
-            ) : (
-                <TableContainer sx={{ minHeight: "50vh" }}>
-                    <Table aria-label="simple table" sx={{ width: "80vw" }}>
-                        <TableHead>
-                            <TableRow>
-                                <CustomCell title="Id" />
-                                <CustomCell title="Title" />
-                                <CustomCell title="Status" />
-                                <CustomCell title="Assignee" />
-                                <CustomCell title="Description" />
-                                <CustomCell title="Last Updated" />
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {tasks.map((task) => (
-                                <TableRow key={task.id}>
-                                    <TableCell component="th" scope="row">
-                                        <Typography variant="body2" noWrap>
-                                            {task.id}
-                                        </Typography>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Typography variant="body2" noWrap>
-                                            {task.title}
-                                        </Typography>
-                                    </TableCell>
-                                    <TableCell sx={{ display: "flex", alignItems: "center" }}>
-                                        <ListItemIcon>
-                                            <CheckCircleOutlineIcon color="success" />
-                                        </ListItemIcon>
-                                        <Typography variant="body2" noWrap>
-                                            {task.status}
-                                        </Typography>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Typography variant="body2" noWrap>
-                                            {task.assignee}
-                                        </Typography>
-                                    </TableCell>
-                                    <TableCell
-                                        sx={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
-                                    >
-                                        <Typography variant="body2" title={task.description}>
-                                            {task.description}
-                                        </Typography>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Typography variant="body2" noWrap>
-                                            {dateToString(task.deadline)}
-                                        </Typography>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            )}
-        </div>
-    );
+function Workflow({ workflows = [] }) {
+  return (
+    <div>
+      {workflows.length === 0 ? (
+        <Typography variant="h4" gutterBottom>
+  
+        </Typography>
+      ) : (
+        <TableContainer sx={{ minHeight: "50vh" }}>
+          <Table aria-label="workflow table" sx={{ width: { xs: "100%", sm: "80vw" } }}>
+            <TableHead>
+              <TableRow>
+                <TableCell><Typography variant="subtitle2">Id</Typography></TableCell>
+                <TableCell><Typography variant="subtitle2">Title</Typography></TableCell>
+                <TableCell><Typography variant="subtitle2">Included in Projects</Typography></TableCell>
+                <TableCell><Typography variant="subtitle2">Included in Workflow Schemes</Typography></TableCell>
+                <TableCell><Typography variant="subtitle2">Last Updated</Typography></TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {workflows.map((workflow) => (
+                <TableRow key={workflow.id}>
+                  <TableCell>
+                    <Typography variant="body2" noWrap>
+                      {workflow.id}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="body2" noWrap>
+                      {workflow.title}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="body2" noWrap>
+                      {workflow.projectIncluded.length === 0 ? "NOT IN USE" : workflow.projectIncluded.join(", ")}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="body2" noWrap>
+                    {workflow.schemeIncluded.length === 0 ? "NOT IN USE" : workflow.schemeIncluded.join(", ")}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="body2" noWrap>
+                      {new Date(workflow.lastUpdated).toLocaleDateString()}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+    </div>
+  );
 }
 
 export default Workflow;

@@ -2,22 +2,22 @@ import { useEffect, useState } from "react";
 import { Box, TextField, Container, Typography, Paper } from "@mui/material";
 import WorkflowTab from "./WorkflowTab";
 import Workflow from "./Workflow";
+import { initialWorkflows, STATE } from "../initial_tasks";
 
 export default function AdminWorkflow() {
-    const [tasks, setTasks] = useState([]);
+    const [workflows, setTasks] = useState([]);
     const [activeTasks, setActiveTasks] = useState([]);
     const [inactiveTasks, setInactiveTasks] = useState([]);
     const [search, setSearch] = useState("");
 
     useEffect(() => {
-        setTasks([]);
+        setTasks(initialWorkflows);
     }, []);
 
     useEffect(() => {
-        const filteredTasks = search ? tasks.filter((task) => task.title.toLowerCase().includes(search)) : tasks;
-        // setActiveTasks(filteredTasks.filter((task) => task.status !== STATE.INACTIVE));
-        // setInactiveTasks(filteredTasks.filter((task) => task.status === STATE.INACTIVE));
-    }, [tasks, search]);
+        setActiveTasks(workflows.filter((task) => task.active));
+        setInactiveTasks(workflows.filter((task) => !task.active));
+    }, [workflows, search]);
 
     function handleSearch(event) {
         const q = event.target.value.toLowerCase();
@@ -40,11 +40,11 @@ export default function AdminWorkflow() {
             </Typography>
             <Paper elevation={3} sx={{ width: "80vw" }}>
                 <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
-                    <TextField fullWidth onChange={handleSearch} value={search} placeholder="Search tasks..." />
+                    <TextField fullWidth onChange={handleSearch} value={search} placeholder="Search workflows..." />
                 </Box>
                 <WorkflowTab labels={["Active", "Inactive"]}>
-                    <Workflow tasks={activeTasks} sx={{ py: 2 }} />
-                    <Workflow tasks={inactiveTasks} sx={{ py: 2 }} />
+                    <Workflow workflows={activeTasks} sx={{ py: 2 }} />
+                    <Workflow workflows={inactiveTasks} sx={{ py: 2 }} />
                 </WorkflowTab>
             </Paper>
         </Container>
