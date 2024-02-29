@@ -18,51 +18,47 @@ public class Incident {
     private String reporter;
     private List<String> employeesInvolved;
     private Map<String, Object> customFields;
-    private EmployeeIncidentStatus employeeIncidentStatus;
-    private SafetyWardenIncidentStatus safetyWardenIncidentStatus;
+    private String statusId;
     private List<Comment> comments;
     private Date createdAt;
     private Date lastUpdatedAt;
 
     public Incident() {}
 
-    public Incident(String id, String incidentDate, String incidentCategory, String reporter, List<String> employeesInvolved, EmployeeIncidentStatus employeeIncidentStatus, SafetyWardenIncidentStatus safetyWardenIncidentStatus, List<Comment> comments) {
+    public Incident(String id, String incidentDate, String incidentCategory, String reporter, List<String> employeesInvolved, String statusId, List<Comment> comments) {
         this.id = id;
         this.incidentDate = incidentDate;
         this.incidentCategory = incidentCategory;
         this.reporter = reporter;
         this.employeesInvolved = employeesInvolved;
         this.customFields = new HashMap<>();
-        this.employeeIncidentStatus = employeeIncidentStatus;
-        this.safetyWardenIncidentStatus = safetyWardenIncidentStatus;
+        this.statusId = statusId;
         this.comments = comments;
         this.createdAt = new Date();
         this.lastUpdatedAt = new Date();
     }
 
-    public Incident(String id, String incidentDate, String incidentCategory, String reporter, List<String> employeesInvolved) {
+    public Incident(String id, String incidentDate, String incidentCategory, String reporter, List<String> employeesInvolved, String statusId) {
         this.id = id;
         this.incidentDate = incidentDate;
         this.incidentCategory = incidentCategory;
         this.reporter = reporter;
         this.employeesInvolved = employeesInvolved;
         this.customFields = new HashMap<>();
-        this.employeeIncidentStatus = EmployeeIncidentStatus.REPORT_SUBMITTED;
-        this.safetyWardenIncidentStatus = SafetyWardenIncidentStatus.PENDING_REVIEW;
+        this.statusId = statusId;
         this.comments = new ArrayList<>();
         this.createdAt = new Date();
         this.lastUpdatedAt = new Date();
     }
 
-    public Incident(String id, String incidentDate, String incidentCategory, String reporter, List<String> employeesInvolved, Map<String, Object> customFields, EmployeeIncidentStatus employeeIncidentStatus, SafetyWardenIncidentStatus safetyWardenIncidentStatus, List<Comment> comments) {
+    public Incident(String id, String incidentDate, String incidentCategory, String reporter, List<String> employeesInvolved, Map<String, Object> customFields, String statusId, List<Comment> comments) {
         this.id = id;
         this.incidentDate = incidentDate;
         this.incidentCategory = incidentCategory;
         this.reporter = reporter;
         this.employeesInvolved = employeesInvolved;
         this.customFields = customFields;
-        this.employeeIncidentStatus = employeeIncidentStatus;
-        this.safetyWardenIncidentStatus = safetyWardenIncidentStatus;
+        this.statusId = statusId;
         this.comments = comments;
         this.createdAt = new Date();
         this.lastUpdatedAt = new Date();
