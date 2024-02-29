@@ -11,11 +11,15 @@ import AdminWorkflow from "./pages/admin/workflows/index.jsx";
 import AdminManagement from "./pages/admin/management/index.jsx";
 import AdminStatus from "./pages/admin/status/index.jsx";
 import AdminForm from "./pages/admin/form/index.jsx";
-import ReportOverview from "./pages/report/overview/index.jsx";
+import ReportOverview from "./pages/report/index.jsx";
 import ReportDashboard from "./pages/report/dashboard/index.jsx";
-import ReportPast from "./pages/report/past/index.jsx";
 import { isPrivileged } from "./utils/permissions.js";
 import IncidentReport from "./pages/incident/report/index.jsx";
+import BarReport from "./pages/report/bar/index.jsx";
+import LineReport from "./pages/report/line/index.jsx";
+import PieReport from "./pages/report/pie/index.jsx";
+import ScatterReport from "./pages/report/scatter/index.jsx";
+
 import { BoardProvider } from "./context/BoardContext.jsx";
 
 const theme = createTheme({
@@ -62,10 +66,12 @@ function App() {
                     <Route path="report" element={<IncidentReport />} />
                 </Route>
                 <Route path="report">
-                    <Route index element={<Report />} />
-                    <Route path="overview" element={<ReportOverview />} />
+                    <Route index element={<ReportOverview />} />
+                    <Route path="bar" element={<BarReport/>} />
+                    <Route path="scatter" element={<ScatterReport/>} />
+                    <Route path="line" element={<LineReport/>} />
+                    <Route path="pie" element={<PieReport/>} />
                     <Route path="dashboard" element={<ReportDashboard />} />
-                    <Route path="past" element={<ReportPast />} />
                 </Route>
             </>
         );
