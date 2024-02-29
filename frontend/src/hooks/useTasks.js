@@ -2,13 +2,14 @@ import { useState, useEffect, useCallback } from "react";
 import useAxios from "./useAxios";
 import { useAuthContext } from "../context/AuthContext";
 import { isPrivileged } from "../utils/permissions";
-import { ADMIN_COLUMNS, EMPLOYEE_COLUMNS } from "../constants/board";
+import { useBoard } from "../context/BoardContext";
 
 export default function useTasks() {
     const [tasks, setTasks] = useState({});
     const [filteredTasks, setFilteredTasks] = useState({});
     const { user } = useAuthContext();
     const { sendRequest } = useAxios();
+    const { adminColumns, employeeColumns } = useBoard();
 
     const fetchTasks = useCallback(async () => {
         const incidents = await sendRequest({ url: "/incidents" });
@@ -19,13 +20,11 @@ export default function useTasks() {
         const userMap = users.reduce((acc, user) => ({ ...acc, [user.id]: user }), {});
 
         let newTasks = incidents.reduce((acc, incident) => {
-            const status = isPrivileged(user.role)
-                ? incident.safetyWardenIncidentStatus
-                : incident.employeeIncidentStatus;
-            const statusKey = status || "unknown";
+            const columns = isPrivileged(user.role) ? adminColumns : employeeColumns;
+            const columnId = columns.find((col) => col.statusIds.includes(incident.statusId))?.id || "unknown";
 
-            if (!acc[statusKey]) {
-                acc[statusKey] = [];
+            if (!acc[columnId]) {
+                acc[columnId] = [];
             }
 
             const incidentWithUserDetails = {
@@ -33,12 +32,12 @@ export default function useTasks() {
                 reporter: userMap[incident.reporter],
             };
 
-            acc[statusKey].push(incidentWithUserDetails);
+            acc[columnId].push(incidentWithUserDetails);
 
             return acc;
         }, {});
 
-        const allStatuses = isPrivileged(user.role) ? ADMIN_COLUMNS : EMPLOYEE_COLUMNS;
+        const allStatuses = isPrivileged(user.role) ? adminColumns : employeeColumns;
         allStatuses.forEach((column) => {
             if (!(column.id in newTasks)) {
                 newTasks[column.id] = [];
@@ -47,7 +46,7 @@ export default function useTasks() {
 
         setTasks(newTasks);
         setFilteredTasks(newTasks);
-    }, []);
+    }, [adminColumns, employeeColumns]);
 
     useEffect(() => {
         fetchTasks();

@@ -94,4 +94,3 @@ function AdminForm({ fields, setFields }) {
 }
 
 export default AdminForm;
-

@@ -16,19 +16,17 @@ public class BasicIncidentResponse {
     private String incidentCategory;
     private String reporter;
     private List<String> employeesInvolved;
-    private EmployeeIncidentStatus employeeIncidentStatus;
-    private SafetyWardenIncidentStatus safetyWardenIncidentStatus;
+    private String statusId;
 
     public BasicIncidentResponse() {}
 
-    public BasicIncidentResponse(String id, String incidentDate, String incidentCategory, String reporter, List<String> employeesInvolved, EmployeeIncidentStatus employeeIncidentStatus, SafetyWardenIncidentStatus safetyWardenIncidentStatus) {
+    public BasicIncidentResponse(String id, String incidentDate, String incidentCategory, String reporter, List<String> employeesInvolved, String statusId) {
         this.id = id;
         this.incidentDate = incidentDate;
         this.incidentCategory = incidentCategory;
         this.reporter = reporter;
         this.employeesInvolved = employeesInvolved;
-        this.employeeIncidentStatus = employeeIncidentStatus;
-        this.safetyWardenIncidentStatus = safetyWardenIncidentStatus;
+        this.statusId = statusId;
     }
 
 }

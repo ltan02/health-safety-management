@@ -6,6 +6,7 @@ import com.teamadc.backend.dto.request.IncidentRequest;
 import com.teamadc.backend.dto.response.BasicIncidentResponse;
 import com.teamadc.backend.model.Comment;
 import com.teamadc.backend.model.Incident;
+import com.teamadc.backend.service.CommentService;
 import com.teamadc.backend.service.IncidentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,13 +23,19 @@ import java.util.concurrent.ExecutionException;
 @RequestMapping("/incidents")
 public class IncidentController {
 
+    private final IncidentService incidentService;
+    private final CommentService commentService;
+
     @Autowired
-    private IncidentService incidentService;
+    public IncidentController(IncidentService incidentService, CommentService commentService) {
+        this.incidentService = incidentService;
+        this.commentService = commentService;
+    }
 
     @PostMapping
     public ResponseEntity<Incident> createIncident(@RequestBody IncidentRequest request) {
         List<CustomFieldRequest> customFieldsRequest = request.getCustomFields();
-        Incident incident = new Incident(null, request.getIncidentDate(), request.getIncidentCategory(), request.getReporter(), request.getEmployeesInvolved());
+        Incident incident = new Incident(null, request.getIncidentDate(), request.getIncidentCategory(), request.getReporter(), request.getEmployeesInvolved(), request.getStatusId());
 
         for (CustomFieldRequest field : customFieldsRequest) {
             incident.setCustomField(field.getFieldName(), field.getValue());
@@ -52,7 +59,7 @@ public class IncidentController {
 
             List<BasicIncidentResponse> response = new ArrayList<>();
             for (Incident incident : incidents) {
-                response.add(new BasicIncidentResponse(incident.getId(), incident.getIncidentDate(), incident.getIncidentCategory(), incident.getReporter(), incident.getEmployeesInvolved(), incident.getEmployeeIncidentStatus(), incident.getSafetyWardenIncidentStatus()));
+                response.add(new BasicIncidentResponse(incident.getId(), incident.getIncidentDate(), incident.getIncidentCategory(), incident.getReporter(), incident.getEmployeesInvolved(), incident.getStatusId()));
             }
 
             return ResponseEntity.ok(response);
@@ -73,8 +80,7 @@ public class IncidentController {
             if (request.getIncidentCategory() != null) existingIncident.setIncidentCategory(request.getIncidentCategory());
             if (request.getReporter() != null) existingIncident.setReporter(request.getReporter());
             if (request.getEmployeesInvolved() != null) existingIncident.setEmployeesInvolved(request.getEmployeesInvolved());
-            if (request.getEmployeeIncidentStatus() != null) existingIncident.setEmployeeIncidentStatus(request.getEmployeeIncidentStatus());
-            if (request.getSafetyWardenIncidentStatus() != null) existingIncident.setSafetyWardenIncidentStatus(request.getSafetyWardenIncidentStatus());
+            if (request.getStatusId() != null) existingIncident.setStatusId(request.getStatusId());
             if (request.getComments() != null) existingIncident.setComments(request.getComments());
 
             existingIncident.setLastUpdatedAt(new Date());
@@ -120,19 +126,18 @@ public class IncidentController {
         try {
             Comment comment = new Comment(null, uid, commentReq.getContent());
             Incident incident = incidentService.addComment(incidentId, comment);
+            commentService.createOrUpdateComment(comment);
             return ResponseEntity.ok(incident);
         } catch (InterruptedException | ExecutionException e) {
             return ResponseEntity.internalServerError().build();
         }
     }
 
-    @PostMapping("/{incidentId}/comments/{commentId}")
-    public ResponseEntity<Incident> addComment(@PathVariable String incidentId, @PathVariable String commentId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String uid = (String) authentication.getPrincipal();
-
+    @DeleteMapping("/{incidentId}/comments/{commentId}")
+    public ResponseEntity<Incident> deleteComment(@PathVariable String incidentId, @PathVariable String commentId) {
         try {
             Incident incident = incidentService.deleteComment(incidentId, commentId);
+            commentService.deleteComment(commentId);
             return ResponseEntity.ok(incident);
         } catch (InterruptedException | ExecutionException e) {
             return ResponseEntity.internalServerError().build();

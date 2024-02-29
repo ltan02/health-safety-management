@@ -7,13 +7,11 @@ import lombok.Setter;
 @Getter
 public class CommentRequest {
     private String content;
-    private String timestamp;
 
     public CommentRequest() {}
 
-    public CommentRequest(String content, String timestamp) {
+    public CommentRequest(String content) {
         this.content = content;
-        this.timestamp = timestamp;
     }
 
 }

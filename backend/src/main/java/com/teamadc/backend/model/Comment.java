@@ -11,8 +11,7 @@ public class Comment {
     private String id;
     private String userId;
     private String content;
-    private Date createdAt;
-    private Date lastUpdatedAt;
+    private Date timestamp;
 
     public Comment() {}
 
@@ -20,7 +19,6 @@ public class Comment {
         this.id = id;
         this.userId = userId;
         this.content = content;
-        this.createdAt = new Date();
-        this.lastUpdatedAt = new Date();
+        this.timestamp = new Date();
     }
 }
