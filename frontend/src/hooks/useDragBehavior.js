@@ -17,9 +17,6 @@ const useDragBehavior = (tasks, setTasks) => {
     const handleDragOver = ({ active, over }) => {
         if (!over) return;
 
-        console.log(active);
-        console.log(over);
-
         const columns = isPrivileged(user.role) ? adminColumns : employeeColumns;
         const sourceColumn = Object.keys(tasks).find((column) => tasks[column].some((task) => task.id === active.id));
         let destinationColumn = over.id;

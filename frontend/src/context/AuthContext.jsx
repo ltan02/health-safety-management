@@ -8,7 +8,17 @@ export function useAuthContext() {
 }
 
 export function AuthProvider({ children }) {
-    const [user, setUser] = useState(JSON.parse(sessionStorage.getItem("user")) ?? null);
+    const [user, setUser] = useState(() => {
+        const storedUser = sessionStorage.getItem("user");
+        if (storedUser) {
+            try {
+                return JSON.parse(storedUser);
+            } catch (e) {
+                return null;
+            }
+        }
+        return null;
+    });
     const { error, sendRequest } = useAxios();
 
     useEffect(() => {
@@ -21,7 +31,7 @@ export function AuthProvider({ children }) {
                     const backendResponse = await sendRequest({
                         url: `/users/${user.uid}`,
                     });
-        
+
                     sessionStorage.setItem("user", JSON.stringify(backendResponse));
                     setUser(backendResponse);
                 } catch (e) {
@@ -36,6 +46,12 @@ export function AuthProvider({ children }) {
 
         return () => unsubscribe();
     }, []);
+
+    useEffect(() => {
+        if (!sessionStorage.getItem("user")) {
+            signOut();
+        }
+    }, [user]);
 
     const signIn = async (email, password) => {
         try {
