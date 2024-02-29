@@ -26,10 +26,8 @@ export const PRIVILEGED_SIDEBAR_CONTENTS = {
     },
     [PAGE_TYPE.REPORT]: {
         ["Role"]: <RoleSwitchModal>Role</RoleSwitchModal>,
-        ["Report Board"]: <RedirectButton to="/report">Report Board</RedirectButton>,
-        ["Overview"]: <RedirectButton to="/report/overview">Overview</RedirectButton>,
-        ["Dashboard"]: <RedirectButton to="/report/dashboard">Dashboard</RedirectButton>,
-        ["Past Reports"]: <RedirectButton to="/report/past">Past Reports</RedirectButton>,
+        ["Overview"]: <RedirectButton to="/report">Overview</RedirectButton>,
+        ["Dashboard"]: <RedirectButton to="/report/dashboard">Dashboard</RedirectButton>
     },
 };
 
