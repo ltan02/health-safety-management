@@ -1,7 +1,11 @@
-import { Grid, CardActionArea, CardContent, Typography, Card } from "@mui/material";
+import { Grid, CardActionArea, CardContent, Typography, Card, Fab } from "@mui/material";
 import { BarChart, LineChart, PieChart, ScatterChart } from "@mui/x-charts";
 import { useNavigate } from "react-router-dom";
 import { data } from "./initialData.js";
+import Chatbot from "../../components/report/Chatbot.jsx";
+import ChatIcon from "@mui/icons-material/Chat";
+import Draggable from "react-draggable";
+import { useState } from "react";
 
 const reportCardBarChart = (
     <Card sx={{ maxWidth: 500, maxHeight: 450 }}>
@@ -109,6 +113,12 @@ const reportCardPieChart = (
 );
 
 function ReportOverview() {
+
+    const [chatbotVisible, setChatbotVisible] = useState(false);
+    const toggleChatbot = () => {
+        setChatbotVisible(!chatbotVisible);
+    };
+    
     const navigate = useNavigate();
 
     const handleBarClick = () => {
@@ -166,6 +176,30 @@ function ReportOverview() {
                     {reportCardPieChart}
                 </Grid>
             </Grid>
+            <Fab
+        color="primary"
+        aria-label="chat"
+        sx={{ position: "fixed", bottom: 16, right: 16 }}
+        onClick={toggleChatbot}
+      >
+        <ChatIcon />
+      </Fab>
+
+      {
+        <Draggable>
+          <div
+            style={{
+              position: "fixed",
+              top: 50,
+              left: 50,
+              zIndex: 1500,
+              display: chatbotVisible ? "block" : "none",
+            }}
+          >
+            <Chatbot />
+          </div>
+        </Draggable>
+      }
         </div>
     );
 }
