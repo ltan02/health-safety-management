@@ -1,9 +1,14 @@
 import { useState } from "react";
 import { Button, Modal, Box, TextField, Select, MenuItem } from "@mui/material";
-
-function AdminForm({ fields, setFields }) {
+const initialFields = [
+    { name: "title", label: "Title", columnWidth: 300, type: "text" },
+    { name: "reporter", label: "Reported By", columnWidth: 200, type: "text" },
+    { name: "employeesInvolved", label: "Employees Involved", columnWidth: 800, type: "text" },
+];
+function AdminForm() {
     const [open, setOpen] = useState(false);
     const [newField, setNewField] = useState({ name: "", label: "", columnWidth: 150, type: "text" });
+    const [fields, setFields] = useState(initialFields);
 
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);

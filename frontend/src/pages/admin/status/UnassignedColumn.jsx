@@ -6,11 +6,8 @@ import Task from "./Task";
 import AddIcon from "@mui/icons-material/Add";
 import AddTaskModal from "./AddTaskModal";
 
-function Column({ id, title, tasks, handleAddTask, employees, onRefresh }) {
+function Column({ id, title, tasks, activeId }) {
     const { setNodeRef } = useDroppable({ id });
-    const [openModal, setOpenModal] = useState(false);
-
-    const toggleModal = () => setOpenModal(!openModal);
 
     return (
         <Container
@@ -21,7 +18,6 @@ function Column({ id, title, tasks, handleAddTask, employees, onRefresh }) {
                 borderRadius: 1,
                 minHeight: "100%",
                 width: "350px",
-                minWidth: "350px",
                 margin: 2,
                 boxShadow: 2,
             }}
@@ -34,27 +30,26 @@ function Column({ id, title, tasks, handleAddTask, employees, onRefresh }) {
                     marginBottom: 2,
                 }}
             >
-                <Typography variant="h6" fontWeight={600} sx={{ flexGrow: 1 }}>
-                    {title} <Chip label={tasks.length} size="small" />
-                </Typography>
-                <IconButton onClick={toggleModal} color="primary">
-                    <AddIcon />
-                </IconButton>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <Typography variant="h6" fontWeight={600}>
+                        {title}
+                    </Typography>
+                    <Chip label={tasks.length} size="small" />
+                </Box>
             </Box>
             <SortableContext id={id} items={tasks.map((task) => task.id)} strategy={rectSortingStrategy}>
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                <Box sx={{ marginTop: 2 }}>
                     {tasks.map((task) => (
-                        <Task key={task.id} id={task.id} task={task} onRefresh={onRefresh} />
+                        <Box key={task.id} sx={{ margin: 1 }}>
+                            {task.id === activeId ? (
+                                <Task id={task.id} task={task} invisible />
+                            ) : (
+                                <Task id={task.id} task={task} />
+                            )}
+                        </Box>
                     ))}
                 </Box>
             </SortableContext>
-            <AddTaskModal
-                open={openModal}
-                onClose={toggleModal}
-                columnId={id}
-                handleAddTask={handleAddTask}
-                allEmployees={employees}
-            />
         </Container>
     );
 }
