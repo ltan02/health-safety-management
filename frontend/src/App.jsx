@@ -20,6 +20,7 @@ import LineReport from "./pages/report/line/index.jsx";
 import PieReport from "./pages/report/pie/index.jsx";
 import ScatterReport from "./pages/report/scatter/index.jsx";
 
+import { BoardProvider } from "./context/BoardContext.jsx";
 
 const theme = createTheme({
     typography: {
@@ -47,54 +48,60 @@ function App() {
     const { isUserLoggedIn, user } = useAuthContext();
 
     const getRoutesForRole = () => {
-        if (!isUserLoggedIn()) return <Route path="/" element={<Login />} />;
+        if (!isUserLoggedIn())
+            return (
+                <Routes>
+                    <Route path="/" element={<Login />} />
+                </Routes>
+            );
 
-        const isPrivilegedUser = isUserLoggedIn() && isPrivileged(user.role);
-        if (isPrivilegedUser) {
-            return (
-                <>
-                    <Route path="/">
-                        <Route index element={<AdminWorkflow />} />
-                        <Route path="management" element={<AdminManagement />} />
-                        <Route path="form" element={<AdminForm />} />
-                        <Route path="status" element={<AdminStatus />} />
-                    </Route>
-                    <Route path="incident">
-                        <Route index element={<Incident />} />
-                        <Route path="report" element={<IncidentReport />} />
-                    </Route>
-                    <Route path="report">
-                        <Route index element={<ReportOverview />} />
-                        <Route path="bar" element={<BarReport/>} />
-                        <Route path="scatter" element={<ScatterReport/>} />
-                        <Route path="line" element={<LineReport/>} />
-                        <Route path="pie" element={<PieReport/>} />
-                        <Route path="dashboard" element={<ReportDashboard />} />
-                    </Route>
-                </>
-            );
-        } else {
-            return (
-                <>
+        const routesForPrivilegedUser = (
+            <>
+                <Route path="/" element={<AdminWorkflow />} />
+                <Route path="management" element={<AdminManagement />} />
+                <Route path="form" element={<AdminForm />} />
+                <Route path="status" element={<AdminStatus />} />
+                <Route path="incident">
                     <Route index element={<Incident />} />
-                    <Route path="/report" element={<IncidentReport />} />
-                </>
-            );
-        }
+                    <Route path="report" element={<IncidentReport />} />
+                </Route>
+                <Route path="report">
+                    <Route index element={<ReportOverview />} />
+                    <Route path="bar" element={<BarReport/>} />
+                    <Route path="scatter" element={<ScatterReport/>} />
+                    <Route path="line" element={<LineReport/>} />
+                    <Route path="pie" element={<PieReport/>} />
+                    <Route path="dashboard" element={<ReportDashboard />} />
+                </Route>
+            </>
+        );
+
+        const routesForRegularUser = (
+            <>
+                <Route index element={<Incident />} />
+                <Route path="/report" element={<IncidentReport />} />
+            </>
+        );
+
+        const isPrivilegedUser = isPrivileged(user.role);
+
+        return (
+            <BoardProvider>
+                <Routes>
+                    {isPrivilegedUser ? routesForPrivilegedUser : routesForRegularUser}
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+            </BoardProvider>
+        );
     };
 
     return (
-        <>
-            <BrowserRouter>
-                <ThemeProvider theme={theme}>
-                    {isUserLoggedIn() && <Header />}
-                    <Routes>
-                        {getRoutesForRole()}
-                        <Route path="*" element={<Navigate to={"/"} replace />} />
-                    </Routes>
-                </ThemeProvider>
-            </BrowserRouter>
-        </>
+        <BrowserRouter>
+            <ThemeProvider theme={theme}>
+                {isUserLoggedIn() && <Header />}
+                {getRoutesForRole()}
+            </ThemeProvider>
+        </BrowserRouter>
     );
 }
 
