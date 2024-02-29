@@ -16,18 +16,20 @@ import useTasks from "../../hooks/useTasks";
 import useDragBehavior from "../../hooks/useDragBehavior";
 import { useAuthContext } from "../../context/AuthContext";
 import { isPrivileged } from "../../utils/permissions";
-import { ADMIN_COLUMNS, EMPLOYEE_COLUMNS } from "../../constants/board";
 import useAxios from "../../hooks/useAxios";
+import { useBoard } from "../../context/BoardContext";
 
 function Dashboard() {
     const { tasks, filterTasks, setTasks, fetchTasks } = useTasks();
     const { activeId, handleDragStart, handleDragOver, handleDragEnd } = useDragBehavior(tasks, setTasks);
     const { user } = useAuthContext();
     const { sendRequest } = useAxios();
+    const { adminColumns, employeeColumns, statuses } = useBoard();
 
     const [employees, setEmployees] = useState([]);
 
-    const columns = isPrivileged(user.role) ? ADMIN_COLUMNS : EMPLOYEE_COLUMNS;
+    const unsortedColumns = isPrivileged(user.role) ? adminColumns : employeeColumns;
+    const columns = unsortedColumns.sort((a, b) => a.order - b.order);
 
     const activeTask = activeId
         ? Object.values(tasks)
@@ -48,6 +50,7 @@ function Dashboard() {
             incidentCategory: task.category,
             employeesInvolved: task.employeesInvolved,
             customFields: [],
+            statusId: statuses.find((status) => status.name === "Pending Review")?.id,
         };
 
         for (const key in task) {
@@ -113,7 +116,7 @@ function Dashboard() {
                         >
                             <Column
                                 id={column.id}
-                                title={column.title}
+                                title={column.name}
                                 tasks={tasks[column.id] || []}
                                 activeId={activeId}
                                 handleAddTask={handleAddTask}

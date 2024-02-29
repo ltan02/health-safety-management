@@ -2,12 +2,13 @@ import { useState } from "react";
 import { useAuthContext } from "../context/AuthContext";
 import { isPrivileged } from "../utils/permissions";
 import useAxios from "./useAxios";
-import { ADMIN_STATE, EMPLOYEE_STATE } from "../constants/board";
+import { useBoard } from "../context/BoardContext";
 
 const useDragBehavior = (tasks, setTasks) => {
     const [activeId, setActiveId] = useState(null);
     const { user } = useAuthContext();
     const { sendRequest } = useAxios();
+    const { adminColumns, employeeColumns } = useBoard();
 
     const handleDragStart = (event) => {
         setActiveId(event.active.id);
@@ -16,13 +17,16 @@ const useDragBehavior = (tasks, setTasks) => {
     const handleDragOver = ({ active, over }) => {
         if (!over) return;
 
-        const states = isPrivileged(user.role) ? ADMIN_STATE : EMPLOYEE_STATE;
+        console.log(active);
+        console.log(over);
+
+        const columns = isPrivileged(user.role) ? adminColumns : employeeColumns;
         const sourceColumn = Object.keys(tasks).find((column) => tasks[column].some((task) => task.id === active.id));
         let destinationColumn = over.id;
 
         if (!sourceColumn || !destinationColumn) return;
 
-        if (Object.keys(states).indexOf(destinationColumn) < 0) {
+        if (columns.find((column) => column.id === destinationColumn) === undefined) {
             destinationColumn = Object.keys(tasks).find((column) => tasks[column].some((task) => task.id === over.id));
         }
 
@@ -62,13 +66,12 @@ const useDragBehavior = (tasks, setTasks) => {
 
     const handleDragEnd = ({ active, over }) => {
         if (!over) return;
-
-        const states = isPrivileged(user.role) ? ADMIN_STATE : EMPLOYEE_STATE;
         let destinationColumn = over.id;
 
         if (!destinationColumn) return;
 
-        if (Object.keys(states).indexOf(destinationColumn) < 0) {
+        const columns = isPrivileged(user.role) ? adminColumns : employeeColumns;
+        if (Object.keys(columns).indexOf(destinationColumn) < 0) {
             destinationColumn = Object.keys(tasks).find((column) => tasks[column].some((task) => task.id === over.id));
         }
 

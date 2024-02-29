@@ -3,12 +3,11 @@ import { Modal, Box, Typography, Select, MenuItem, IconButton, Grid, Avatar, Tex
 import CloseIcon from "@mui/icons-material/Close";
 import useAxios from "../../hooks/useAxios";
 import { useAuthContext } from "../../context/AuthContext";
-import { isPrivileged } from "../../utils/permissions";
-import { ADMIN_COLUMNS, EMPLOYEE_COLUMNS } from "../../constants/board";
 import { formatCamelCaseToNormalText } from "../../utils/textFormat";
 import Profile from "../users/Profile";
 import { convertToPacificTime } from "../../utils/date";
 import { dateToDaysAgo } from "../../utils/date";
+import { useBoard } from "../../context/BoardContext";
 
 const modalStyle = {
     position: "absolute",
@@ -26,12 +25,10 @@ const modalStyle = {
 export default function IncidentDetailModal({ incidentId, open, onClose, onRefresh }) {
     const { sendRequest } = useAxios();
     const { user } = useAuthContext();
+    const { statuses } = useBoard();
 
     const [incident, setIncident] = useState(null);
     const [incidentState, setIncidentState] = useState(null);
-
-    const possibleStates = isPrivileged(user.role) ? ADMIN_COLUMNS : EMPLOYEE_COLUMNS;
-    const statusField = isPrivileged(user.role) ? "safetyWardenIncidentStatus" : "employeeIncidentStatus";
 
     useEffect(() => {
         const fetchData = async () => {
@@ -53,7 +50,7 @@ export default function IncidentDetailModal({ incidentId, open, onClose, onRefre
             };
 
             setIncident(updatedIncident);
-            setIncidentState(updatedIncident[statusField]);
+            setIncidentState(updatedIncident.statusId);
         };
 
         fetchData();
@@ -68,14 +65,14 @@ export default function IncidentDetailModal({ incidentId, open, onClose, onRefre
             url: `/incidents/${incidentId}`,
             method: "POST",
             body: {
-                [statusField]: newStateId,
+                statusId: newStateId,
             },
         });
 
         setIncident((prevIncident) => {
             const newIncident = {
                 ...prevIncident,
-                [statusField]: newStateId,
+                statusId: newStateId,
             };
             return newIncident;
         });
@@ -180,10 +177,10 @@ export default function IncidentDetailModal({ incidentId, open, onClose, onRefre
                                 },
                             }}
                         >
-                            {possibleStates.map(({ id, title }) => {
+                            {statuses.map(({ id, name }) => {
                                 return (
                                     <MenuItem key={id} value={id}>
-                                        {title}
+                                        {name}
                                     </MenuItem>
                                 );
                             })}
