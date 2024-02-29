@@ -1,10 +1,7 @@
-import { useState } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
-import { Container, Typography, Box, Chip, IconButton } from "@mui/material";
+import { Container, Typography, Box, Chip } from "@mui/material";
 import Task from "./Task";
-import AddIcon from "@mui/icons-material/Add";
-import AddTaskModal from "./AddTaskModal";
 
 function Column({ id, title, tasks, activeId }) {
     const { setNodeRef } = useDroppable({ id });
