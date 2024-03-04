@@ -7,14 +7,19 @@ import lombok.Setter;
 @Getter
 @Setter
 public class State {
-    private String statusId;
+    @DocumentId
+    private String id;
     private String name;
     private Coordinate coordinate;
 
     public State() {}
 
-    public State(String statusId, String name, Coordinate coordinate) {
-        this.statusId = statusId;
+    public State(String name) {
+        this.name = name;
+    }
+
+    public State(String id, String name, Coordinate coordinate) {
+        this.id = id;
         this.name = name;
         this.coordinate = coordinate;
     }
