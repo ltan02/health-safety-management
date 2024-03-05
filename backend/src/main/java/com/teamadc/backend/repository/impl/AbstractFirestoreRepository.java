@@ -44,6 +44,14 @@ public abstract class AbstractFirestoreRepository<T> {
         } else {
             ApiFuture<DocumentReference> future = firestore.collection(getCollectionName().toLowerCase()).add(entity);
             docRef = future.get();
+            id = docRef.getId();
+            Method setIdMethod = null;
+            try {
+                setIdMethod = clazz.getMethod("setId", String.class);
+                setIdMethod.invoke(entity, id);
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
         }
 
         DocumentSnapshot documentSnapshot = docRef.get().get();
