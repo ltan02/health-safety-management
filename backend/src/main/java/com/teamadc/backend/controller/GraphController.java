@@ -51,6 +51,16 @@ public class GraphController {
         }
     }
 
+    @GetMapping("/{graphId}")
+    public  ResponseEntity<Graph> getGraphById(@PathVariable String graphId) {
+        try {
+            Graph graph = graphService.getGraphById(graphId);
+            return  ResponseEntity.ok(graph);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
 
     @PostMapping("/{graphId}/addState")
     public ResponseEntity<Graph> addState(@PathVariable String graphId, @RequestBody State request) {
@@ -78,16 +88,6 @@ public class GraphController {
         try {
             Graph graph = graphService.getGraphById(request.getId());
             return ResponseEntity.ok(graph);
-        } catch (InterruptedException | ExecutionException e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @PostMapping("/deleteGraph")
-    public ResponseEntity<List<Graph>> getGraphs() {
-        try {
-            List<Graph> graphs = graphService.getGraphs();
-            return ResponseEntity.ok(graphs);
         } catch (InterruptedException | ExecutionException e) {
             return ResponseEntity.internalServerError().build();
         }
