@@ -1,8 +1,7 @@
 import { useCallback, useEffect } from "react";
 import ReactFlow, { useNodesState, useEdgesState, addEdge } from "reactflow";
 import "reactflow/dist/style.css";
-import useAxios from "../../../hooks/useAxios";
-import useGraph from "../../../hooks/useGraph";
+import useWorkflow from "../../../hooks/useWorkflow";
 
 import { Container } from "@mui/material";
 
@@ -11,12 +10,12 @@ function AdminManagement() {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const {
     states,
-    flows,
+    transitions,
     fetchGraph,
     updateCoordinate,
-    createFlow,
-    deleteFlow,
-  } = useGraph();
+    createTransition,
+    deleteTransition,
+  } = useWorkflow();
 
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge(params, eds)),
@@ -29,12 +28,12 @@ function AdminManagement() {
 
   const handleEdgesUpdated = (params) => {
     onConnect(params);
-    createFlow(params.source, params.target);
+    createTransition(params.source, params.target);
   };
 
   const onEdgeDelete = useCallback((id) => {
-    deleteFlow(id);
-  }, [deleteFlow]);
+    deleteTransition(id);
+  }, [deleteTransition]);
 
 
   const handleEdgesChange = useCallback(
@@ -58,8 +57,10 @@ function AdminManagement() {
 
   useEffect(() => {
     setNodes(states);
-    setEdges(flows);
-  }, [states, flows]);
+    setEdges(transitions);
+    console.log(states)
+    console.log(transitions)
+  }, [states, transitions]);
 
   return (
     <Container style={{ width: "800px", height: "700px" }}>

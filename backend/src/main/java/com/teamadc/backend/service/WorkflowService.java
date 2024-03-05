@@ -1,6 +1,7 @@
 package com.teamadc.backend.service;
 
 import com.teamadc.backend.model.Workflow;
+import com.teamadc.backend.model.Coordinate;
 import com.teamadc.backend.model.State;
 import com.teamadc.backend.model.Transition;
 import com.teamadc.backend.repository.GenericRepository;
@@ -75,6 +76,18 @@ public class WorkflowService {
         transitionRepository.deleteById(flowId);
         flows.removeIf(f -> f.getId().equals(flowId));
         workflow.setTransitions(flows);
+        workflowRepository.save(workflow);
+    }
+
+    public void updateCoordinate(String workflowId, String stateId, Coordinate coordinate) throws InterruptedException, ExecutionException {
+        Workflow workflow = workflowRepository.findById(workflowId);
+        List<State> states = workflow.getStates();
+        State state = states.stream().filter(s -> s.getId().equals(stateId)).findFirst().orElseThrow();
+        state.setCoordinate(coordinate);
+        states.removeIf(s -> s.getId().equals(stateId));
+        stateRepository.save(state);
+        states.add(state);
+        workflow.setStates(states);
         workflowRepository.save(workflow);
     }
     

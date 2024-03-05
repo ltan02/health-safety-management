@@ -14,11 +14,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import com.teamadc.backend.model.Workflow;
 import com.teamadc.backend.model.Transition;
 import com.teamadc.backend.service.WorkflowService;
-
+import com.teamadc.backend.model.Coordinate;
 import com.teamadc.backend.model.State;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+
 
 
 
@@ -99,6 +101,16 @@ public class WorkflowController {
     public ResponseEntity<Workflow> deleteTransition(@PathVariable String workflowId, @PathVariable String flowId) {
         try {
             workflowService.deleteTransition(workflowId, flowId);
+            return ResponseEntity.ok().build();
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PutMapping("/{workflowId}/coordinate/{stateId}")
+    public ResponseEntity<Workflow> updateCoordinate(@PathVariable String workflowId, @PathVariable String stateId, @RequestBody Coordinate request) {
+        try {
+            workflowService.updateCoordinate(workflowId, stateId, request);
             return ResponseEntity.ok().build();
         } catch (InterruptedException | ExecutionException e) {
             return ResponseEntity.internalServerError().build();
