@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import useAxios from "./useAxios";
 
 export default function useGraph() {
@@ -17,14 +17,13 @@ export default function useGraph() {
             const newFlow = []
             Promise.all(
                 response.states.map(async (id) => {
-                    console.log(id)
                     const res = await sendRequest({
                         url: `/state/${id}`,
                         method: "GET",
                     });
                     const node = {
                         id: res.id,
-                        position: { x: 0, y: newStates.length * 100 },
+                        position: { x: res.coordinate.x, y: res.coordinate.y },
                         data: { label: res.name },
                     }
                     newStates.push(node);
@@ -38,7 +37,6 @@ export default function useGraph() {
                         url: `/flow/${id}`,
                         method: "GET",
                     });
-                    console.log(res)
                     const flow = {
                         id: res.id,
                         source: res.from,
@@ -55,5 +53,23 @@ export default function useGraph() {
         }
     }, []);
 
-    return { states, flows, fetchGraph };
+    const updateCoordinate = useCallback(async (id, coordinate) => {
+        try {
+            await sendRequest({
+                url: `/state/${id}`,
+                method: "PUT",
+                body: {
+                    "coordinate": {
+                        "x": coordinate.x,
+                        "y": coordinate.y
+                    }
+                }
+            });
+            console.log("update coordinate success");
+        } catch (error) {
+            console.log(error);
+        }
+    }, [states, flows]);
+
+    return { states, flows, fetchGraph, updateCoordinate };
 }

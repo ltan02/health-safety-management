@@ -9,12 +9,17 @@ import { Container } from "@mui/material";
 function AdminManagement() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const { states, flows, fetchGraph } = useGraph();
+  const { states, flows, fetchGraph, updateCoordinate  } = useGraph();
 
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge(params, eds)),
     [setEdges]
   );
+  
+  const onDragEnd = (event, node) => {
+    console.log(node);
+    updateCoordinate(node.id, node.position);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,6 +40,7 @@ function AdminManagement() {
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
+        onNodeDragStop={onDragEnd}
         onConnect={onConnect}
         fitView
       >

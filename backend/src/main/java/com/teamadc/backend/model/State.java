@@ -18,6 +18,10 @@ public class State {
         this.name = name;
     }
 
+    public State(Coordinate coordinate) {
+        this.coordinate = coordinate;
+    }
+
     public State(String id, String name, Coordinate coordinate) {
         this.id = id;
         this.name = name;

@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
 
 
 @RestController
@@ -74,6 +77,19 @@ public class StateController {
             if (req.getName() != null) existingState.setName(req.getName());
 
             State newState = stateService.createOrUpdateState(existingState);
+            return ResponseEntity.ok(newState);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PutMapping("/{stateId}")
+    public ResponseEntity<State> updateCoordinate(@PathVariable String stateId, @RequestBody State req) {
+        try {
+            State state = stateService.getStateById(stateId);
+            state.setCoordinate(req.getCoordinate());
+
+            State newState = stateService.createOrUpdateState(state);
             return ResponseEntity.ok(newState);
         } catch (InterruptedException | ExecutionException e) {
             return ResponseEntity.internalServerError().build();
