@@ -9,17 +9,45 @@ import { Container } from "@mui/material";
 function AdminManagement() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const { states, flows, fetchGraph, updateCoordinate  } = useGraph();
+  const {
+    states,
+    flows,
+    fetchGraph,
+    updateCoordinate,
+    createFlow,
+    deleteFlow,
+  } = useGraph();
 
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge(params, eds)),
     [setEdges]
   );
-  
-  const onDragEnd = (event, node) => {
-    console.log(node);
+
+  const handleDragEnd = (_, node) => {
     updateCoordinate(node.id, node.position);
   };
+
+  const handleEdgesUpdated = (params) => {
+    onConnect(params);
+    createFlow(params.source, params.target);
+  };
+
+  const onEdgeDelete = useCallback((id) => {
+    deleteFlow(id);
+  }, [deleteFlow]);
+
+
+  const handleEdgesChange = useCallback(
+    (changes) => {
+      onEdgesChange(changes);
+      changes.forEach((change) => {
+        if (change.type === "remove") {
+          onEdgeDelete(change.id);
+        }
+      });
+    },
+    [onEdgesChange, onEdgeDelete]
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,9 +67,9 @@ function AdminManagement() {
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onNodeDragStop={onDragEnd}
-        onConnect={onConnect}
+        onEdgesChange={handleEdgesChange}
+        onNodeDragStop={handleDragEnd}
+        onConnect={handleEdgesUpdated}
         fitView
       >
         {/* <MiniMap />

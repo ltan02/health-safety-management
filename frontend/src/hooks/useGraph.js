@@ -71,5 +71,46 @@ export default function useGraph() {
         }
     }, [states, flows]);
 
-    return { states, flows, fetchGraph, updateCoordinate };
+    const createFlow = useCallback(async (source, target, label = null) => {
+        try {
+            const flow = await sendRequest({
+                url: `/flow`,
+                method: "POST",
+                body: {
+                    "from": source,
+                    "to": target,
+                    "name": label
+                }
+            });
+            await sendRequest({
+                url: `/graphs/NqdsQ8uIyGnlWgN2dI2o/addFlow`,
+                method: "POST",
+                body: {
+                   id: flow.id
+                }
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    }, [states, flows]);
+
+    const deleteFlow = useCallback(async (id) => {
+        try {
+            await sendRequest({
+                url: `/flow/${id}`,
+                method: "DELETE"
+            });
+            await sendRequest({
+                url: `/graphs/NqdsQ8uIyGnlWgN2dI2o/deleteFlow/${id}`,
+                method: "DELETE",
+                body: {
+                   id: id
+                }
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    }, [states, flows]);
+
+    return { states, flows, fetchGraph, updateCoordinate, createFlow, deleteFlow };
 }

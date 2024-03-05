@@ -16,6 +16,8 @@ import com.teamadc.backend.model.Flow;
 import com.teamadc.backend.service.GraphService;
 
 import com.teamadc.backend.model.State;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 
 
@@ -83,13 +85,25 @@ public class GraphController {
     }
 
 
-    @PostMapping("/deleteGraph")
-    public ResponseEntity<Graph> getGraphById(@RequestBody Flow request) {
+    @DeleteMapping("/{graphId}/deleteState/{stateId}")
+    public ResponseEntity<Graph> deleteState(@PathVariable String graphId, @PathVariable String stateId) {
         try {
-            Graph graph = graphService.getGraphById(request.getId());
-            return ResponseEntity.ok(graph);
+            graphService.deleteState(graphId, stateId);
+            return ResponseEntity.ok().build();
         } catch (InterruptedException | ExecutionException e) {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    @DeleteMapping("/{graphId}/deleteFlow/{flowId}")
+    public ResponseEntity<Graph> deleteFlow(@PathVariable String graphId, @PathVariable String flowId) {
+        try {
+            graphService.deleteFlow(graphId, flowId);
+            return ResponseEntity.ok().build();
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    
 }
