@@ -45,6 +45,16 @@ public class WorkflowController {
         }
     }
 
+    @PutMapping("/{workflowId}")
+    public ResponseEntity<Workflow> updateWorkflow(@PathVariable String workflowId, @RequestBody Workflow request) {
+        try {
+            Workflow newWorkflow = workflowService.updateWorkflow(request);
+            return ResponseEntity.ok(newWorkflow);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     @GetMapping
     public ResponseEntity<List<Workflow>> getAllWorkflows() {
         try {

@@ -4,7 +4,21 @@ import useAxios from "./useAxios";
 export default function useGraph() {
     const [states, setStates] = useState([]);
     const [transitions, setTransitions] = useState([]);
-    const { sendRequest } = useAxios();
+    const [callbackStack, setCallbackStack] = useState([]);
+    const { sendRequest, loading } = useAxios();
+
+    const pushCallback = (callback) => {
+        setCallbackStack((prev) => [...prev, callback]);
+    };
+
+    const applyCallbacks = () => {
+        callbackStack.forEach((callback) => callback());
+        setCallbackStack([]);
+    };
+
+    const discardCallbacks = () => {
+        setCallbackStack([]);
+    };
 
     const fetchGraph = useCallback(async () => {
         try {
@@ -87,5 +101,5 @@ export default function useGraph() {
         }
     }, [states, transitions]);
 
-    return { states, transitions, fetchGraph, updateCoordinate, createTransition, deleteTransition };
+    return { states, transitions, loading, fetchGraph, updateCoordinate, createTransition, deleteTransition, pushCallback, applyCallbacks, discardCallbacks };
 }

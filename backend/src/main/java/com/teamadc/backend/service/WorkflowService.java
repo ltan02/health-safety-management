@@ -31,6 +31,18 @@ public class WorkflowService {
         return workflowRepository.save(workflow);
     }
 
+    public Workflow updateWorkflow(Workflow workflow) throws InterruptedException, ExecutionException {
+        List<State> states = workflow.getStates();
+        List<Transition> transitions = workflow.getTransitions();
+        for (State state : states) {
+            stateRepository.save(state);
+        }
+        for (Transition transition : transitions) {
+            transitionRepository.save(transition);
+        }
+        return workflowRepository.save(workflow);
+    }
+
     public void deleteWorkflow(String workflowId) throws InterruptedException, ExecutionException {
         workflowRepository.deleteById(workflowId);
     }
