@@ -17,6 +17,7 @@ function Header() {
 
     const handleLogout = async () => {
         signOut();
+        navigate("/");
     };
 
     const directTo = (path) => () => {
