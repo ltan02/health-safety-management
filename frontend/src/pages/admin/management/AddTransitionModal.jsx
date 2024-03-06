@@ -17,7 +17,6 @@ function AddTransitionModal({ handleFieldSubmit, handleClose, open, states, tran
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log({ name, from, to });
     handleFieldSubmit({
       label: name,
       source: from.id,
@@ -30,11 +29,9 @@ function AddTransitionModal({ handleFieldSubmit, handleClose, open, states, tran
     handleClose();
   };
 
-  
   const findStateById = (id) => states.find((state) => state.id === id) || {};
 
-  const isStateAlreadyConnected = (from, to) => {
-    console.log(transitions)
+  const isStateAlreadyConnected = (from, to) => { 
     return transitions.some(
       (transition) =>
         transition.source === from.id && transition.target === to.id || transition.source === to.id && transition.target === from.id

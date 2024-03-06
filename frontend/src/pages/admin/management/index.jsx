@@ -9,6 +9,7 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import useWorkflow from "../../../hooks/useWorkflow";
 import AddTransitionModal from "./AddTransitionModal";
+import AddStateModal from "./AddStateModal";
 import {
   Container,
   Button,
@@ -21,6 +22,8 @@ import {
 
 function AdminManagement() {
   const [transitionModalOpen, setTransitionModalOpen] = React.useState(false);
+  const [stateModalOpen, setStateModalOpen] = React.useState(false);
+  const [selectedStatus, setSelectedStatus] = React.useState(null);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const {
@@ -30,6 +33,7 @@ function AdminManagement() {
     statuses,
     fetchWorkflow,
     updateCoordinate,
+    createState,
     deleteState,
     createTransition,
     deleteTransition,
@@ -38,7 +42,6 @@ function AdminManagement() {
     applyCallbacks,
     organizeCoordinates,
   } = useWorkflow();
-
 
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge(params, eds)),
@@ -55,10 +58,36 @@ function AdminManagement() {
   const handleEdgesUpdated = useCallback(
     (params) => {
       onConnect(params);
-      pushCallback(() => createTransition(params.source, params.target, params?.label));
+      pushCallback(() =>
+        createTransition(params.source, params.target, params?.label)
+      );
     },
     [onConnect, pushCallback, createTransition]
   );
+
+  const handleStateModalOpen = (status) => {
+    setStateModalOpen(true);
+    setSelectedStatus({
+      id: status,
+      name: statuses[status].name,
+      color: statuses[status].color,
+    });
+  };
+
+  const handleStateUpdated = useCallback((name) => {
+    const newState = {
+      id: `temp-${Date.now()}`,
+      data: { label: name },
+      position: { x: 0, y: 0 },
+      style: {
+        backgroundColor: selectedStatus.color,
+        fontWeight: "bold",
+        border: `solid 2px ${selectedStatus.color}`,
+      },
+    };
+    setNodes([...nodes, newState]);
+    pushCallback(() => createState(name, selectedStatus.id, newState.position));
+  });
 
   const onEdgeDelete = useCallback(
     (id) => {
@@ -73,7 +102,6 @@ function AdminManagement() {
     },
     [deleteState, pushCallback]
   );
-  
 
   const handleEdgesChange = useCallback(
     (changes) => {
@@ -130,17 +158,24 @@ function AdminManagement() {
         <Grid container justifyContent="space-between" alignItems="center">
           <Grid item>
             <Grid container spacing={2}>
-              {Object.values(statuses).map((status) => (
+              {Object.values(statuses).map((status, index) => (
                 <Grid item key={status.name}>
-                  <Button onClick={fetchWorkflow} variant="outlined" style={{
-                    backgroundColor: status.color,
-                  }}>
+                  <Button
+                    onClick={() => handleStateModalOpen(Object.keys(statuses)[index])}
+                    variant="outlined"
+                    style={{
+                      backgroundColor: status.color,
+                    }}
+                  >
                     <Typography color="black">{status.name}</Typography>
                   </Button>
                 </Grid>
               ))}
               <Grid item>
-                <Button onClick={() => setTransitionModalOpen(true)} variant="outlined">
+                <Button
+                  onClick={() => setTransitionModalOpen(true)}
+                  variant="outlined"
+                >
                   <Typography color="black">Transition</Typography>
                 </Button>
               </Grid>
@@ -200,7 +235,19 @@ function AdminManagement() {
           <CircularProgress />
         </Box>
       )}
-      <AddTransitionModal open={transitionModalOpen} handleClose={() => setTransitionModalOpen(false)} states = {states} handleFieldSubmit={handleEdgesUpdated} transitions={transitions} />
+      <AddTransitionModal
+        open={transitionModalOpen}
+        handleClose={() => setTransitionModalOpen(false)}
+        states={states}
+        handleFieldSubmit={handleEdgesUpdated}
+        transitions={transitions}
+      />
+      <AddStateModal
+        open={stateModalOpen}
+        handleClose={() => setStateModalOpen(false)}
+        handleFieldSubmit={handleStateUpdated}
+        selectedStatus={selectedStatus}
+      />
     </Container>
   );
 }

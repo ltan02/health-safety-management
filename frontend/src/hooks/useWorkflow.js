@@ -103,7 +103,6 @@ export default function useWorkflow() {
 
   const createTransition = useCallback(
     async (source, target, label = null) => {
-      console.log({ source, target, label })
       try {
         await sendRequest({
           url: `/workflows/i3iOjBN8AAbz9txF5M9B/transition`,
@@ -173,6 +172,29 @@ export default function useWorkflow() {
     });
   }, [states, transitions, setStates, updateCoordinate, pushCallback]);
 
+  const createState = useCallback(
+    async (name, statusId, coordinate) => {
+      try {
+        const response = await sendRequest({
+          url: "/workflows/i3iOjBN8AAbz9txF5M9B/state",
+          method: "POST",
+          body: {
+            name,
+            statusId,
+            coordinate: {
+              x: coordinate.x,
+              y: coordinate.y,
+            },
+          },
+        });
+        return response;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [states, transitions]
+  );
+
   const deleteState = useCallback(
     async (id) => {
       try {
@@ -194,6 +216,7 @@ export default function useWorkflow() {
     loading,
     fetchWorkflow,
     updateCoordinate,
+    createState,
     deleteState,
     createTransition,
     deleteTransition,
