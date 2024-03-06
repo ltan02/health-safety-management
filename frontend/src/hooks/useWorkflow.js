@@ -3,6 +3,7 @@ import useAxios from "./useAxios";
 import useStatus from "./useStatus";
 
 export default function useWorkflow() {
+  const [workflows, setWorkflows] = useState([])
   const [states, setStates] = useState([]);
   const [transitions, setTransitions] = useState([]);
   const [callbackStack, setCallbackStack] = useState([]);
@@ -134,6 +135,18 @@ export default function useWorkflow() {
     [states, transitions]
   );
 
+  const fetchAllWorkflows = useCallback(async () => {
+    try {
+      const response = await sendRequest({
+        url: "/workflows",
+        method: "GET",
+      });
+      setWorkflows(response);
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
   const organizeCoordinates = useCallback(() => {
     let currentY = 0;
     const yIncrement = 100;
@@ -209,10 +222,12 @@ export default function useWorkflow() {
 
   return {
     states,
+    workflows,
     statuses,
     transitions,
     loading,
     fetchWorkflow,
+    fetchAllWorkflows,
     updateCoordinate,
     createState,
     deleteState,

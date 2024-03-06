@@ -2,16 +2,16 @@ import { useEffect, useState } from "react";
 import { Box, TextField, Container, Typography, Paper } from "@mui/material";
 import WorkflowTab from "./WorkflowTab";
 import Workflow from "./Workflow";
-import { initialWorkflows, STATE } from "../initial_tasks";
+import useWorkflow from "../../../hooks/useWorkflow";
 
 export default function AdminWorkflow() {
-    const [workflows, setTasks] = useState([]);
     const [activeTasks, setActiveTasks] = useState([]);
     const [inactiveTasks, setInactiveTasks] = useState([]);
     const [search, setSearch] = useState("");
+    const {fetchAllWorkflows, workflows} = useWorkflow();
 
     useEffect(() => {
-        setTasks(initialWorkflows);
+        fetchAllWorkflows();
     }, []);
 
     useEffect(() => {

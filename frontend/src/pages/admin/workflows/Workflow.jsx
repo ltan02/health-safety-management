@@ -65,17 +65,19 @@ function Workflow({ workflows = [] }) {
                   </TableCell>
                   <TableCell>
                     <Typography variant="body2" noWrap>
-                      {workflow.title}
+                      {workflow.name}
                     </Typography>
                   </TableCell>
                   <TableCell>
                     <Typography variant="body2" noWrap>
-                      {workflow.projectIncluded.length === 0 ? "NOT IN USE" : workflow.projectIncluded.join(", ")}
+                      {/* {workflow.projectIncluded.length === 0 ? "NOT IN USE" : workflow.projectIncluded.join(", ")} */}
+                      NOT IN USE
                     </Typography>
                   </TableCell>
                   <TableCell>
                     <Typography variant="body2" noWrap>
-                    {workflow.schemeIncluded.length === 0 ? "NOT IN USE" : workflow.schemeIncluded.join(", ")}
+                    {/* {workflow.schemeIncluded.length === 0 ? "NOT IN USE" : workflow.schemeIncluded.join(", ")} */}
+                    NOT IN USE
                     </Typography>
                   </TableCell>
                   <TableCell>
