@@ -20,6 +20,44 @@ export default function useGraph() {
         setCallbackStack([]);
     };
 
+    const organizeCoordinates = useCallback(() => {
+        let currentY = 0;
+        const yIncrement = 100;
+
+        const newCoordinates = {};
+      
+        transitions.forEach((transition) => {
+          if (!newCoordinates[transition.source]) {
+            newCoordinates[transition.source] = { x: 100, y: currentY }; 
+            currentY += yIncrement;
+          }
+          if (!newCoordinates[transition.target]) {
+            newCoordinates[transition.target] = { x: 100, y: currentY };
+            currentY += yIncrement;
+          }
+        });
+        
+        currentY = 0;
+        states.forEach((state) => {
+            if (!newCoordinates[state.id]) {
+                newCoordinates[state.id] = { x: 300, y: currentY };
+                currentY += yIncrement;
+            }
+        });
+
+        const newStates = states.map((state) => {
+          if (newCoordinates[state.id]) {
+            return { ...state, position: newCoordinates[state.id] };
+          }
+          return state;
+        });
+
+
+      
+        setStates(newStates);
+      }, [states, transitions, setStates]);
+      
+
     const fetchGraph = useCallback(async () => {
         try {
             const response = await sendRequest({
@@ -101,5 +139,5 @@ export default function useGraph() {
         }
     }, [states, transitions]);
 
-    return { states, transitions, loading, fetchGraph, updateCoordinate, createTransition, deleteTransition, pushCallback, applyCallbacks, discardCallbacks };
+    return { states, transitions, loading, fetchGraph, updateCoordinate, createTransition, deleteTransition, pushCallback, applyCallbacks, discardCallbacks, organizeCoordinates };
 }

@@ -32,6 +32,7 @@ function AdminManagement() {
     discardCallbacks,
     pushCallback,
     applyCallbacks,
+    organizeCoordinates
   } = useWorkflow();
 
   const onConnect = useCallback(
@@ -121,6 +122,12 @@ function AdminManagement() {
           </Grid>
           <Grid item>
             <Grid container spacing={2}>
+            <Grid item>
+                <Button onClick={organizeCoordinates} variant="outlined">
+                  <Typography color="black">Organize</Typography>
+                </Button>
+              </Grid>
+              
               <Grid item>
                 <Button onClick={handleDiscardChanges} variant="outlined">
                   <Typography color="black">Discard</Typography>
@@ -131,6 +138,7 @@ function AdminManagement() {
                   <Typography color="black">Update</Typography>
                 </Button>
               </Grid>
+              
             </Grid>
           </Grid>
         </Grid>
