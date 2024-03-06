@@ -26,7 +26,7 @@ export default function useWorkflow() {
     setCallbackStack([]);
   };
 
-  const fetchGraph = useCallback(async () => {
+  const fetchWorkflow = useCallback(async () => {
     try {
       const response = await sendRequest({
         // assume we only have a single worktransition for now
@@ -153,12 +153,28 @@ export default function useWorkflow() {
     });
   }, [states, transitions, setStates, updateCoordinate, pushCallback]);
 
+  const deleteState = useCallback(
+    async (id) => {
+      try {
+        await sendRequest({
+          url: `/workflows/i3iOjBN8AAbz9txF5M9B/state/${id}`,
+          method: "DELETE",
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [states, transitions]
+  
+  );
+
   return {
     states,
     transitions,
     loading,
-    fetchGraph,
+    fetchWorkflow,
     updateCoordinate,
+    deleteState,
     createTransition,
     deleteTransition,
     pushCallback,

@@ -8,6 +8,7 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import useWorkflow from "../../../hooks/useWorkflow";
+import useStatus from "../../../hooks/useStatus";
 import {
   Container,
   Button,
@@ -25,8 +26,9 @@ function AdminManagement() {
     states,
     transitions,
     loading,
-    fetchGraph,
+    fetchWorkflow,
     updateCoordinate,
+    deleteState,
     createTransition,
     deleteTransition,
     discardCallbacks,
@@ -34,6 +36,8 @@ function AdminManagement() {
     applyCallbacks,
     organizeCoordinates
   } = useWorkflow();
+
+  const { fetchStatus, statuses } = useStatus();
 
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge(params, eds)),
@@ -62,6 +66,12 @@ function AdminManagement() {
     [deleteTransition, pushCallback]
   );
 
+  const onStateDelete = useCallback(
+    (id) => {
+      pushCallback(() => deleteState(id));
+    },[deleteState, pushCallback]
+  )
+
   const handleEdgesChange = useCallback(
     (changes) => {
       onEdgesChange(changes);
@@ -74,9 +84,21 @@ function AdminManagement() {
     [onEdgesChange, onEdgeDelete]
   );
 
+
+  const handleStatesChange= useCallback(
+    (changes) => {
+      onNodesChange(changes);
+      changes.forEach((change) => {
+        if (change.type === "remove") {
+          onStateDelete(change.id);
+        }
+      });
+    },
+    [onEdgesChange, onEdgeDelete]
+  );
   const handleDiscardChanges = () => {
     discardCallbacks();
-    fetchGraph();
+    fetchWorkflow();
   };
 
   const handleSaveChanges = () => {
@@ -84,13 +106,14 @@ function AdminManagement() {
   };
 
   useEffect(() => {
-    fetchGraph();
-  }, [fetchGraph]);
-
-  useEffect(() => {
     setNodes(states);
     setEdges(transitions);
   }, [states, transitions]);
+
+  useEffect(() => {
+    fetchStatus();
+    fetchWorkflow();
+  }, []);
 
   return (
     <Container >
@@ -106,15 +129,10 @@ function AdminManagement() {
         <Grid container justifyContent="space-between" alignItems="center">
           <Grid item>
             <Grid container spacing={2}>
-              {[
-                "Todo Status",
-                "In-progress Status",
-                "Done Status",
-                "Transition",
-              ].map((status) => (
-                <Grid item key={status}>
-                  <Button onClick={fetchGraph} variant="outlined">
-                    <Typography color="black">{status}</Typography>
+              {statuses.map((status) => (
+                <Grid item key={status.id}>
+                  <Button onClick={fetchWorkflow} variant="outlined">
+                    <Typography color="black">{status.name}</Typography>
                   </Button>
                 </Grid>
               ))}
@@ -147,7 +165,7 @@ function AdminManagement() {
         <ReactFlow
           nodes={nodes}
           edges={edges}
-          onNodesChange={onNodesChange}
+          onNodesChange={handleStatesChange}
           onEdgesChange={handleEdgesChange}
           onNodeDragStop={handleDragEnd}
           onConnect={handleEdgesUpdated}
