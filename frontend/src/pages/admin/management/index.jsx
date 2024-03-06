@@ -8,7 +8,7 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import useWorkflow from "../../../hooks/useWorkflow";
-import useStatus from "../../../hooks/useStatus";
+import AddTransitionModal from "./AddTransitionModal";
 import {
   Container,
   Button,
@@ -16,16 +16,18 @@ import {
   Grid,
   CircularProgress,
   Box,
-  Divider
+  Divider,
 } from "@mui/material";
 
 function AdminManagement() {
+  const [transitionModalOpen, setTransitionModalOpen] = React.useState(false);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const {
     states,
     transitions,
     loading,
+    statuses,
     fetchWorkflow,
     updateCoordinate,
     deleteState,
@@ -34,10 +36,9 @@ function AdminManagement() {
     discardCallbacks,
     pushCallback,
     applyCallbacks,
-    organizeCoordinates
+    organizeCoordinates,
   } = useWorkflow();
 
-  const { fetchStatus, statuses } = useStatus();
 
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge(params, eds)),
@@ -54,7 +55,7 @@ function AdminManagement() {
   const handleEdgesUpdated = useCallback(
     (params) => {
       onConnect(params);
-      pushCallback(() => createTransition(params.source, params.target));
+      pushCallback(() => createTransition(params.source, params.target, params.data?.label));
     },
     [onConnect, pushCallback, createTransition]
   );
@@ -69,8 +70,10 @@ function AdminManagement() {
   const onStateDelete = useCallback(
     (id) => {
       pushCallback(() => deleteState(id));
-    },[deleteState, pushCallback]
-  )
+    },
+    [deleteState, pushCallback]
+  );
+  
 
   const handleEdgesChange = useCallback(
     (changes) => {
@@ -84,8 +87,7 @@ function AdminManagement() {
     [onEdgesChange, onEdgeDelete]
   );
 
-
-  const handleStatesChange= useCallback(
+  const handleStatesChange = useCallback(
     (changes) => {
       onNodesChange(changes);
       changes.forEach((change) => {
@@ -111,41 +113,47 @@ function AdminManagement() {
   }, [states, transitions]);
 
   useEffect(() => {
-    fetchStatus();
     fetchWorkflow();
   }, []);
 
   return (
-    <Container >
+    <Container>
       <Typography variant="h4" align="left" gutterBottom>
         Workflow
       </Typography>
       <Container
         sx={{ mt: 2, border: "1px solid", width: "1000px", height: "700px" }}
         style={{
-          padding:"0px",
+          padding: "0px",
         }}
       >
         <Grid container justifyContent="space-between" alignItems="center">
           <Grid item>
             <Grid container spacing={2}>
-              {statuses.map((status) => (
-                <Grid item key={status.id}>
-                  <Button onClick={fetchWorkflow} variant="outlined">
+              {Object.values(statuses).map((status) => (
+                <Grid item key={status.name}>
+                  <Button onClick={fetchWorkflow} variant="outlined" style={{
+                    backgroundColor: status.color,
+                  }}>
                     <Typography color="black">{status.name}</Typography>
                   </Button>
                 </Grid>
               ))}
+              <Grid item>
+                <Button onClick={() => setTransitionModalOpen(true)} variant="outlined">
+                  <Typography color="black">Transition</Typography>
+                </Button>
+              </Grid>
             </Grid>
           </Grid>
           <Grid item>
             <Grid container spacing={2}>
-            <Grid item>
+              <Grid item>
                 <Button onClick={organizeCoordinates} variant="outlined">
                   <Typography color="black">Organize</Typography>
                 </Button>
               </Grid>
-              
+
               <Grid item>
                 <Button onClick={handleDiscardChanges} variant="outlined">
                   <Typography color="black">Discard</Typography>
@@ -156,7 +164,6 @@ function AdminManagement() {
                   <Typography color="black">Update</Typography>
                 </Button>
               </Grid>
-              
             </Grid>
           </Grid>
         </Grid>
@@ -193,6 +200,7 @@ function AdminManagement() {
           <CircularProgress />
         </Box>
       )}
+      <AddTransitionModal open={transitionModalOpen} handleClose={() => setTransitionModalOpen(false)} states = {states} handleFieldSubmit={handleEdgesUpdated} transitions={transitions} />
     </Container>
   );
 }

@@ -1,10 +1,13 @@
 import { useCallback, useState } from "react";
 import useAxios from "./useAxios";
+import useStatus from "./useStatus";
 
 export default function useWorkflow() {
   const [states, setStates] = useState([]);
   const [transitions, setTransitions] = useState([]);
   const [callbackStack, setCallbackStack] = useState([]);
+  const { statuses, fetchStatus } = useStatus();
+
   const { sendRequest, loading } = useAxios();
 
   const pushCallback = useCallback((callback) => {
@@ -28,6 +31,7 @@ export default function useWorkflow() {
 
   const fetchWorkflow = useCallback(async () => {
     try {
+      await fetchStatus();
       const response = await sendRequest({
         // assume we only have a single worktransition for now
         url: "/workflows/i3iOjBN8AAbz9txF5M9B",
@@ -39,8 +43,24 @@ export default function useWorkflow() {
       response.states.forEach((state) => {
         const newState = {
           id: state.id,
-          position: { x: state.coordinate.x, y: state.coordinate.y },
+          position: {
+            x: state.coordinate?.x ?? 0,
+            y: state.coordinate?.y ?? 0,
+          },
           data: { label: state.name },
+          style: {
+            background: `${
+              statuses[state.statusId]
+                ? statuses[state.statusId].color
+                : "#000000"
+            }`,
+            border: `solid 2px ${
+              statuses[state.statusId]
+                ? statuses[state.statusId].color
+                : "#000000"
+            }`,
+            fontWeight: "bold",
+          },
         };
         newStates.push(newState);
       });
@@ -83,7 +103,6 @@ export default function useWorkflow() {
   const createTransition = useCallback(
     async (source, target, label = null) => {
       try {
-        console.log(source);
         await sendRequest({
           url: `/workflows/i3iOjBN8AAbz9txF5M9B/transition`,
           method: "POST",
@@ -147,7 +166,6 @@ export default function useWorkflow() {
     });
 
     setStates(newStates);
-    console.log(newStates);
     newStates.forEach((state) => {
       pushCallback(() => updateCoordinate(state.id, state.position));
     });
@@ -165,11 +183,11 @@ export default function useWorkflow() {
       }
     },
     [states, transitions]
-  
   );
 
   return {
     states,
+    statuses,
     transitions,
     loading,
     fetchWorkflow,

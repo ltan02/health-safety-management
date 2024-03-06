@@ -7,11 +7,17 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Status {
-    @DocumentId
     private String id;
     private String name;
+    private String color;
 
     public Status() {}
+
+    public Status(String id, String name, String color) {
+        this.id = id;
+        this.name = name;
+        this.color = color;
+    }
 
     public Status(String id, String name) {
         this.id = id;
