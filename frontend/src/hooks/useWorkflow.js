@@ -137,40 +137,38 @@ export default function useWorkflow() {
   const organizeCoordinates = useCallback(() => {
     let currentY = 0;
     const yIncrement = 100;
-
+    const xPositionSource = 300;
+    const xPositionState = 300;
     const newCoordinates = {};
 
     transitions.forEach((transition) => {
       if (!newCoordinates[transition.source]) {
-        newCoordinates[transition.source] = { x: 100, y: currentY };
+        newCoordinates[transition.source] = { x: xPositionSource, y: currentY };
         currentY += yIncrement;
       }
       if (!newCoordinates[transition.target]) {
-        newCoordinates[transition.target] = { x: 100, y: currentY };
+        newCoordinates[transition.target] = { x: xPositionSource, y: currentY };
         currentY += yIncrement;
       }
     });
-
-    currentY = 0;
+  
     states.forEach((state) => {
       if (!newCoordinates[state.id]) {
-        newCoordinates[state.id] = { x: 300, y: currentY };
+        newCoordinates[state.id] = { x: xPositionState, y: currentY };
         currentY += yIncrement;
       }
     });
-
-    const newStates = states.map((state) => {
-      if (newCoordinates[state.id]) {
-        return { ...state, position: newCoordinates[state.id] };
-      }
-      return state;
-    });
+  
+    const newStates = states.map((state) => newCoordinates[state.id] ? { ...state, position: newCoordinates[state.id] } : state);
 
     setStates(newStates);
+
     newStates.forEach((state) => {
       pushCallback(() => updateCoordinate(state.id, state.position));
     });
-  }, [states, transitions, setStates, updateCoordinate, pushCallback]);
+  }, [states, transitions]);
+  
+  
 
   const createState = useCallback(
     async (name, statusId, coordinate) => {

@@ -145,77 +145,96 @@ function AdminManagement() {
   }, []);
 
   return (
-    <Container>
-      <Typography variant="h4" align="left" gutterBottom>
+    <Container
+      maxWidth="false"
+      disableGutters
+      style={{ height: "100vh", display: "flex", flexDirection: "column", paddingBottom: "50px"}}
+    >
+      <Typography
+        variant="h4"
+        align="left"
+        gutterBottom
+        sx={{ margin: "20px" }}
+      >
         Workflow
       </Typography>
       <Container
-        sx={{ mt: 2, border: "1px solid", width: "1000px", height: "700px" }}
-        style={{
-          padding: "0px",
+        sx={{
+          flexGrow: 1,
+          display: "flex",
+          flexDirection: "column",
+          border: "1px solid",
+          padding: "20px",
+          overflow: "hidden",
         }}
       >
-        <Grid container justifyContent="space-between" alignItems="center">
-          <Grid item>
+        <Grid
+          container
+          justifyContent="space-between"
+          alignItems="center"
+          spacing={2}
+        >
+          <Grid item xs={12} md={12}>
             <Grid container spacing={2}>
               {Object.values(statuses).map((status, index) => (
                 <Grid item key={status.name}>
                   <Button
-                    onClick={() => handleStateModalOpen(Object.keys(statuses)[index])}
-                    variant="outlined"
-                    style={{
+                    onClick={() =>
+                      handleStateModalOpen(Object.keys(statuses)[index])
+                    }
+                    variant="contained"
+                    sx={{
                       backgroundColor: status.color,
+                      "&:hover": {
+                        backgroundColor: status.color,
+                      },
                     }}
                   >
-                    <Typography color="black">{status.name}</Typography>
+                    <Typography>{status.name}</Typography>
                   </Button>
                 </Grid>
               ))}
               <Grid item>
                 <Button
                   onClick={() => setTransitionModalOpen(true)}
-                  variant="outlined"
+                  variant="contained"
                 >
-                  <Typography color="black">Transition</Typography>
-                </Button>
-              </Grid>
-            </Grid>
-          </Grid>
-          <Grid item>
-            <Grid container spacing={2}>
-              <Grid item>
-                <Button onClick={organizeCoordinates} variant="outlined">
-                  <Typography color="black">Organize</Typography>
-                </Button>
-              </Grid>
-
-              <Grid item>
-                <Button onClick={handleDiscardChanges} variant="outlined">
-                  <Typography color="black">Discard</Typography>
+                  <Typography>Transition</Typography>
                 </Button>
               </Grid>
               <Grid item>
-                <Button onClick={handleSaveChanges} variant="outlined">
-                  <Typography color="black">Update</Typography>
+                <Button onClick={organizeCoordinates} variant="contained">
+                  <Typography>Organize</Typography>
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button onClick={handleDiscardChanges} variant="contained">
+                  <Typography>Discard</Typography>
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button onClick={handleSaveChanges} variant="contained">
+                  <Typography>Update</Typography>
                 </Button>
               </Grid>
             </Grid>
           </Grid>
         </Grid>
-        <Divider variant="fullWidth" sx={{ mt: 2, mb: 2 }} />
-
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={handleStatesChange}
-          onEdgesChange={handleEdgesChange}
-          onNodeDragStop={handleDragEnd}
-          onConnect={handleEdgesUpdated}
-          fitView
-        >
-          <MiniMap />
-          <Controls />
-        </ReactFlow>
+        <Divider sx={{ my: 2 }} />
+        <Box sx={{ flexGrow: 1, position: "relative" }}>
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={handleStatesChange}
+            onEdgesChange={handleEdgesChange}
+            onNodeDragStop={handleDragEnd}
+            onConnect={handleEdgesUpdated}
+            fitView
+          >
+            <MiniMap />
+            <Controls />
+          </ReactFlow>
+        </Box>
       </Container>
       {loading && (
         <Box
