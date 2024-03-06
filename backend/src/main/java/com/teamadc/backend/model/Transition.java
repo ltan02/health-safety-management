@@ -9,6 +9,7 @@ import java.util.List;
 @Setter
 public class Transition {
     private String id;
+    private String name;
     private String fromStateId;
     private String toStateId;
     private List<Rule> rules;
@@ -21,10 +22,11 @@ public class Transition {
         this.toStateId = toStateId;
     }
 
-    public Transition(String fromStateId, String toStateId, String type) {
+    public Transition(String fromStateId, String toStateId, String type, String name) {
         this.fromStateId = fromStateId;
         this.toStateId = toStateId;
         this.type = type;
+        this.name = name;
     }
 
     public Transition(String fromStateId, String toStateId, List<Rule> rules, String type) {

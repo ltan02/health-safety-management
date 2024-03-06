@@ -9,6 +9,7 @@ public class State {
     private String id;
     private String name;
     private Coordinate coordinate;
+    private String statusId;
 
     public State() {}
 
@@ -16,13 +17,19 @@ public class State {
         this.name = name;
     }
 
+    public State(String name, String statusId) {
+        this.name = name;
+        this.statusId = statusId;
+    }
+
     public State(Coordinate coordinate) {
         this.coordinate = coordinate;
     }
 
-    public State(String name, Coordinate coordinate) {
+    public State(String name, Coordinate coordinate, String statusId) {
         this.coordinate = coordinate;
         this.name = name;
+        this.statusId = statusId;
     }
 
 }

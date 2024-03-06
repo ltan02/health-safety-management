@@ -3,6 +3,7 @@ package com.teamadc.backend.service;
 import com.teamadc.backend.model.Workflow;
 import com.teamadc.backend.model.Coordinate;
 import com.teamadc.backend.model.State;
+import com.teamadc.backend.model.Status;
 import com.teamadc.backend.model.Transition;
 import com.teamadc.backend.repository.GenericRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +18,14 @@ public class WorkflowService {
     private final GenericRepository<Workflow> workflowRepository;
     private final GenericRepository<State> stateRepository;
     private final GenericRepository<Transition> transitionRepository;
+    private final GenericRepository<Status> statusRepository;
 
     @Autowired
-    public WorkflowService(GenericRepository<Workflow> workflowRepository, GenericRepository<State> stateRepository, GenericRepository<Transition> transitionRepository) {
+    public WorkflowService(GenericRepository<Workflow> workflowRepository, GenericRepository<State> stateRepository, GenericRepository<Transition> transitionRepository, GenericRepository<Status> statusRepository) {
         this.workflowRepository = workflowRepository;
         this.stateRepository = stateRepository;
         this.transitionRepository = transitionRepository;
+        this.statusRepository = statusRepository;
     }
 
     public Workflow createOrUpdateWorkflow(Workflow workflow) throws InterruptedException, ExecutionException {
@@ -69,6 +72,16 @@ public class WorkflowService {
         List<State> states = workflow.getStates();
         stateRepository.deleteById(stateId);
         states.removeIf(state -> state.getId().equals(stateId));
+        workflow.setStates(states);
+        workflowRepository.save(workflow);
+    }
+
+    public void updateStatus(String workflowId, String stateId, State state) throws InterruptedException, ExecutionException {
+        Workflow workflow = workflowRepository.findById(workflowId);
+        List<State> states = workflow.getStates();
+        stateRepository.save(state);
+        states.removeIf(s -> s.getId().equals(stateId));
+        states.add(state);
         workflow.setStates(states);
         workflowRepository.save(workflow);
     }

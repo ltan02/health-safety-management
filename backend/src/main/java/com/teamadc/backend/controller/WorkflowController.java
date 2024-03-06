@@ -86,6 +86,16 @@ public class WorkflowController {
         }
     }
 
+    @PutMapping("/{workflowId}/status/{stateId}")
+    public ResponseEntity<Workflow> updateStatus(@PathVariable String workflowId, @PathVariable String stateId, @RequestBody State request) {
+        try {
+            workflowService.updateStatus(workflowId, stateId, request);
+            return ResponseEntity.ok().build();
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     @PostMapping("/{workflowId}/transition")
     public ResponseEntity<Workflow> addTransition(@PathVariable String workflowId, @RequestBody Transition request) {
         try {
