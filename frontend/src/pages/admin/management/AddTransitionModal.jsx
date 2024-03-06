@@ -19,13 +19,14 @@ function AddTransitionModal({ handleFieldSubmit, handleClose, open, states, tran
     event.preventDefault();
     console.log({ name, from, to });
     handleFieldSubmit({
-      data: {
-        label: name,
-      },
+      label: name,
       source: from.id,
       target: to.id,
       type: "smoothstep",
     });
+    setName("");
+    setFrom("");
+    setTo("");
     handleClose();
   };
 

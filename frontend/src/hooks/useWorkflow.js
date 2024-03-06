@@ -70,8 +70,9 @@ export default function useWorkflow() {
           id: transition.id,
           source: transition.fromStateId,
           target: transition.toStateId,
-          label: null,
+          label: transition.name,
           type: "smoothstep",
+          arrowHeadType: "arrowclosed",
         };
         newTransitions.push(newTransition);
       });
@@ -102,6 +103,7 @@ export default function useWorkflow() {
 
   const createTransition = useCallback(
     async (source, target, label = null) => {
+      console.log({ source, target, label })
       try {
         await sendRequest({
           url: `/workflows/i3iOjBN8AAbz9txF5M9B/transition`,

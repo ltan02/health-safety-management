@@ -22,10 +22,9 @@ public class Transition {
         this.toStateId = toStateId;
     }
 
-    public Transition(String fromStateId, String toStateId, String type, String name) {
+    public Transition(String fromStateId, String toStateId, String name) {
         this.fromStateId = fromStateId;
         this.toStateId = toStateId;
-        this.type = type;
         this.name = name;
     }
 

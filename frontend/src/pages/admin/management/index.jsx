@@ -55,7 +55,7 @@ function AdminManagement() {
   const handleEdgesUpdated = useCallback(
     (params) => {
       onConnect(params);
-      pushCallback(() => createTransition(params.source, params.target, params.data?.label));
+      pushCallback(() => createTransition(params.source, params.target, params?.label));
     },
     [onConnect, pushCallback, createTransition]
   );
