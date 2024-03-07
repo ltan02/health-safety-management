@@ -18,9 +18,9 @@ export const FIELD_TYPES = {
   SELECTION_SINGLE: "selection-single",
   FILE_ATTACHMENT: "file",
   //   DESCRIPTION: "description",
-  HEADING_1: "heading-1",
-  HEADING_2: "heading-2",
-  HEADING_3: "heading-3",
+  // HEADING_1: "heading-1",
+  // HEADING_2: "heading-2",
+  // HEADING_3: "heading-3",
 };
 
 export const VARIANT_TYPES = {
@@ -300,7 +300,7 @@ export const DEFAULT_DATA = [
       required: false,
       placeholder: "i.e., weekly cleaning of floors in the office.",
     },
-    coordinate: { x: 1, y: 3 },
+    coordinate: { x: 1, y: 4 },
   },
   {
     id: 11,
@@ -312,6 +312,6 @@ export const DEFAULT_DATA = [
       required: false,
       placeholder: "i.e., weekly cleaning of floors in the office.",
     },
-    coordinate: { x: 1, y: 4 },
+    coordinate: { x: 1, y: 3 },
   },
 ];

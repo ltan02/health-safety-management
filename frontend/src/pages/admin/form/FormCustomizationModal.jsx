@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Paper, TextField, Modal } from "@mui/material";
 import FormTab from "./FormTab";
 import PreviewForm from "./PreviewForm";
+import AddFieldForm from "./AddFieldForm";
 
 function FormCustomizationModal({ open, handleClose }) {
   return (
@@ -10,7 +11,7 @@ function FormCustomizationModal({ open, handleClose }) {
             <Paper elevation={3} sx={{ width: "80vw" }}>
                 <FormTab labels={["Preview", "Customize", "Edit"]}>
                     <PreviewForm />
-                    <PreviewForm />
+                    <AddFieldForm />
                     <PreviewForm />
                 </FormTab>
             </Paper>
