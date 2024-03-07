@@ -64,6 +64,7 @@ function PreviewForm() {
                       {...fieldData.props}
                       value={formData[fieldData.props.name] || ""}
                       onChange={handleChange}
+                      style={{ padding: "10px 0px" }}
                     />
                   </Grid>
                 );

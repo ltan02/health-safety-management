@@ -50,6 +50,7 @@ export const FIELD_ELEMENT = {
         required={required}
         placeholder={placeholder}
         variant={VARIANT_TYPES.OUTLINED}
+        disabled={props.disabled}
       />
     </FormControl>
   ),
@@ -74,6 +75,7 @@ export const FIELD_ELEMENT = {
         multiline
         rows={rows}
         variant={VARIANT_TYPES.OUTLINED}
+        disabled={props.disabled}
       />
     </FormControl>
   ),
@@ -95,6 +97,7 @@ export const FIELD_ELEMENT = {
         required={required}
         onChange={onChange}
         variant={VARIANT_TYPES.OUTLINED}
+        disabled={props.disabled}
       />
     </FormControl>
   ),
@@ -114,6 +117,7 @@ export const FIELD_ELEMENT = {
         onChange={onChange}
         value={value}
         variant={VARIANT_TYPES.OUTLINED}
+        disabled={props.disabled}
       />
     </FormControl>
   ),
@@ -135,6 +139,7 @@ export const FIELD_ELEMENT = {
         value={value}
         onChange={onChange}
         renderValue={(selected) => selected.join(", ")}
+        disabled={props.disabled}
       >
         {options.map((option) => (
           <MenuItem key={option.value} value={option.value}>
@@ -161,6 +166,7 @@ export const FIELD_ELEMENT = {
         value={value}
         onChange={onChange}
         name={name}
+        disabled={props.disabled}
       >
         {options.map((option) => (
           <MenuItem key={option.value} value={option.value}>
@@ -174,7 +180,7 @@ export const FIELD_ELEMENT = {
     <FormControl fullWidth {...props}>
       <Typography variant={VARIANT_TYPES.LABEL}>{label}</Typography>
       <Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>
-      <TextField {...props} type="file" variant={VARIANT_TYPES.OUTLINED} />
+      <TextField {...props} type="file" variant={VARIANT_TYPES.OUTLINED} disabled={props.disabled} />
     </FormControl>
   ),
 };
