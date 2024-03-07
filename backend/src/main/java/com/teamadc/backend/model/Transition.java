@@ -8,19 +8,30 @@ import java.util.List;
 @Getter
 @Setter
 public class Transition {
+    private String id;
+    private String name;
     private String fromStateId;
     private String toStateId;
     private List<Rule> rules;
     private String type;
-    private List<Coordinate> coordinates;
 
     public Transition() {}
 
-    public Transition(String fromStateId, String toStateId, List<Rule> rules, String type, List<Coordinate> coordinates) {
+    public Transition(String fromStateId, String toStateId) {
+        this.fromStateId = fromStateId;
+        this.toStateId = toStateId;
+    }
+
+    public Transition(String fromStateId, String toStateId, String name) {
+        this.fromStateId = fromStateId;
+        this.toStateId = toStateId;
+        this.name = name;
+    }
+
+    public Transition(String fromStateId, String toStateId, List<Rule> rules, String type) {
         this.fromStateId = fromStateId;
         this.toStateId = toStateId;
         this.rules = rules;
         this.type = type;
-        this.coordinates = coordinates;
     }
 }
