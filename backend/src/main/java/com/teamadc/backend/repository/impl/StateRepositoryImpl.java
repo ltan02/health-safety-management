@@ -12,6 +12,6 @@ public class StateRepositoryImpl extends AbstractFirestoreRepository<State> impl
 
     @Override
     protected String getCollectionName() {
-        return "State";
+        return "state";
     }
 }

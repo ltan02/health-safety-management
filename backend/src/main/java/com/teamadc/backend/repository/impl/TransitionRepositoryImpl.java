@@ -12,6 +12,6 @@ public class TransitionRepositoryImpl extends AbstractFirestoreRepository<Transi
 
     @Override
     protected String getCollectionName() {
-        return "Transition";
+        return "transition";
     }
 }
