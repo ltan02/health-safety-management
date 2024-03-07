@@ -34,7 +34,7 @@ public class WorkflowController {
         this.workflowService = workflowService;
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<Workflow> createOrUpdateWorkflow() {
         Workflow workflow = new Workflow();
         try {
