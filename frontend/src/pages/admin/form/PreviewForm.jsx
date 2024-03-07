@@ -22,8 +22,14 @@ function PreviewForm() {
     console.log(formData); // This is where you would typically send the data to a server
   };
 
+
+
   return (
-    <Container maxWidth="md">
+    <Container style={{
+      height: "700px",
+      width: "700px",
+      overflow: "auto",
+    }}>
       <Typography variant="h6" align="center" sx={{ my: 5 }}>
         Incident Report Form
       </Typography>
@@ -35,7 +41,7 @@ function PreviewForm() {
               console.error("Missing FieldComponent:", fieldData);
             }
             return (
-              <Grid item xs={12} sm={4} key={fieldData.id}>
+              <Grid item xs={12} sm={6} key={fieldData.id} >
                 <FieldComponent
                   {...fieldData.props}
                   value={formData[fieldData.props.name] || ""}
@@ -45,14 +51,23 @@ function PreviewForm() {
             );
           })}
         </Grid>
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          sx={{ mt: 3, display: "block", ml: "auto", mr: "auto" }}
-        >
-          Submit
-        </Button>
+        <Grid container spacing={2} alignItems="top">
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            sx={{ mt: 3, display: "block", ml: "auto", mr: "auto" }}
+          >
+            Submit
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{ mt: 3, display: "block", ml: "auto", mr: "auto" }}
+          >
+            Cancel
+          </Button>
+        </Grid>
       </form>
     </Container>
   );
