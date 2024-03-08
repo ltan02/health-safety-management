@@ -63,8 +63,8 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
                 sx={{
                     display: "flex",
                     flexDirection: "column",
-                    gap: "2rem",
-                    width: "240px",
+                    // gap: "2rem",
+                    width: drawerWidth,
                 }}
             >
                 {Object.keys(items).map((id) => (

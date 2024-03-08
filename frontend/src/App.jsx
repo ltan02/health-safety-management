@@ -27,19 +27,22 @@ const theme = createTheme({
         button: {
             textTransform: "none",
         },
-        fontFamily: "Roboto",
+        fontFamily: "Helvetica",
     },
     palette: {
         primary: {
-            light: COLORS.LIGHT, //set these later
-            main: COLORS.PRIMARY,
-            dark: COLORS.DARK,
-            contrastText: "black",
+            light: COLORS.YELLOW, //set these later
+            main: COLORS.TANGERINE,
+            dark: COLORS.ORANGE,
+            contrastText: COLORS.BLACK,
+            rose: COLORS.ROSE,
+            red: COLORS.RED
         },
         secondary: {
-            light: "#DEDEDE", //set these later
-            main: "#7D7D7D",
-            dark: "#464646",
+            light: COLORS.GREY, //set these later
+            main: COLORS.MEDIUM_GREY,
+            dark: COLORS.DARK_GREY,
+            lightest: COLORS.LIGHT_GREY
         },
     },
 });

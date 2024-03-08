@@ -13,6 +13,10 @@ const RedirectButton = ({ to, children }) => {
             variant="contained"
             sx={{
                 width: "100%",
+                backgroundColor: "white",
+                padding: ".75rem",
+                boxShadow: "0px 0px 0px",
+                '&:hover': {backgroundColor: "primary.light"}
             }}
             onClick={handleClick}
         >
