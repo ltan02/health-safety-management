@@ -57,14 +57,14 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
                         padding: "0px",
                     }}
                 />
-                <Typography fontSize={"1.5rem"}>{user?.email ?? "Anonymous User"}</Typography>
+                <Typography variant="h6">{user?.email ?? "Anonymous User"}</Typography>
             </Box>
             <List
                 sx={{
                     display: "flex",
                     flexDirection: "column",
-                    gap: "2rem",
-                    width: "240px",
+                    // gap: "2rem",
+                    width: drawerWidth,
                 }}
             >
                 {Object.keys(items).map((id) => (

@@ -8,13 +8,13 @@ import { useState } from "react";
 import Sidebar from "./Sidebar";
 import { useAuthContext } from "../../context/AuthContext";
 import { isPrivileged } from "../../utils/permissions";
+import pwcLogo from "../../assets/pwcLogo.svg"
 
 function Header() {
     const drawerWidth = 300;
     const { user, signOut } = useAuthContext();
     const navigate = useNavigate();
     const [sidebarOpen, setSidebarOpen] = useState(false);
-
     const handleLogout = async () => {
         signOut();
         navigate("/");
@@ -32,9 +32,12 @@ function Header() {
                         display: "flex",
                         flexDirection: "row",
                         justifyContent: "space-between",
+                        backgroundColor: "white"
                     }}
                 >
                     <Sidebar drawerWidth={drawerWidth} isOpen={sidebarOpen} handleSidebarToggle={setSidebarOpen} />
+                    <img src={pwcLogo} alt="logo"
+                         style={{height: "3rem", width: "auto", paddingLeft: "15px"}} ></img>
                     <Box
                         sx={{
                             display: "flex",
@@ -65,13 +68,19 @@ function Header() {
                                     padding: "0px",
                                 }}
                             >
-                                <Button color="inherit" onClick={directTo("/")}>
+                                <Button color="inherit" onClick={directTo("/")}
+                                    sx = {{'&:hover': {borderBottom: '3px solid'},
+                                    padding: "0.9rem", marginTop: "0.5rem"}}>
                                     Admin
                                 </Button>
-                                <Button color="inherit" onClick={directTo("/incident")}>
+                                <Button color="inherit" onClick={directTo("/incident")}
+                                        sx = {{'&:hover': {borderBottom: '3px solid'},
+                                            padding: "0.9rem", marginTop: "0.5rem"}}>
                                     Incident
                                 </Button>
-                                <Button color="inherit" onClick={directTo("/report")}>
+                                <Button color="inherit" onClick={directTo("/report")}
+                                        sx = {{'&:hover': {borderBottom: '3px solid'},
+                                            padding: "0.9rem", marginTop: "0.5rem"}}>
                                     Report
                                 </Button>
                             </Container>
@@ -86,7 +95,9 @@ function Header() {
                         }}
                     >
                         {user.email}
-                        <Button color="inherit" onClick={() => handleLogout()}>
+                        <Button color="inherit" onClick={() => handleLogout()}
+                                sx = {{'&:hover': {fontWeight: "bold"},
+                                padding: "1.1rem", marginLeft: "10px"}}>
                             Logout
                         </Button>
                     </Box>
