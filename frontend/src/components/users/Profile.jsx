@@ -7,7 +7,7 @@ export default function Profile({ user }) {
 
     return (
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Avatar sx={{ bgcolor: "blue", width: "30px", height: "30px", fontSize: "14px" }}>{getInitials(user.firstName, user.lastName)}</Avatar>
+            <Avatar sx={{ bgcolor: "#DB536A", width: "30px", height: "30px", fontSize: "14px" }}>{getInitials(user.firstName, user.lastName)}</Avatar>
             <Typography variant="body2">{`${user.firstName} ${user.lastName}`}</Typography>
         </Box>
     );
