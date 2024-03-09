@@ -37,7 +37,7 @@ function Header() {
                 >
                     <Sidebar drawerWidth={drawerWidth} isOpen={sidebarOpen} handleSidebarToggle={setSidebarOpen} />
                     <img src={pwcLogo} alt="logo"
-                         style={{height: "2.37rem", width: "3.12rem", paddingLeft: "15px"}} ></img>
+                         style={{height: "3rem", width: "auto", paddingLeft: "15px"}} ></img>
                     <Box
                         sx={{
                             display: "flex",
@@ -70,17 +70,17 @@ function Header() {
                             >
                                 <Button color="inherit" onClick={directTo("/")}
                                     sx = {{'&:hover': {borderBottom: '3px solid'},
-                                    padding: "1.1rem"}}>
+                                    padding: "0.9rem", marginTop: "0.5rem"}}>
                                     Admin
                                 </Button>
                                 <Button color="inherit" onClick={directTo("/incident")}
                                         sx = {{'&:hover': {borderBottom: '3px solid'},
-                                            padding: "1.1rem"}}>
+                                            padding: "0.9rem", marginTop: "0.5rem"}}>
                                     Incident
                                 </Button>
                                 <Button color="inherit" onClick={directTo("/report")}
                                         sx = {{'&:hover': {borderBottom: '3px solid'},
-                                            padding: "1.1rem"}}>
+                                            padding: "0.9rem", marginTop: "0.5rem"}}>
                                     Report
                                 </Button>
                             </Container>

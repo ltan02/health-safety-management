@@ -16,11 +16,12 @@ const RedirectButton = ({ to, children }) => {
                 backgroundColor: "white",
                 padding: ".75rem",
                 boxShadow: "0px 0px 0px",
-                '&:hover': {backgroundColor: "primary.light"}
+                '&:hover': {backgroundColor: "primary.light", borderRight: "7px solid",
+                    borderRightColor: "primary.dark"}
             }}
             onClick={handleClick}
         >
-            <Typography fontSize={"1.2rem"}>{children}</Typography>
+            <Typography variant="h6">{children}</Typography>
         </Button>
     );
 };
