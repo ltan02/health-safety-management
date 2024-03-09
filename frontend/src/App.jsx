@@ -27,7 +27,7 @@ const theme = createTheme({
         button: {
             textTransform: "none",
         },
-        fontFamily: "ITC Charter",
+        fontFamily: "Helvetica",
     },
     palette: {
         primary: {
