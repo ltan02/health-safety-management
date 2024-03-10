@@ -1,98 +1,98 @@
 import React, { useEffect, useState } from "react";
-import { Container, Typography, Button, Grid } from "@mui/material";
-import { DEFAULT_DATA } from "./initial_form";
-import FieldComponentWrapper from "./FieldComponentWrapper";
 import {
-  DndContext,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragOverlay,
-  closestCorners,
-} from "@dnd-kit/core";
-import {
-  SortableContext,
-  arrayMove,
-  rectSortingStrategy,
-} from "@dnd-kit/sortable";
+  Button,
+  Modal,
+  Box,
+  TextField,
+  Select,
+  MenuItem,
+  Typography,
+  Container,
+  Grid,
+} from "@mui/material";
+import { FIELD_ADD_FORM, FIELD_DATA, FIELD_TYPES } from "./initial_form";
 
-function PreviewForm() {
-  const [formData, setFormData] = useState([]);
-  const [activeId, setActiveId] = useState(null);
-  const sensors = useSensors(useSensor(PointerSensor));
+function AddFieldForm() {
+  const [fieldType, setFieldType] = useState([]);
+  const [fieldTitle, setFieldTitle] = useState("");
+  const [fieldDescription, setFieldDescription] = useState("");
+  const [options, setOptions] = useState([]);
+  const [select, setSelect] = useState("text");
 
   useEffect(() => {
-    setFormData(DEFAULT_DATA);
+    setFieldType(Object.values(FIELD_DATA));
   }, []);
 
-  const handleDragEnd = (event) => {
-    const { active, over } = event;
-    if (over && active.id !== over.id) {
-      const oldIndex = formData.findIndex((item) => item.id === active.id);
-      const newIndex = formData.findIndex((item) => item.id === over.id);
-
-      // Swap coordinates
-      let newFormData = [...formData];
-      [newFormData[oldIndex].coordinate, newFormData[newIndex].coordinate] = [newFormData[newIndex].coordinate, newFormData[oldIndex].coordinate];
-      
-      // Move item in the array for visual reordering
-      newFormData = arrayMove(newFormData, oldIndex, newIndex);
-      
-      setFormData(newFormData);
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    if (fieldTitle === "") {
+      alert("Title is required");
+      return;
     }
-    setActiveId(null);
+    console.log(FIELD_TYPES.SELECTION_SINGLE )
+    console.log("Options: ", options);
+    if (select === FIELD_TYPES.SELECTION_SINGLE || select === FIELD_TYPES.SELECTION_MULTI) {
+      if (options.length === 0) {
+        alert("Options are required for selection field");
+        return;
+      }
+      if (options.includes("")) {
+        alert("Options cannot be empty");
+        return;
+      }
+    }
+  
+    console.log("Field Type: ", select);
+    console.log("Field Title: ", fieldTitle);
+    console.log("Field Description: ", fieldDescription);
+    console.log("Options: ", options);
+
   };
 
-  // Calculate sorted rows based on updated formData
-  const sortedRows = formData.reduce((acc, field) => {
-    const { y } = field.coordinate;
-    if (!acc[y]) {
-      acc[y] = [];
-    }
-    acc[y].push(field);
-    return acc;
-  }, {});
-
-  const sortedRowKeys = Object.keys(sortedRows).sort((a, b) => a - b).map((y) => ({
-    row: y,
-    fields: sortedRows[y].sort((a, b) => a.coordinate.x - b.coordinate.x),
-  }));
-
   return (
-    <Container style={{ height: "700px", width: "700px", overflow: "auto" }}>
+    <Container style={{ height: "700px", width: "500px", overflow: "auto" }}>
       <Typography variant="h6" align="center" sx={{ my: 5 }}>
-        Incident Report Form
+        Select Field Type
       </Typography>
-      <form onSubmit={(e) => e.preventDefault()}>
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCorners}
-          onDragEnd={handleDragEnd}
-          onDragStart={(event) => setActiveId(event.active.id)}
-        >
-          <SortableContext
-            items={formData.map((item) => item.id)}
-            strategy={rectSortingStrategy}
-          >
-            <Grid container spacing={2} alignItems="top">
-              {sortedRowKeys.map((row, rowIndex) => (
-                <Grid container spacing={2} key={rowIndex} alignItems="center">
-                  {row.fields.map((fieldData) => (
-                    <Grid item xs={12} sm={6} key={fieldData.id}>
-                      <FieldComponentWrapper fieldData={fieldData} />
-                    </Grid>
-                  ))}
-                </Grid>
-              ))}
-            </Grid>
-          </SortableContext>
-        </DndContext>
-        <Button type="submit" variant="contained" color="primary" sx={{ mt: 3 }}>
-          Submit
-        </Button>
-      </form>
+      <Select
+        labelId="field-select-label"
+        value={select}
+        onChange={(e) => setSelect(e.target.value)}
+        fullWidth // To make Select take the full width
+      >
+        {Object.keys(FIELD_DATA).map((key) => (
+          <MenuItem key={key} value={key}>
+            {FIELD_DATA[key].label}
+          </MenuItem>
+        ))}
+      </Select>
+      <Container sx={{
+        marginTop: "20px",
+        marginBottom: "10px",
+      }}>
+        {FIELD_ADD_FORM[select] ? (
+          <>
+            {FIELD_ADD_FORM[select]({
+              onTitleChange: (e) => setFieldTitle(e.target.value),
+              onDescriptionChange: (e) => setFieldDescription(e.target.value),
+              onOptionChange: (option) => setOptions(option),
+            })}
+          </>
+        ) : (
+          <Typography variant="h6" align="center" sx={{ my: 5 }}>
+            Select Field Type
+          </Typography>
+        )}
+      </Container>
+      <Button
+        onClick={handleSubmit}
+        variant="contained"
+        color="primary"
+        sx={{ mt: 3 }}
+      >
+        Submit
+      </Button>
     </Container>
   );
 }
-
-export default PreviewForm;
+export default AddFieldForm;

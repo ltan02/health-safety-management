@@ -2,7 +2,7 @@ import React from "react";
 import { Container, IconButton, Chip } from "@mui/material";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import EditIcon from '@mui/icons-material/Edit';
-import { FIELD_ELEMENT } from "./initial_form";
+import { FIELD_ELEMENT, FIELD_TYPES } from "./initial_form";
 import { useSortable } from "@dnd-kit/sortable";
 
 const FieldComponentWrapper = ({ fieldData, onEdit }) => {
@@ -28,7 +28,7 @@ const FieldComponentWrapper = ({ fieldData, onEdit }) => {
       <FieldComponent
         {...fieldData.props}
         disabled
-        value={""}
+        value={fieldData.type === FIELD_TYPES.SELECTION_MULTI ? []: ""}
         style={{ padding: "10px 0px", flexGrow: 1 }}
       />
       <div style={{ position: 'absolute', top: 0, right: 0, display: 'flex', flexDirection: 'column' }}>

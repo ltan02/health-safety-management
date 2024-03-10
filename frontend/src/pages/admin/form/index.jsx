@@ -14,7 +14,6 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { styled } from "@mui/material/styles";
-import AddFiledModal from "./AddFieldModal";
 import FormCustomizationModal from "./FormCustomizationModal";
 
 const initialFields = [

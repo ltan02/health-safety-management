@@ -1,9 +1,8 @@
-import { Container, Typography, Button, Grid } from "@mui/material";
-import { useState } from "react";
-import { FIELD_ELEMENT, FIELD_TYPES, DEFAULT_DATA } from "./initial_form";
+import React, { useEffect, useState } from 'react';
+import { Container, Typography, Button, Grid } from '@mui/material';
+import { FIELD_ELEMENT, FIELD_TYPES, DEFAULT_DATA } from './initial_form';
 
 function PreviewForm() {
-  // Using useState to handle form data
   const [formData, setFormData] = useState({});
 
   const groupedByRows = DEFAULT_DATA.reduce((acc, field) => {
@@ -17,33 +16,60 @@ function PreviewForm() {
 
   const sortedRows = Object.keys(groupedByRows)
     .sort((a, b) => a - b)
-    .map((y) => ({
+    .map(y => ({
       row: y,
       fields: groupedByRows[y].sort((a, b) => a.coordinate.x - b.coordinate.x),
     }));
 
-  // Function to handle input changes and update state
-  const handleChange = (event) => {
+  const handleChange = (event, field) => {
     const { name, value } = event.target;
-    console.log(event);
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    const isMultiSelect = field.type === FIELD_TYPES.SELECTION_MULTI;
+    if (isMultiSelect) {
+      const newValue = typeof value === 'string' ? value.split(',') : value;
+      const duplicates = findDuplicateIndexes(newValue);
+      if (duplicates.length > 0) {
+        duplicates.forEach((index) => {
+          newValue.splice(index, 1);
+        })
+      }
+      setFormData(prevData => ({
+        ...prevData,
+        [name]: newValue,
+      }));
+    } else {
+      setFormData(prevData => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
   };
 
-  // Function to handle form submission
+  function findDuplicateIndexes(arr) {
+    const seen = new Map();
+    const duplicates = [];
+  
+    arr.forEach((item, index) => {
+      if (seen.has(item)) {
+        duplicates.push(index);
+      } else {
+        seen.set(item, index);
+      }
+    });
+  
+    return duplicates;
+  }
+
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log(formData); // This is where you would typically send the data to a server
+    console.log(formData);
   };
 
   return (
     <Container
       style={{
-        height: "700px",
-        width: "700px",
-        overflow: "auto",
+        height: '700px',
+        width: '700px',
+        overflow: 'auto',
       }}
     >
       <Typography variant="h6" align="center" sx={{ my: 5 }}>
@@ -56,15 +82,16 @@ function PreviewForm() {
               {row.fields.map((fieldData) => {
                 const FieldComponent = FIELD_ELEMENT[fieldData.type];
                 if (!FieldComponent) {
-                  console.error("Missing FieldComponent:", fieldData);
+                  console.error('Missing FieldComponent:', fieldData);
+                  return null;
                 }
                 return (
                   <Grid item xs={12} sm={6} key={fieldData.id}>
                     <FieldComponent
                       {...fieldData.props}
-                      value={formData[fieldData.props.name] || ""}
-                      onChange={handleChange}
-                      style={{ padding: "10px 0px" }}
+                      value={fieldData.type === FIELD_TYPES.SELECTION_MULTI ? formData[fieldData.props.name] ?? [] : formData[fieldData.props.name] ?? ''}
+                      onChange={(e) => handleChange(e, fieldData)}
+                      style={{ padding: '10px 0px' }}
                     />
                   </Grid>
                 );
@@ -77,14 +104,15 @@ function PreviewForm() {
             type="submit"
             variant="contained"
             color="primary"
-            sx={{ mt: 3, display: "block", ml: "auto", mr: "auto" }}
+            sx={{ mt: 3, display: 'block', ml: 'auto', mr: 'auto' }}
           >
             Submit
           </Button>
           <Button
             variant="contained"
-            color="primary"
-            sx={{ mt: 3, display: "block", ml: "auto", mr: "auto" }}
+            color="secondary"
+            sx={{ mt: 3, display: 'block', ml: 'auto', mr: 'auto' }}
+            onClick={() => setFormData({})} // Assuming you want to clear the form or take some action on cancel
           >
             Cancel
           </Button>

@@ -7,7 +7,14 @@ import {
   Select,
   MenuItem,
   TextField,
+  OutlinedInput,
+  Chip,
+  
 } from "@mui/material";
+
+import AddInputField from "./AddInputField";
+import AddSelectionField from "./AddSelectionField";
+import AddFileField from "./AddFileField";
 
 export const FIELD_TYPES = {
   TEXT_FIELD: "text",
@@ -23,9 +30,48 @@ export const FIELD_TYPES = {
   // HEADING_3: "heading-3",
 };
 
+export const FIELD_DATA = {
+  [FIELD_TYPES.TEXT_FIELD]: {
+    id: FIELD_TYPES.TEXT_FIELD,
+    label: "Text Field",
+    description: "A single line of text",
+  },
+  [FIELD_TYPES.TEXT_BOX]: {
+    id: FIELD_TYPES.TEXT_BOX,
+    label: "Text Box",
+    description: "A multi-line text input",
+  },
+  [FIELD_TYPES.NUMBER_FIELD]: {
+    id: FIELD_TYPES.NUMBER_FIELD,
+    label: "Number Field",
+    description: "A number input",
+  },
+  [FIELD_TYPES.DATETIME_LOCAL]: {
+    id: FIELD_TYPES.DATETIME_LOCAL,
+    label: "Date and Time",
+    description: "A date and time input",
+  },
+  [FIELD_TYPES.SELECTION_MULTI]: {
+    id: FIELD_TYPES.SELECTION_MULTI,
+    label: "Multi-Select",
+    description: "Select multiple options",
+  },
+  [FIELD_TYPES.SELECTION_SINGLE]: {
+    id: FIELD_TYPES.SELECTION_SINGLE,
+    label: "Single-Select",
+    description: "Select a single option",
+  },
+  [FIELD_TYPES.FILE_ATTACHMENT]: {
+    id: FIELD_TYPES.FILE_ATTACHMENT,
+    label: "File Attachment",
+    description: "Upload a file",
+  },
+};
+
 export const VARIANT_TYPES = {
   OUTLINED: "outlined",
   STANDARD: "standard",
+  TEXT: "text",
   FILLED: "filled",
   LABEL: "h7",
   BODY: "body2",
@@ -127,19 +173,35 @@ export const FIELD_ELEMENT = {
     options,
     onChange,
     value,
+    name,
     ...props
   }) => (
-    <FormControl fullWidth {...props}>
-      <Typography variant={VARIANT_TYPES.LABEL}>{label}</Typography>
-      <Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>
-      <InputLabel id="multi-select-label">{label}</InputLabel>
+    <FormControl fullWidth {...props} variant="outlined" margin="normal">
+      <Typography variant={VARIANT_TYPES.LABEL} gutterBottom>{label}</Typography>
+      <Typography variant={VARIANT_TYPES.BODY} gutterBottom>{description}</Typography>
       <Select
         labelId="multi-select-label"
+        name={name}
         multiple
         value={value}
         onChange={onChange}
-        renderValue={(selected) => selected.join(", ")}
+        input={<OutlinedInput label={label} />}
+        renderValue={(selected) => (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+            {selected.map((value) => (
+              <Chip key={value} label={options.find(option => option.value === value)?.label || value} />
+            ))}
+          </div>
+        )}
         disabled={props.disabled}
+        MenuProps={{
+          PaperProps: {
+            style: {
+              maxHeight: 224,
+              width: 250,
+            },
+          },
+        }}
       >
         {options.map((option) => (
           <MenuItem key={option.value} value={option.value}>
@@ -180,10 +242,40 @@ export const FIELD_ELEMENT = {
     <FormControl fullWidth {...props}>
       <Typography variant={VARIANT_TYPES.LABEL}>{label}</Typography>
       <Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>
-      <TextField {...props} type="file" variant={VARIANT_TYPES.OUTLINED} disabled={props.disabled} />
+      <TextField
+        {...props}
+        type="file"
+        variant={VARIANT_TYPES.OUTLINED}
+        disabled={props.disabled}
+      />
     </FormControl>
   ),
 };
+
+export const FIELD_ADD_FORM = {
+  [FIELD_TYPES.TEXT_FIELD]: ({onTitleChange, onDescriptionChange})=> (
+    <AddInputField type={FIELD_TYPES.TEXT_FIELD} onTitleChange={onTitleChange} onDescriptionChange={onDescriptionChange}/>
+  ),
+  [FIELD_TYPES.TEXT_BOX]: ({onTitleChange, onDescriptionChange})=> (
+    <AddInputField type={FIELD_TYPES.TEXT_BOX} onTitleChange={onTitleChange} onDescriptionChange={onDescriptionChange}/>
+  ),
+  [FIELD_TYPES.NUMBER_FIELD]: ({onTitleChange, onDescriptionChange})=> (
+    <AddInputField type={FIELD_TYPES.NUMBER_FIELD} onTitleChange={onTitleChange} onDescriptionChange={onDescriptionChange}/>
+  ),
+  [FIELD_TYPES.DATETIME_LOCAL]: ({onTitleChange, onDescriptionChange})=> (
+    <AddInputField type={FIELD_TYPES.DATETIME_LOCAL} onTitleChange={onTitleChange} onDescriptionChange={onDescriptionChange}/>
+  ),
+  [FIELD_TYPES.SELECTION_MULTI]: ({onTitleChange, onDescriptionChange, onOptionChange})=> (
+    <AddSelectionField type={FIELD_TYPES.SELECTION_MULTI} onTitleChange={onTitleChange} onDescriptionChange={onDescriptionChange} onOptionChange={onOptionChange}/>
+  ),
+  [FIELD_TYPES.SELECTION_SINGLE]: ({onTitleChange, onDescriptionChange, onOptionChange})=> (
+    <AddSelectionField type={FIELD_TYPES.SELECTION_SINGLE} onTitleChange={onTitleChange} onDescriptionChange={onDescriptionChange} onOptionChange={onOptionChange}/>
+  ),
+  [FIELD_TYPES.FILE_ATTACHMENT]: ({onTitleChange, onDescriptionChange})=> (
+    <AddFileField type={FIELD_TYPES.FILE_ATTACHMENT} onTitleChange={onTitleChange} onDescriptionChange={onDescriptionChange}/>
+
+  )
+}
 export const DEFAULT_DATA = [
   {
     id: 1,
@@ -218,10 +310,9 @@ export const DEFAULT_DATA = [
     },
     coordinate: { x: 0, y: 2 },
   },
-  // For 'Involvement Type', assuming you want to create radio buttons
   {
     id: 4,
-    type: FIELD_TYPES.SELECTION_SINGLE,
+    type: FIELD_TYPES.SELECTION_MULTI,
     props: {
       label: "Involvement Type",
       name: "involvement_type",

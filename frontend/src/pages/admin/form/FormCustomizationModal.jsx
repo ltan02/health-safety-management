@@ -3,6 +3,7 @@ import { Box, Paper, TextField, Modal } from "@mui/material";
 import FormTab from "./FormTab";
 import PreviewForm from "./PreviewForm";
 import AddFieldForm from "./AddFieldForm";
+import EditFieldForm from "./EditFieldForm";
 
 function FormCustomizationModal({ open, handleClose }) {
   return (
@@ -11,9 +12,9 @@ function FormCustomizationModal({ open, handleClose }) {
             <Paper elevation={3} sx={{ width: "80vw" }}>
                 <FormTab labels={["Preview", "Customize", "Add", "Remove"]}>
                     <PreviewForm />
+                    <EditFieldForm />
                     <AddFieldForm />
-                    <PreviewForm />
-                    <PreviewForm />
+                    {/* <PreviewForm /> */}
                 </FormTab>
             </Paper>
         </Box>
