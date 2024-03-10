@@ -1,4 +1,4 @@
-export const data = [
+export const scatterPlotData = [
     {
         id: 'data-0',
         x1: 329.39,
@@ -162,4 +162,117 @@ export const data = [
     },
 ];
 
+export const categoryReports = [
+    {
+        id: 1, 
+        label: "Environmental Hazard",
+        value: 71
+    }, 
+    {
+        id: 2,
+        label: "Workplace Injury",
+        value: 2
+    }, 
+    {
+        id: 3,
+        label: "Health Incident",
+        value: 13
+    }, 
+    {
+        id: 4,
+        label: "Security Breach",
+        value: 42
+    }, 
+    {
+        id: 5,
+        label: "Equipment Malfunction",
+        value: 50
+    }, 
+    {
+        id: 6,
+        label: "Fire Safety",
+        value: 61
+    }
+]
+
+export const dateReports = [
+    {
+        id: 1,
+        label: "2021-10-01",
+        value: 1
+    },
+    {
+        id: 2,
+        label: "2021-10-05",
+        value: 2
+    },
+    {
+        id: 3,
+        label: "2022-01-02",
+        value: 2
+    },
+    {
+        id: 4,
+        label: "2022-10-03",
+        value: 3
+    },
+    {
+        id: 5,
+        label: "2023-05-04",
+        value: 2
+    },
+    {
+        id: 6,
+        label: "2023-09-05",
+        value: 5
+    },
+    {
+        id: 7,
+        label: "2023-10-06",
+        value: 6
+    }
+]
+
+
+
+export const statusReports = [
+    {
+        id: 1,
+        label: "Open",
+        value: 10
+    },
+    {
+        id: 2,
+        label: "In Progress",
+        value: 20
+    },
+    {
+        id: 3,
+        label: "Closed",
+        value: 30
+    }
+]
+
+export const locationReports = [
+    {
+        id: 1,
+        label: "New York",
+        value: 10
+    },
+    {
+        id: 2,
+        label: "California",
+        value: 20
+    },
+    {
+        id: 3,
+        label: "Texas",
+        value: 30
+    },
+    {
+        id: 4,
+        label: "Florida",
+        value: 40
+    }
+]
 
