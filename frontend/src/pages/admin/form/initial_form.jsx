@@ -412,3 +412,35 @@ export const DEFAULT_DATA = [
     coordinate: { x: 1, y: 3 },
   },
 ];
+
+export const DEFAULT_DATA_SECOND = [
+  {
+    id: 1,
+    type: FIELD_TYPES.DATETIME_LOCAL,
+    props: {
+      label: "Time Of Incident",
+      name: "time_of_incident",
+      required: true,
+    },
+    coordinate: { x: 0, y: 0 },
+  },
+];
+
+export const FIELD_DATA_LIST = [
+  {
+    "id": "0",
+    "formData": DEFAULT_DATA,
+    "name": "Incident Form",
+    "author": "Admin",
+    "dateAdded": "2022-10-31",
+    "lastUpdated": "2022-10-31",
+  },
+  {
+    "id": "1",
+    "formData": DEFAULT_DATA_SECOND,
+    "name": "Incident Form2",
+    "author": "something",
+    "dateAdded": "2022-10-31",
+    "lastUpdated": "2022-10-31",
+  }
+]
