@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Typography, Button, Grid } from '@mui/material';
-import { FIELD_ELEMENT, FIELD_TYPES, DEFAULT_DATA } from './initial_form';
+import { FIELD_ELEMENT, FIELD_TYPES } from './initial_form';
 
-function PreviewForm() {
+function PreviewForm({ form = `default-form-id` }) {
   const [formData, setFormData] = useState({});
 
-  const groupedByRows = DEFAULT_DATA.reduce((acc, field) => {
+  const groupedByRows = form["formData"].reduce((acc, field) => {
     const { y } = field.coordinate;
     if (!acc[y]) {
       acc[y] = [];
@@ -73,7 +73,7 @@ function PreviewForm() {
       }}
     >
       <Typography variant="h6" align="center" sx={{ my: 5 }}>
-        Incident Report Form
+        {form.name}
       </Typography>
       <form onSubmit={handleSubmit}>
         <Grid container spacing={2} alignItems="top">

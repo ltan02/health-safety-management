@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Container, Typography, Button, Grid } from "@mui/material";
-import { DEFAULT_DATA } from "./initial_form";
 import FieldComponentWrapper from "./FieldComponentWrapper";
 import {
   DndContext,
@@ -16,13 +15,13 @@ import {
   rectSortingStrategy,
 } from "@dnd-kit/sortable";
 
-function EditFieldForm() {
+function EditFieldForm({form}) {
   const [formData, setFormData] = useState([]);
   const [activeId, setActiveId] = useState(null);
   const sensors = useSensors(useSensor(PointerSensor));
 
   useEffect(() => {
-    setFormData(DEFAULT_DATA);
+    setFormData(form["formData"]);
   }, []);
 
   const handleDragEnd = (event) => {
