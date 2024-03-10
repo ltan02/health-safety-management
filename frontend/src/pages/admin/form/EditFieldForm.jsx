@@ -42,7 +42,6 @@ function EditFieldForm({form}) {
     setActiveId(null);
   };
 
-  // Calculate sorted rows based on updated formData
   const sortedRows = formData.reduce((acc, field) => {
     const { y } = field.coordinate;
     if (!acc[y]) {
@@ -56,6 +55,11 @@ function EditFieldForm({form}) {
     row: y,
     fields: sortedRows[y].sort((a, b) => a.coordinate.x - b.coordinate.x),
   }));
+
+  const onHandleDelete = (fieldData) => {
+    const newFormData = formData.filter((item) => item.id !== fieldData.id);
+    setFormData(newFormData);
+  };
 
   return (
     <Container style={{ height: "700px", width: "700px", overflow: "auto" }}>
@@ -78,7 +82,7 @@ function EditFieldForm({form}) {
                 <Grid container spacing={2} key={rowIndex} alignItems="center">
                   {row.fields.map((fieldData) => (
                     <Grid item xs={12} sm={6} key={fieldData.id}>
-                      <FieldComponentWrapper fieldData={fieldData} />
+                      <FieldComponentWrapper fieldData={fieldData} onDelete={onHandleDelete} />
                     </Grid>
                   ))}
                 </Grid>

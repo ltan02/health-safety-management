@@ -2,10 +2,11 @@ import React from "react";
 import { Container, IconButton, Chip } from "@mui/material";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { FIELD_ELEMENT, FIELD_TYPES } from "./initial_form";
 import { useSortable } from "@dnd-kit/sortable";
 
-const FieldComponentWrapper = ({ fieldData, onEdit }) => {
+const FieldComponentWrapper = ({ fieldData, onEdit, onDelete }) => {
   const FieldComponent = FIELD_ELEMENT[fieldData.type];
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: fieldData.id });
 
@@ -35,8 +36,11 @@ const FieldComponentWrapper = ({ fieldData, onEdit }) => {
         <IconButton size="small" style={{ margin: '2px' }} {...listeners} {...attributes}>
           <DragIndicatorIcon />
         </IconButton>
-        <IconButton size="small" style={{ margin: '2px' }} onClick={() => onEdit(fieldData)}>
+        {/* <IconButton size="small" style={{ margin: '2px' }} onClick={() => onEdit(fieldData)}>
           <EditIcon />
+        </IconButton> */}
+        <IconButton size="small" style={{ margin: '2px' }} onClick={() => onDelete(fieldData)}>
+          <DeleteIcon />
         </IconButton>
       </div>
     </Container>

@@ -16,6 +16,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Paper,
 } from "@mui/material";
 
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -44,67 +45,70 @@ function AdminForm() {
   }, []);
   return (
     <Container maxWidth="md" sx={{ mt: 4 }}>
-      <TableContainer sx={{ minHeight: "50vh" }}>
-        <Table
-          aria-label="form table"
-          sx={{ width: { xs: "100%", sm: "80vw" } }}
-        >
+      <TableContainer
+        component={Paper}
+        sx={{ maxHeight: "75vh", overflow: "auto" }}
+      >
+        <Table stickyHeader aria-label="simple table">
           <TableHead>
             <TableRow>
               <TableCell>
                 <Typography variant="subtitle2">Id</Typography>
               </TableCell>
-              <TableCell>
+              <TableCell align="left">
                 <Typography variant="subtitle2">Name</Typography>
               </TableCell>
-              <TableCell>
+              <TableCell align="left">
                 <Typography variant="subtitle2">Author</Typography>
               </TableCell>
-              <TableCell>
+              <TableCell align="left">
                 <Typography variant="subtitle2">Date Added</Typography>
               </TableCell>
-              <TableCell>
+              <TableCell align="left">
                 <Typography variant="subtitle2">Last Updated</Typography>
+              </TableCell>
+              <TableCell align="right">
+                <Typography variant="subtitle2">Actions</Typography>
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {formDataList.map((form) => (
-              <TableRow key={form.id}>
-                <TableCell>
-                  <Typography variant="body2" noWrap>
-                    {form.id}
-                  </Typography>
+              <TableRow key={form.id} hover>
+                <TableCell component="th" scope="row">
+                  <Typography variant="body2">{form.id}</Typography>
                 </TableCell>
-                <TableCell>
-                  <Typography variant="body2" noWrap>
-                    {form.name}
-                  </Typography>
+                <TableCell align="left">
+                  <Typography variant="body2">{form.name}</Typography>
                 </TableCell>
-                <TableCell>
-                  <Typography variant="body2" noWrap>
-                    {form.author}
-                  </Typography>
+                <TableCell align="left">
+                  <Typography variant="body2">{form.author}</Typography>
                 </TableCell>
-                <TableCell>
-                  <Typography variant="body2" noWrap>
+                <TableCell align="left">
+                  <Typography variant="body2">
                     {new Date(form.dateAdded).toLocaleDateString()}
                   </Typography>
                 </TableCell>
-                <TableCell>
-                  <Typography variant="body2" noWrap>
+                <TableCell align="left">
+                  <Typography variant="body2">
                     {new Date(form.lastUpdated).toLocaleDateString()}
                   </Typography>
                 </TableCell>
-                <IconButton onClick={()=>handleOpen(form)}>
-                  <AddCircleOutlineIcon />
-                </IconButton>
+                <TableCell align="right">
+                  <IconButton size="small" onClick={() => handleOpen(form)}>
+                    <AddCircleOutlineIcon />
+                  </IconButton>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
-      <FormCustomizationModal open={open} handleClose={handleClose} form={form} />
+      <FormCustomizationModal
+        open={open}
+        handleClose={handleClose}
+        form={form}
+      />
     </Container>
   );
 }
