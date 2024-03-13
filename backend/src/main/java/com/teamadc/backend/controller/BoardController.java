@@ -1,14 +1,15 @@
 package com.teamadc.backend.controller;
 
+import com.teamadc.backend.dto.request.UpdateStatusRequest;
 import com.teamadc.backend.model.Board;
-import com.teamadc.backend.model.Incident;
+import com.teamadc.backend.model.Column;
+import com.teamadc.backend.model.Status;
 import com.teamadc.backend.service.BoardService;
+import com.teamadc.backend.service.ColumnService;
 import com.teamadc.backend.service.IncidentService;
 import com.teamadc.backend.service.StatusService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,14 +20,14 @@ import java.util.concurrent.ExecutionException;
 public class BoardController {
 
     private final BoardService boardService;
-    private final IncidentService incidentService;
     private final StatusService statusService;
+    private final ColumnService columnService;
 
     @Autowired
-    public BoardController(BoardService boardService, IncidentService incidentService, StatusService statusService) {
+    public BoardController(BoardService boardService, StatusService statusService, ColumnService columnService) {
         this.boardService = boardService;
-        this.incidentService = incidentService;
         this.statusService = statusService;
+        this.columnService = columnService;
     }
 
     @PostMapping
@@ -86,6 +87,73 @@ public class BoardController {
 
             Board updatedBoard = boardService.createOrUpdateBoard(existingBoard);
             return ResponseEntity.ok(updatedBoard);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PostMapping("/{boardId}/status/{statusId}")
+    public ResponseEntity<Board> updateStatus(@PathVariable String boardId, @PathVariable String statusId, @RequestBody UpdateStatusRequest req) {
+        try {
+            Board existingBoard = boardService.getBoardById(boardId);
+            if (existingBoard == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            Status status = statusService.getStatusById(statusId);
+            if (status == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            if (req.getFromColumnId() != null && req.getToColumnId() != null) {
+                if (req.getFromColumnId().equals("UNASSIGNED") && !req.getToColumnId().equals("UNASSIGNED")) {
+                    Column toColumn = columnService.getColumnById(req.getToColumnId());
+                    if (toColumn == null) {
+                        return ResponseEntity.notFound().build();
+                    }
+
+                    List<String> updatedStatusIdsTo = toColumn.getStatusIds();
+                    updatedStatusIdsTo.add(statusId);
+                    toColumn.setStatusIds(updatedStatusIdsTo);
+
+                    columnService.createOrUpdateColumn(toColumn);
+                } else if (!req.getFromColumnId().equals("UNASSIGNED") && req.getToColumnId().equals("UNASSIGNED")) {
+                    Column fromColumn = columnService.getColumnById(req.getFromColumnId());
+                    if (fromColumn == null) {
+                        return ResponseEntity.notFound().build();
+                    }
+
+                    List<String> updatedStatusIdsFrom = fromColumn.getStatusIds();
+                    updatedStatusIdsFrom.remove(statusId);
+                    fromColumn.setStatusIds(updatedStatusIdsFrom);
+
+                    columnService.createOrUpdateColumn(fromColumn);
+                } else {
+                    Column fromColumn = columnService.getColumnById(req.getFromColumnId());
+                    if (fromColumn == null) {
+                        return ResponseEntity.notFound().build();
+                    }
+
+                    List<String> updatedStatusIdsFrom = fromColumn.getStatusIds();
+                    updatedStatusIdsFrom.remove(statusId);
+                    fromColumn.setStatusIds(updatedStatusIdsFrom);
+                    columnService.createOrUpdateColumn(fromColumn);
+
+                    Column toColumn = columnService.getColumnById(req.getToColumnId());
+                    if (toColumn == null) {
+                        return ResponseEntity.notFound().build();
+                    }
+
+                    List<String> updatedStatusIdsTo = toColumn.getStatusIds();
+                    updatedStatusIdsTo.add(statusId);
+                    toColumn.setStatusIds(updatedStatusIdsTo);
+                    columnService.createOrUpdateColumn(toColumn);
+                }
+
+                return ResponseEntity.ok(existingBoard);
+            } else {
+                return ResponseEntity.badRequest().build();
+            }
         } catch (InterruptedException | ExecutionException e) {
             return ResponseEntity.internalServerError().build();
         }

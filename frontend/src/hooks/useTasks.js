@@ -1,12 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import useAxios from "./useAxios";
 import { useAuthContext } from "../context/AuthContext";
 import { isPrivileged } from "../utils/permissions";
 import { useBoard } from "../context/BoardContext";
 
-export default function useTasks() {
+export default function useTasks(searchQuery = "") {
     const [tasks, setTasks] = useState({});
-    const [filteredTasks, setFilteredTasks] = useState({});
     const { user } = useAuthContext();
     const { sendRequest } = useAxios();
     const { adminColumns, employeeColumns } = useBoard();
@@ -45,27 +44,26 @@ export default function useTasks() {
         });
 
         setTasks(newTasks);
-        setFilteredTasks(newTasks);
     }, [adminColumns, employeeColumns]);
 
     useEffect(() => {
         fetchTasks();
     }, [fetchTasks]);
 
-    const filterTasks = (searchQuery) => {
-        if (!searchQuery) {
-            setFilteredTasks(tasks);
-            return;
-        }
+    const filterTasks = useCallback(
+        (query) => {
+            if (!query) return tasks;
 
-        const lowerCaseQuery = searchQuery.toLowerCase();
-        const filtered = Object.keys(tasks).reduce((acc, status) => {
-            acc[status] = tasks[status].filter((task) => task.title.toLowerCase().includes(lowerCaseQuery));
-            return acc;
-        }, {});
+            const lowerCaseQuery = query.toLowerCase();
+            return Object.keys(tasks).reduce((acc, status) => {
+                acc[status] = tasks[status].filter((task) => task.title.toLowerCase().includes(lowerCaseQuery));
+                return acc;
+            }, {});
+        },
+        [tasks],
+    );
 
-        setFilteredTasks(filtered);
-    };
+    const filteredTasks = useMemo(() => filterTasks(searchQuery), [filterTasks, searchQuery]);
 
-    return { tasks, filteredTasks, setTasks, filterTasks, fetchTasks };
+    return { tasks, filteredTasks, setTasks, fetchTasks };
 }

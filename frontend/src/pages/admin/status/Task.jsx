@@ -32,7 +32,7 @@ function Task({ id, task }) {
                 }}
             >
                 <Chip label={`${task.name}`} variant="outlined" />
-                <Typography variant="p">0 Issues</Typography>
+                <Typography variant="p">{`${task.count} Issues`}</Typography>
             </Box>
         </Card>
     );
