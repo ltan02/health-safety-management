@@ -24,15 +24,17 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { styled } from "@mui/material/styles";
 import FormCustomizationModal from "./FormCustomizationModal";
 import { FIELD_DATA_LIST } from "./initial_form";
+import useForm from "../../../hooks/useForm";
 
 function AdminForm() {
-  const [formDataList, setFormDataList] = useState([]);
-  const [form, setForm] = useState(null);
+  const {fetchForms, forms, updateFieldCoordinate} = useForm();
+  const [fields, setFields] = useState({});
+  const [selectingForm, setSelectingForm] = useState({});
 
   const [open, setOpen] = useState(false);
 
-  const handleOpen = (form) => {
-    setForm(form);
+  const handleOpen = (fields) => {
+    setFields(fields);
     setOpen(true);
   };
 
@@ -40,9 +42,20 @@ function AdminForm() {
     setOpen(false);
   };
 
+  const handleUpdateCoordinate = (fieldId, coordinate) => {
+    updateFieldCoordinate(selectingForm.id, fieldId, coordinate);
+  };
+
   useEffect(() => {
-    setFormDataList(FIELD_DATA_LIST);
+    fetchForms();
   }, []);
+
+  useEffect(() => {
+    if (selectingForm.id) {
+      handleOpen(selectingForm.fields);
+    }
+  }, [selectingForm]);
+
   return (
     <Container maxWidth="md" sx={{ mt: 4 }}>
       <TableContainer
@@ -73,29 +86,29 @@ function AdminForm() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {formDataList.map((form) => (
-              <TableRow key={form.id} hover>
+            {Object.keys(forms).map((formId) => (
+              <TableRow key={forms[formId].id} hover>
                 <TableCell component="th" scope="row">
-                  <Typography variant="body2">{form.id}</Typography>
+                  <Typography variant="body2">{forms[formId].id}</Typography>
                 </TableCell>
                 <TableCell align="left">
-                  <Typography variant="body2">{form.name}</Typography>
+                  <Typography variant="body2">{forms[formId].name}</Typography>
                 </TableCell>
                 <TableCell align="left">
-                  <Typography variant="body2">{form.author}</Typography>
+                  <Typography variant="body2">{forms[formId].author.firstName} {forms[formId].author.secondName}</Typography>
                 </TableCell>
                 <TableCell align="left">
                   <Typography variant="body2">
-                    {new Date(form.dateAdded).toLocaleDateString()}
+                    {new Date(forms[formId].dateAdded).toLocaleDateString()}
                   </Typography>
                 </TableCell>
                 <TableCell align="left">
                   <Typography variant="body2">
-                    {new Date(form.lastUpdated).toLocaleDateString()}
+                    {new Date(forms[formId].dateModified).toLocaleDateString()}
                   </Typography>
                 </TableCell>
                 <TableCell align="right">
-                  <IconButton size="small" onClick={() => handleOpen(form)}>
+                  <IconButton size="small" onClick={() => setSelectingForm(forms[formId])}>
                     <AddCircleOutlineIcon />
                   </IconButton>
                 </TableCell>
@@ -106,8 +119,9 @@ function AdminForm() {
       </TableContainer>
       <FormCustomizationModal
         open={open}
+        updateFieldCoordinate={handleUpdateCoordinate}
         handleClose={handleClose}
-        form={form}
+        fields={fields}
       />
     </Container>
   );

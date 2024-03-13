@@ -1,9 +1,9 @@
 package com.teamadc.backend.service;
 
 import com.teamadc.backend.model.Form;
+import com.teamadc.backend.model.Coordinate;
 import com.teamadc.backend.model.Field;
 import com.teamadc.backend.model.FieldProp;
-import com.teamadc.backend.model.FieldOption;
 import com.teamadc.backend.repository.GenericRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,6 +41,53 @@ public class FormService {
 
         return formRepository.save(form);
     }
+
+    public Form addField (String formId, Field field) throws InterruptedException, ExecutionException {
+        Form form = formRepository.findById(formId);
+        FieldProp fieldProp = field.getProps();
+        fieldPropRepository.save(fieldProp);
+        fieldRepository.save(field);
+        List<Field> fields = form.getFields();
+        fields.add(field);
+        form.setFields(fields);
+        return formRepository.save(form);
+    }
+
+    public Form deleteField(String formId, String fieldId) throws InterruptedException, ExecutionException {
+        Form form = formRepository.findById(formId);
+        List<Field> fields = form.getFields();
+        for (Field field : fields) {
+            if (field.getId().equals(fieldId)) {
+                fields.remove(field);
+                fieldRepository.deleteById(fieldId);
+                break;
+            }
+        }
+        form.setFields(fields);
+        return formRepository.save(form);
+    }
+
+    public Field updateCoordinate(String formId, String fieldId, Coordinate coordinate) throws InterruptedException, ExecutionException {
+        Form form = formRepository.findById(formId);
+        List<Field> fields = form.getFields();
+        Field fieldToUpdate = fields.stream()
+                                    .filter(f -> f.getId().equals(fieldId))
+                                    .findFirst()
+                                    .orElseThrow(() -> new IllegalStateException("Field not found with id: " + fieldId));
+        fieldToUpdate.setCoordinate(coordinate);
+        fields.removeIf(f -> f.getId().equals(fieldId));
+        fields.add(fieldToUpdate);
+        
+        fieldRepository.save(fieldToUpdate);
+        form.setFields(fields);
+        formRepository.save(form); // field collection is updated, but field in form is not updated when we try replacing the coordinates
+        
+        return form.getFields().stream()
+                .filter(f -> f.getId().equals(fieldId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Field not found with id: " + fieldId));
+    }
+    
 
     public void deleteForm(String formId) throws InterruptedException, ExecutionException {
         formRepository.deleteById(formId);

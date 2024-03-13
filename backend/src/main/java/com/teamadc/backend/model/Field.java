@@ -21,8 +21,7 @@ public class Field {
         this.props = props;
     }
 
-    public Field(String id, String name, String type, FieldProp props, Coordinate coordinate) {
-        this.id = id;
+    public Field(String name, String type, FieldProp props, Coordinate coordinate) {
         this.name = name;
         this.type = type;
         this.props = props;

@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Container, Typography, Button, Grid } from '@mui/material';
 import { FIELD_ELEMENT, FIELD_TYPES } from './initial_form';
 
-function PreviewForm({ form = `default-form-id` }) {
-  const [formData, setFormData] = useState({});
+function PreviewForm({ fields }) {
+  const [fieldData, setFieldData] = useState({});
 
-  const groupedByRows = form["formData"].reduce((acc, field) => {
+  const groupedByRows = fields.reduce((acc, field) => {
     const { y } = field.coordinate;
     if (!acc[y]) {
       acc[y] = [];
@@ -32,12 +32,12 @@ function PreviewForm({ form = `default-form-id` }) {
           newValue.splice(index, 1);
         })
       }
-      setFormData(prevData => ({
+      setFieldData(prevData => ({
         ...prevData,
         [name]: newValue,
       }));
     } else {
-      setFormData(prevData => ({
+      setFieldData(prevData => ({
         ...prevData,
         [name]: value,
       }));
@@ -61,7 +61,6 @@ function PreviewForm({ form = `default-form-id` }) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log(formData);
   };
 
   return (
@@ -73,7 +72,7 @@ function PreviewForm({ form = `default-form-id` }) {
       }}
     >
       <Typography variant="h6" align="center" sx={{ my: 5 }}>
-        {form.name}
+        {fields.name}
       </Typography>
       <form onSubmit={handleSubmit}>
         <Grid container spacing={2} alignItems="top">
@@ -89,7 +88,7 @@ function PreviewForm({ form = `default-form-id` }) {
                   <Grid item xs={12} sm={6} key={fieldData.id}>
                     <FieldComponent
                       {...fieldData.props}
-                      value={fieldData.type === FIELD_TYPES.SELECTION_MULTI ? formData[fieldData.props.name] ?? [] : formData[fieldData.props.name] ?? ''}
+                      value={fieldData.type === FIELD_TYPES.SELECTION_MULTI ? fieldData[fieldData.props.name] ?? [] : fieldData[fieldData.props.name] ?? ''}
                       onChange={(e) => handleChange(e, fieldData)}
                       style={{ padding: '10px 0px' }}
                     />
@@ -112,7 +111,7 @@ function PreviewForm({ form = `default-form-id` }) {
             variant="contained"
             color="secondary"
             sx={{ mt: 3, display: 'block', ml: 'auto', mr: 'auto' }}
-            onClick={() => setFormData({})} // Assuming you want to clear the form or take some action on cancel
+            onClick={() => setFieldData({})} // Assuming you want to clear the form or take some action on cancel
           >
             Cancel
           </Button>

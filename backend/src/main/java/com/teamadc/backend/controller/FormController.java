@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import com.teamadc.backend.model.Form;
-import com.teamadc.backend.model.FieldProp;
+import com.teamadc.backend.model.Coordinate;
+import com.teamadc.backend.model.Field;
 import com.teamadc.backend.service.FormService;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
@@ -43,6 +45,46 @@ public class FormController {
         try {
             Form newForm = formService.updateForm(formId, request);
             return ResponseEntity.ok(newForm);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PutMapping("/{formId}/coordinate/{fieldId}")
+    public ResponseEntity<Field> updateCoordinate(@PathVariable String formId, @PathVariable String fieldId, @RequestBody Coordinate request) {
+        try {
+            Field newField = formService.updateCoordinate(formId, fieldId, request);
+            return ResponseEntity.ok(newField);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PutMapping("/{formId}/field")
+    public ResponseEntity<Form> addField(@PathVariable String formId, @RequestBody Field request) {
+        try {
+            Form newForm = formService.addField(formId, request);
+            return ResponseEntity.ok(newForm);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+    
+    @DeleteMapping("/{formId}/field/{fieldId}")
+    public ResponseEntity<Form> deleteField(@PathVariable String formId, @PathVariable String fieldId) {
+        try {
+            Form newForm = formService.deleteField(formId, fieldId);
+            return ResponseEntity.ok(newForm);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @DeleteMapping("/{formId}")
+    public ResponseEntity<Form> deleteForm(@PathVariable String formId) {
+        try {
+            formService.deleteForm(formId);
+            return ResponseEntity.ok().build();
         } catch (InterruptedException | ExecutionException e) {
             return ResponseEntity.internalServerError().build();
         }
