@@ -44,4 +44,14 @@ export const COLORS = {
     TERTIARY: "#0011cc",
     LIGHT: "#f2f2f2",
     DARK: "#333333",
+    YELLOW: "#FFB600",
+    TANGERINE: "#EB8C00",
+    ORANGE: "#D04A02",
+    ROSE: "#DB536A",
+    RED: "#E0301E",
+    BLACK: "#000000",
+    DARK_GREY: "#2D2D2D",
+    MEDIUM_GREY: "#464646",
+    GREY: "#7D7D7D",
+    LIGHT_GREY: "#DEDEDE"
 };

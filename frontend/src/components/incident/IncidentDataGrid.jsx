@@ -18,7 +18,7 @@ const CustomToolbar = ({ value, onChange, clearSearch }) => (
                     <IconButton
                         title="Clear"
                         aria-label="Clear"
-                        size="small"
+                        size="large"
                         onClick={clearSearch}
                         style={{ visibility: value ? "visible" : "hidden" }}
                     >
@@ -46,6 +46,7 @@ const IncidentDataGrid = ({ rows, columns, onRowClick }) => {
     const handleSearchChange = (event) => setSearchText(event.target.value);
     const clearSearch = () => setSearchText("");
 
+
     return (
         <DataGrid
             rows={filteredRows}
@@ -62,6 +63,7 @@ const IncidentDataGrid = ({ rows, columns, onRowClick }) => {
             autoHeight
             disableSelectionOnClick
             onRowClick={onRowClick}
+            sx = {{borderTopWidth : "3px", fontSize: "14px"}}
         />
     );
 };
