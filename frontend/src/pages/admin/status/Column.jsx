@@ -5,7 +5,7 @@ import { Container, TextField, Typography, Box, Chip, IconButton, Modal, Button 
 import Task from "./Task";
 import EditIcon from "@mui/icons-material/Edit";
 
-function Column({ id, title, tasks, handleRenameColumn }) {
+function Column({ id, title, tasks, handleRenameColumn, isOverlayActive }) {
     const { setNodeRef, isOver } = useDroppable({ id });
     const [currentTitle, setTitle] = useState(title);
     const [isEditing, setIsEditing] = useState(false);
@@ -36,15 +36,36 @@ function Column({ id, title, tasks, handleRenameColumn }) {
         <Container
             ref={setNodeRef}
             sx={{
+                position: "relative",
                 bgcolor: !isOver ? "grey.200" : "white",
                 padding: 2,
                 borderRadius: 1,
-                height: "600px",
+                minHeight: "220px",
                 width: "300px",
-                margin: 2,
+                marginY: 2,
+                marginX: 1,
                 boxShadow: 2,
+                display: "flex",
+                flexDirection: "column",
             }}
         >
+            {isOverlayActive && (
+                <Box
+                    sx={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        bgcolor: "rgba(235, 140, 0, 0.1)",
+                        zIndex: 1,
+                        borderStyle: "solid",
+                        borderWidth: 2,
+                        borderColor: "#EB8C00",
+                        borderRadius: 1,
+                    }}
+                />
+            )}
             <Box
                 sx={{
                     display: "flex",
@@ -67,13 +88,28 @@ function Column({ id, title, tasks, handleRenameColumn }) {
                     <Chip label={tasks.length} size="small" />
                 </Box>
             </Box>
-            <SortableContext items={tasks.map((task) => task.id)} strategy={rectSortingStrategy}>
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                    {tasks.map((task) => (
-                        <Task key={task.id} id={task.id} task={task} />
-                    ))}
+            {tasks && tasks.length > 0 && (
+                <SortableContext items={tasks.map((task) => task.id)} strategy={rectSortingStrategy}>
+                    <Box sx={{ display: "flex", flexDirection: "column", gap: "10%" }}>
+                        {tasks.map((task) => (
+                            <Task key={task.id} id={task.id} task={task} />
+                        ))}
+                    </Box>
+                </SortableContext>
+            )}
+            {(!tasks || tasks.length === 0) && (
+                <Box
+                    sx={{
+                        flexGrow: 1,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        textAlign: "center",
+                    }}
+                >
+                    <Typography>Drag a status here to assign it to this column.</Typography>
                 </Box>
-            </SortableContext>
+            )}
             <Modal
                 open={isEditing}
                 onClose={handleCloseEditModal}

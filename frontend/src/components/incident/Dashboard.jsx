@@ -22,7 +22,7 @@ import IncidentDetailModal from "./IncidentDetailModal";
 
 
 function Dashboard() {
-  const { tasks, filteredTasks, filterTasks, setTasks, fetchTasks } =
+  const { tasks, filterTasks, setTasks, fetchTasks } =
     useTasks();
   const { activeId, handleDragStart, handleDragOver, handleDragEnd } =
     useDragBehavior(tasks, setTasks);
@@ -98,7 +98,7 @@ function Dashboard() {
 
   return (
     <Container maxWidth="false" disableGutters>
-      <IncidentSearchInput onSearch={filterTasks} isModalOpen={isModalOpen} filteredTasks={filteredTasks} handleOpenModal={handleOpenModal} />
+      <IncidentSearchInput onSearch={filterTasks} handleOpenModal={handleOpenModal} />
       <DndContext
         sensors={useSensors(
           useSensor(PointerSensor, {
