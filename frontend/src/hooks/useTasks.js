@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import useAxios from "./useAxios";
 import { useAuthContext } from "../context/AuthContext";
 import { isPrivileged } from "../utils/permissions";
 import { useBoard } from "../context/BoardContext";
 
-export default function useTasks(searchQuery = "") {
+export default function useTasks() {
     const [tasks, setTasks] = useState({});
     const { user } = useAuthContext();
     const { sendRequest } = useAxios();
@@ -55,15 +55,22 @@ export default function useTasks(searchQuery = "") {
             if (!query) return tasks;
 
             const lowerCaseQuery = query.toLowerCase();
-            return Object.keys(tasks).reduce((acc, status) => {
-                acc[status] = tasks[status].filter((task) => task.title.toLowerCase().includes(lowerCaseQuery));
+            const filtered = Object.keys(tasks).reduce((acc, status) => {
+                acc[status] = tasks[status].filter((task) =>
+                    task.incidentCategory.toLowerCase().includes(lowerCaseQuery),
+                );
                 return acc;
             }, {});
+
+            const concatenatedTasks = Object.keys(filtered).reduce((acc, status) => {
+                acc.push(...filtered[status]);
+                return acc;
+            }, []);
+
+            return concatenatedTasks;
         },
         [tasks],
     );
 
-    const filteredTasks = useMemo(() => filterTasks(searchQuery), [filterTasks, searchQuery]);
-
-    return { tasks, filteredTasks, setTasks, fetchTasks };
+    return { tasks, filterTasks, setTasks, fetchTasks };
 }
