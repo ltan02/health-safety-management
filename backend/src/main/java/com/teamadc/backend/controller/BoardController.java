@@ -105,55 +105,64 @@ public class BoardController {
                 return ResponseEntity.notFound().build();
             }
 
-            if (req.getFromColumnId() != null && req.getToColumnId() != null) {
-                if (req.getFromColumnId().equals("UNASSIGNED") && !req.getToColumnId().equals("UNASSIGNED")) {
-                    Column toColumn = columnService.getColumnById(req.getToColumnId());
-                    if (toColumn == null) {
-                        return ResponseEntity.notFound().build();
-                    }
-
-                    List<String> updatedStatusIdsTo = toColumn.getStatusIds();
-                    updatedStatusIdsTo.add(statusId);
-                    toColumn.setStatusIds(updatedStatusIdsTo);
-
-                    columnService.createOrUpdateColumn(toColumn);
-                } else if (!req.getFromColumnId().equals("UNASSIGNED") && req.getToColumnId().equals("UNASSIGNED")) {
-                    Column fromColumn = columnService.getColumnById(req.getFromColumnId());
-                    if (fromColumn == null) {
-                        return ResponseEntity.notFound().build();
-                    }
-
-                    List<String> updatedStatusIdsFrom = fromColumn.getStatusIds();
-                    updatedStatusIdsFrom.remove(statusId);
-                    fromColumn.setStatusIds(updatedStatusIdsFrom);
-
-                    columnService.createOrUpdateColumn(fromColumn);
-                } else {
-                    Column fromColumn = columnService.getColumnById(req.getFromColumnId());
-                    if (fromColumn == null) {
-                        return ResponseEntity.notFound().build();
-                    }
-
-                    List<String> updatedStatusIdsFrom = fromColumn.getStatusIds();
-                    updatedStatusIdsFrom.remove(statusId);
-                    fromColumn.setStatusIds(updatedStatusIdsFrom);
-                    columnService.createOrUpdateColumn(fromColumn);
-
-                    Column toColumn = columnService.getColumnById(req.getToColumnId());
-                    if (toColumn == null) {
-                        return ResponseEntity.notFound().build();
-                    }
-
-                    List<String> updatedStatusIdsTo = toColumn.getStatusIds();
-                    updatedStatusIdsTo.add(statusId);
-                    toColumn.setStatusIds(updatedStatusIdsTo);
-                    columnService.createOrUpdateColumn(toColumn);
-                }
-
-                return ResponseEntity.ok(existingBoard);
-            } else {
+            String toColumnId = req.getToColumnId();
+            if (toColumnId == null) {
                 return ResponseEntity.badRequest().build();
             }
+
+            Column currentColumn = null;
+            Column toColumn = null;
+
+            List<String> columnIds = req.getType().equals("ADMIN") ? existingBoard.getAdminColumnIds() : existingBoard.getEmployeeColumnIds();
+
+            List<Column> columns = columnIds.stream().map(columnId -> {
+                try {
+                    return columnService.getColumnById(columnId);
+                } catch (InterruptedException | ExecutionException e) {
+                    return null;
+                }
+            }).toList();
+
+            for (Column column : columns) {
+                if (column.getId().equals(toColumnId)) {
+                    if (column.getStatusIds().contains(statusId)) {
+                        return ResponseEntity.ok(existingBoard);
+                    }
+                }
+            }
+
+            if (req.getToColumnId().equals("UNASSIGNED")) {
+                for (Column column : columns) {
+                    if (column.getStatusIds().contains(statusId)) {
+                        column.getStatusIds().remove(statusId);
+                        columnService.createOrUpdateColumn(column);
+                    }
+                }
+                return ResponseEntity.ok(existingBoard);
+            }
+
+            for (Column column : columns) {
+                if (column.getStatusIds().contains(statusId)) {
+                    currentColumn = column;
+                }
+                if (column.getId().equals(toColumnId)) {
+                    toColumn = column;
+                }
+            }
+
+            if (toColumn == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            if (currentColumn != null && !currentColumn.getId().equals(toColumnId)) {
+                currentColumn.getStatusIds().remove(statusId);
+                columnService.createOrUpdateColumn(currentColumn);
+            }
+
+            toColumn.getStatusIds().add(statusId);
+            columnService.createOrUpdateColumn(toColumn);
+
+            return ResponseEntity.ok(existingBoard);
         } catch (InterruptedException | ExecutionException e) {
             return ResponseEntity.internalServerError().build();
         }

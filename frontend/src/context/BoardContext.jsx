@@ -47,9 +47,36 @@ export const BoardProvider = ({ children }) => {
         setBoardDetails({ ...boardResponse, adminColumns, employeeColumns });
     }, []);
 
+    const updateStatusLocally = useCallback((statusId, newColumnId, admin = true) => {
+        const columns = admin ? adminColumns : employeeColumns;
+        const setColumns = admin ? setAdminColumns : setEmployeeColumns;
+    
+        const updatedStatus = statuses.find(status => status.id === statusId);
+    
+        if (!updatedStatus) return;
+    
+        const updatedColumns = columns.map(column => {
+            if (column.id === newColumnId) {
+                return {
+                    ...column,
+                    statusIds: [...new Set([...column.statusIds, updatedStatus.id])],
+                    statuses: [...new Set([...column.statuses, updatedStatus])],
+                };
+            } else {
+                return {
+                    ...column,
+                    statusIds: [...new Set(column.statusIds.filter(id => id !== statusId))],
+                    statuses: [...new Set(column.statuses.filter(status => status.id !== statusId))],
+                };
+            }
+        });
+
+        setColumns(updatedColumns);
+    }, [adminColumns, employeeColumns, statuses]); 
+
     useEffect(() => {
         fetchBoardInfo();
-    }, [fetchBoardInfo]);
+    }, []);
 
     const value = useMemo(
         () => ({
@@ -58,8 +85,9 @@ export const BoardProvider = ({ children }) => {
             adminColumns,
             employeeColumns,
             updateBoard: fetchBoardInfo,
+            updateStatus: updateStatusLocally,
         }),
-        [boardDetails, statuses, adminColumns, employeeColumns, fetchBoardInfo],
+        [boardDetails, statuses, adminColumns, employeeColumns, fetchBoardInfo, updateStatusLocally],
     );
 
     return <BoardContext.Provider value={value}>{children}</BoardContext.Provider>;

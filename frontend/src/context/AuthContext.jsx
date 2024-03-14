@@ -14,9 +14,13 @@ export function AuthProvider({ children }) {
             try {
                 return JSON.parse(storedUser);
             } catch (e) {
+                sessionStorage.removeItem("user");
+                sessionStorage.removeItem("token");
                 return null;
             }
         }
+        sessionStorage.removeItem("user");
+        sessionStorage.removeItem("token");
         return null;
     });
     const { error, sendRequest } = useAxios();
