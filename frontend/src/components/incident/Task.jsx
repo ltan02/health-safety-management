@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Box, Card, CardContent, Typography, Avatar } from "@mui/material";
+import { Box, Card, CardContent, Typography } from "@mui/material";
 import IncidentDetailModal from "./IncidentDetailModal";
+import Profile from "../users/Profile";
 
 function Task({ id, task, onRefresh }) {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
@@ -36,11 +37,7 @@ function Task({ id, task, onRefresh }) {
                         {`${task.incidentCategory} on ${task.incidentDate}`}
                     </Typography>
                     <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                            <Avatar sx={{ bgcolor: "blue", width: "30px", height: "30px", fontSize: "14px" }}>
-                                {`${task.reporter.firstName[0]}${task.reporter.lastName[0]}`}
-                            </Avatar>
-                        </Box>
+                        <Profile user={task.reporter} />
                     </Box>
                 </CardContent>
             </Card>
