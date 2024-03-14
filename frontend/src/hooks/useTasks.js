@@ -60,7 +60,7 @@ export default function useTasks() {
 
         const lowerCaseQuery = searchQuery.toLowerCase();
         const filtered = Object.keys(tasks).reduce((acc, status) => {
-            acc[status] = tasks[status].filter((task) => task.title.toLowerCase().includes(lowerCaseQuery));
+            acc[status] = tasks[status].filter((task) => task.incidentCategory.toLowerCase().includes(lowerCaseQuery));
             return acc;
         }, {});
 
