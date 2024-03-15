@@ -36,13 +36,13 @@ const theme = createTheme({
             dark: COLORS.ORANGE,
             contrastText: COLORS.BLACK,
             rose: COLORS.ROSE,
-            red: COLORS.RED
+            red: COLORS.RED,
         },
         secondary: {
             light: COLORS.GREY, //set these later
             main: COLORS.MEDIUM_GREY,
             dark: COLORS.DARK_GREY,
-            lightest: COLORS.LIGHT_GREY
+            lightest: COLORS.LIGHT_GREY,
         },
     },
 });
@@ -57,39 +57,41 @@ function App() {
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
         ) : (
-            <Suspense fallback={<div>Loading...</div>}>
-                <Routes>
-                    {isPrivileged(user.role) ? (
-                        <>
-                            <Route path="/" element={<AdminWorkflow />} />
-                            <Route path="management" element={<AdminManagement />} />
-                            <Route path="form" element={<AdminForm />} />
-                            <Route path="status" element={<AdminStatus />} />
-                            <Route path="incident">
+            <BoardProvider>
+                <Suspense fallback={<div>Loading...</div>}>
+                    <Routes>
+                        {isPrivileged(user.role) ? (
+                            <>
+                                <Route path="/" element={<AdminWorkflow />} />
+                                <Route path="management" element={<AdminManagement />} />
+                                <Route path="form" element={<AdminForm />} />
+                                <Route path="status" element={<AdminStatus />} />
+                                <Route path="incident">
+                                    <Route index element={<Incident />} />
+                                    <Route path="report" element={<IncidentReport />} />
+                                </Route>
+                                <Route path="report">
+                                    <Route index element={<ReportOverview />} />
+                                    <Route path="bar" element={<BarReport />} />
+                                    <Route path="scatter" element={<ScatterReport />} />
+                                    <Route path="line" element={<LineReport />} />
+                                    <Route path="pie" element={<PieReport />} />
+                                    <Route path="dashboard" element={<ReportDashboard />} />
+                                </Route>
+                            </>
+                        ) : (
+                            <>
                                 <Route index element={<Incident />} />
-                                <Route path="report" element={<IncidentReport />} />
-                            </Route>
-                            <Route path="report">
-                                <Route index element={<ReportOverview />} />
-                                <Route path="bar" element={<BarReport />} />
-                                <Route path="scatter" element={<ScatterReport />} />
-                                <Route path="line" element={<LineReport />} />
-                                <Route path="pie" element={<PieReport />} />
-                                <Route path="dashboard" element={<ReportDashboard />} />
-                            </Route>
-                        </>
-                    ) : (
-                        <>
-                            <Route index element={<Incident />} />
-                            <Route path="/report" element={<IncidentReport />} />
-                        </>
-                    )}
-                    <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
-            </Suspense>
+                                <Route path="/report" element={<IncidentReport />} />
+                            </>
+                        )}
+                        <Route path="*" element={<Navigate to="/" replace />} />
+                    </Routes>
+                </Suspense>
+            </BoardProvider>
         );
 
-        return <BoardProvider>{routes}</BoardProvider>;
+        return routes;
     };
 
     return (

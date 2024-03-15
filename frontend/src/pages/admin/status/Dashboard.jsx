@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
     DndContext,
     closestCorners,
@@ -13,14 +13,14 @@ import Column from "./Column";
 import Task from "./Task";
 import UnassignedColumn from "./UnassignedColumn";
 import useAxios from "../../../hooks/useAxios";
-import { useAuthContext } from "../../../context/AuthContext";
-import { isPrivileged } from "../../../utils/permissions";
 
-function Dashboard({ columns, state, updateBoardStatus, boardId }) {
-    const { user } = useAuthContext();
-    const [tasks, setTasks] = useState({ UNASSIGNED: [] });
-    const [activeId, setActiveId] = useState(null);
-    const [workflowColumns, setWorkflowColumns] = useState(columns);
+function deepCopy(obj) {
+    return JSON.parse(JSON.stringify(obj));
+}
+
+function Dashboard({ columns, updateBoardStatus, boardId, view }) {
+    const [tasks, setTasks] = useState(deepCopy(columns));
+    const [activeTask, setActiveTask] = useState(null);
     const sensors = useSensors(useSensor(PointerSensor));
     const dropAnimation = {
         ...defaultDropAnimation,
@@ -28,24 +28,20 @@ function Dashboard({ columns, state, updateBoardStatus, boardId }) {
     const { sendRequest } = useAxios();
 
     function handleRenameColumn(columnId, name) {
-        const newColumns = workflowColumns.map((column) => {
+        const newColumns = tasks.map((column) => {
             if (column.id === columnId) {
                 column.title = name;
             }
             return column;
         });
-        setWorkflowColumns(newColumns);
+        setTasks(newColumns);
     }
 
     const updateStatus = async (statusId, toColumnId) => {
-        if (Object.keys(tasks).some((columnId) => tasks[columnId].some((task) => task.id === toColumnId))) {
-            toColumnId = "UNASSIGNED";
-        }
-
         sendRequest({
             url: `/boards/${boardId}/status/${statusId}`,
             method: "POST",
-            body: { type: isPrivileged(user.role) ? "ADMIN" : "EMPLOYEE", toColumnId },
+            body: { type: view === "ADMIN" ? "ADMIN" : "EMPLOYEE", toColumnId },
         });
     };
 
@@ -53,17 +49,13 @@ function Dashboard({ columns, state, updateBoardStatus, boardId }) {
         const { active, over } = event;
         if (!over) return;
 
-        const sourceColumnId = Object.keys(tasks).find((columnId) =>
-            tasks[columnId].find((task) => task.id === active.id),
-        );
+        const sourceColumnId = columns.find((column) => column.statusIds.includes(active.id)).id;
 
         let destinationColumnId;
-        if (Object.keys(tasks).includes(over.id)) {
+        if (!tasks.some((column) => column.statusIds.includes(over.id))) {
             destinationColumnId = over.id;
         } else {
-            destinationColumnId = Object.keys(tasks).find((columnId) =>
-                tasks[columnId].find((task) => task.id === over.id),
-            );
+            destinationColumnId = tasks.find((column) => column.statusIds.includes(over.id)).id;
         }
 
         if (!sourceColumnId || !destinationColumnId) {
@@ -71,22 +63,40 @@ function Dashboard({ columns, state, updateBoardStatus, boardId }) {
         }
 
         setTasks((prevTasks) => {
-            const newTasks = { ...prevTasks };
-            const activeTask = newTasks[sourceColumnId].find((task) => task.id === active.id);
-            const movingTaskIndex = newTasks[sourceColumnId].findIndex((task) => task.id === active.id);
-            const targetIndex = newTasks[destinationColumnId].findIndex((task) => task.id === over.id);
+            const newTasks = [...prevTasks];
+            const movingTaskIndex = columns
+                .find((column) => column.id === sourceColumnId)
+                .statuses.findIndex((status) => status.id === active.id);
+            const targetIndex = tasks
+                .find((column) => column.id === destinationColumnId)
+                .statuses.findIndex((status) => status.id === over.id);
 
-            newTasks[sourceColumnId] = newTasks[sourceColumnId].filter((task) => task.id !== active.id);
+            newTasks.find((column) => column.id === sourceColumnId).statuses = newTasks
+                .find((column) => column.id === sourceColumnId)
+                .statuses.filter((task) => task.id !== active.id);
+            newTasks.find((column) => column.id === sourceColumnId).statusIds = newTasks
+                .find((column) => column.id === sourceColumnId)
+                .statusIds.filter((id) => id !== active.id);
 
-            if (!newTasks[destinationColumnId].some((task) => task.id === active.id)) {
+            if (
+                !newTasks
+                    .find((column) => column.id === destinationColumnId)
+                    .statuses.some((task) => task.id === active.id)
+            ) {
                 if (sourceColumnId === destinationColumnId) {
-                    newTasks[destinationColumnId].splice(
-                        movingTaskIndex < targetIndex ? targetIndex : targetIndex,
-                        0,
-                        activeTask,
-                    );
+                    newTasks
+                        .find((column) => column.id === destinationColumnId)
+                        .statuses.splice(movingTaskIndex < targetIndex ? targetIndex : targetIndex, 0, activeTask);
+                    newTasks
+                        .find((column) => column.id === destinationColumnId)
+                        .statusIds.splice(movingTaskIndex < targetIndex ? targetIndex : targetIndex, 0, activeTask.id);
                 } else {
-                    newTasks[destinationColumnId].splice(targetIndex, 0, activeTask);
+                    newTasks
+                        .find((column) => column.id === destinationColumnId)
+                        .statuses.splice(targetIndex, 0, activeTask);
+                    newTasks
+                        .find((column) => column.id === destinationColumnId)
+                        .statusIds.splice(targetIndex, 0, activeTask.id);
                 }
             }
 
@@ -96,58 +106,37 @@ function Dashboard({ columns, state, updateBoardStatus, boardId }) {
 
     function handleStart(event) {
         const { active } = event;
-        setActiveId(active.id);
+        setActiveTask(
+            tasks
+                .find((column) => column.statusIds.includes(active.id))
+                .statuses.find((status) => status.id === active.id),
+        );
     }
 
     function handleDragEnd(event) {
         const { active, over } = event;
 
         if (over) {
-            const newColumnId = Object.keys(tasks).find((columnId) =>
-                tasks[columnId].find((task) => task.id === active.id),
-            );
-
-            if (!newColumnId) {
-                setActiveId(null);
-                return;
+            let toColumnId = over.id;
+            if (!columns.some((column) => column.id === toColumnId)) {
+                toColumnId = tasks.find((column) => column.statusIds.includes(toColumnId)).id;
             }
 
-            updateBoardStatus(active.id, newColumnId, isPrivileged(user.role));
-            updateStatus(active.id, newColumnId);
+            const sourceColumnId = columns.find((column) => column.statusIds.includes(active.id)).id;
+
+            if (sourceColumnId !== toColumnId) {
+                updateStatus(active.id, toColumnId);
+            }
+
+            updateBoardStatus(active.id, toColumnId, view === "ADMIN");
         }
 
-        setActiveId(null);
+        setActiveTask(null);
     }
 
     useEffect(() => {
-        if (!columns || !state) {
-            return;
-        }
-
-        setTasks((currentTasks) => {
-            const newTasks = { ...currentTasks, UNASSIGNED: [] };
-
-            const assignedTaskIds = new Set();
-
-            columns.forEach((column) => {
-                newTasks[column.id] = column.statusIds
-                    .map((statusId) => state.find((task) => task.id === statusId))
-                    .filter((task) => task);
-
-                newTasks[column.id].forEach((task) => assignedTaskIds.add(task.id));
-            });
-
-            state.forEach((task) => {
-                if (!assignedTaskIds.has(task.id)) {
-                    newTasks["UNASSIGNED"].push(task);
-                }
-            });
-
-            return newTasks;
-        });
-
-        setWorkflowColumns(columns);
-    }, [columns, state]);
+        setTasks(deepCopy(columns));
+    }, [columns]);
 
     return (
         <Container disableGutters sx={{ width: "100%", height: "100%" }}>
@@ -161,39 +150,44 @@ function Dashboard({ columns, state, updateBoardStatus, boardId }) {
                 <Grid container direction="row" sx={{ width: "100%", height: "100%" }}>
                     <Grid item>
                         <UnassignedColumn
-                            id={"UNASSIGNED"}
+                            id="UNASSIGNED"
                             title="Unassigned statuses"
-                            tasks={(tasks && tasks["UNASSIGNED"]) || []}
-                            activeId={activeId}
-                            isOverlayActive={activeId && columns.some((column) => column.statusIds.includes(activeId))}
+                            tasks={
+                                (tasks && tasks.length > 0 && tasks.find((column) => column.id === "UNASSIGNED"))
+                                    .statuses || []
+                            }
+                            activeId={activeTask?.id ?? null}
+                            isOverlayActive={
+                                activeTask && columns.some((column) => column.statusIds.includes(activeTask.id))
+                            }
                         />
                     </Grid>
                     <Grid item style={{ overflowX: "auto", flex: 1 }}>
                         <Grid container direction="row" wrap="nowrap" spacing={-1}>
-                            {workflowColumns.map((column) => (
-                                <Grid key={column.id} item>
-                                    <Column
-                                        id={column.id}
-                                        title={column.name}
-                                        tasks={(tasks && tasks[column.id]) || []}
-                                        activeId={activeId}
-                                        handleRenameColumn={handleRenameColumn}
-                                        isOverlayActive={activeId && !column.statusIds.includes(activeId)}
-                                    />
-                                </Grid>
-                            ))}
+                            {tasks
+                                .filter((column) => column.id !== "UNASSIGNED")
+                                .map((column) => (
+                                    <Grid key={column.id} item>
+                                        <Column
+                                            id={column.id}
+                                            title={column.name}
+                                            tasks={(tasks && column.statuses) || []}
+                                            activeId={activeTask?.id ?? null}
+                                            handleRenameColumn={handleRenameColumn}
+                                            isOverlayActive={
+                                                activeTask &&
+                                                !columns
+                                                    .find((c) => c.id === column.id)
+                                                    .statusIds.includes(activeTask.id)
+                                            }
+                                        />
+                                    </Grid>
+                                ))}
                         </Grid>
                     </Grid>
                 </Grid>
                 <DragOverlay dropAnimation={dropAnimation}>
-                    {activeId && (
-                        <Task
-                            id={activeId}
-                            task={Object.values(tasks)
-                                .flat()
-                                .find((task) => task.id === activeId)}
-                        />
-                    )}
+                    {activeTask && <Task id={activeTask.id} task={activeTask} />}
                 </DragOverlay>
             </DndContext>
         </Container>

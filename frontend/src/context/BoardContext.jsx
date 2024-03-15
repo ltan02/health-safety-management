@@ -42,37 +42,79 @@ export const BoardProvider = ({ children }) => {
             fetchStatus(boardResponse.statusIds),
         ]);
 
+        adminColumns.push({
+            id: "UNASSIGNED",
+            title: "Unassigned statuses",
+            statusIds: [
+                ...new Set(
+                    statuses
+                        .map((status) => status.id)
+                        .filter((id) => !adminColumns.flatMap((column) => column.statusIds).includes(id)),
+                ),
+            ],
+            statuses: [
+                ...new Set(
+                    statuses.filter(
+                        (status) => !adminColumns.flatMap((column) => column.statusIds).includes(status.id),
+                    ),
+                ),
+            ],
+        });
+
+        employeeColumns.push({
+            id: "UNASSIGNED",
+            title: "Unassigned statuses",
+            statusIds: [
+                ...new Set(
+                    statuses
+                        .map((status) => status.id)
+                        .filter((id) => !employeeColumns.flatMap((column) => column.statusIds).includes(id)),
+                ),
+            ],
+            statuses: [
+                ...new Set(
+                    statuses.filter(
+                        (status) => !employeeColumns.flatMap((column) => column.statusIds).includes(status.id),
+                    ),
+                ),
+            ],
+        });
+
         setAdminColumns(adminColumns);
         setEmployeeColumns(employeeColumns);
         setBoardDetails({ ...boardResponse, adminColumns, employeeColumns });
     }, []);
 
-    const updateStatusLocally = useCallback((statusId, newColumnId, admin = true) => {
-        const columns = admin ? adminColumns : employeeColumns;
-        const setColumns = admin ? setAdminColumns : setEmployeeColumns;
-    
-        const updatedStatus = statuses.find(status => status.id === statusId);
-    
-        if (!updatedStatus) return;
-    
-        const updatedColumns = columns.map(column => {
-            if (column.id === newColumnId) {
-                return {
-                    ...column,
-                    statusIds: [...new Set([...column.statusIds, updatedStatus.id])],
-                    statuses: [...new Set([...column.statuses, updatedStatus])],
-                };
-            } else {
-                return {
-                    ...column,
-                    statusIds: [...new Set(column.statusIds.filter(id => id !== statusId))],
-                    statuses: [...new Set(column.statuses.filter(status => status.id !== statusId))],
-                };
-            }
-        });
+    const updateStatusLocally = useCallback(
+        (statusId, newColumnId, admin = true) => {
+            const columns = admin ? adminColumns : employeeColumns;
+            const setColumns = admin ? setAdminColumns : setEmployeeColumns;
 
-        setColumns(updatedColumns);
-    }, [adminColumns, employeeColumns, statuses]); 
+            const updatedStatus = statuses.find((status) => status.id === statusId);
+
+            if (!updatedStatus) return;
+
+            const updatedColumns = columns.map((column) => {
+                if (column.id === newColumnId) {
+                    if (column.statusIds.includes(statusId)) return column;
+                    return {
+                        ...column,
+                        statusIds: [...new Set([...column.statusIds, updatedStatus.id])],
+                        statuses: [...new Set([...column.statuses, updatedStatus])],
+                    };
+                } else {
+                    return {
+                        ...column,
+                        statusIds: [...new Set(column.statusIds.filter((id) => id !== statusId))],
+                        statuses: [...new Set(column.statuses.filter((status) => status.id !== statusId))],
+                    };
+                }
+            });
+
+            setColumns(updatedColumns);
+        },
+        [adminColumns, employeeColumns, statuses],
+    );
 
     useEffect(() => {
         fetchBoardInfo();
