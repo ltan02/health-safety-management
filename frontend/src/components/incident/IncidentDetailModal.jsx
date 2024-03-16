@@ -20,6 +20,7 @@ import { convertToPacificTime } from "../../utils/date";
 import { dateToDaysAgo } from "../../utils/date";
 import { useBoard } from "../../context/BoardContext";
 import ChangeCircleIcon from "@mui/icons-material/ChangeCircle";
+import { isPrivileged } from "../../utils/permissions";
 
 const modalStyle = {
   position: "absolute",
@@ -365,9 +366,11 @@ export default function IncidentDetailModal({
                       <Grid item>
                         {incident.reviewer?.firstName ?? "Unassigned"}
                         {incident.reviewer?.lastName ?? ""}
-                        <IconButton onClick={handleOpenModal}>
-                          <ChangeCircleIcon />
-                        </IconButton>
+                        {isPrivileged(user.role) && (
+                          <IconButton onClick={handleOpenModal}>
+                            <ChangeCircleIcon />
+                          </IconButton>
+                        )}
                         {openReviewer && (
                           <Menu
                             id="basic-menu"
