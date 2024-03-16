@@ -72,27 +72,28 @@ function Task({ id, task, onRefresh }) {
             </Typography>
 
             <Grid spacing={2} justifyContent="space-between" container>
-              <Grid
-                item
-                width="50%"
-                display="flex"
-                justifyContent={"center"}
-                direction={"column"}
-              >
-                <Grid item>
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    fontWeight={500}
-                    sx={{ mt: 2 }}
-                  >
-                    {new Date(task.incidentDate).toLocaleDateString()}
-                  </Typography>
-                </Grid>
-                <Grid item>
-                  <Typography variant="p" color="primary.text" sx={{ mb: 2 }}>
-                    {task.incidentCategory}
-                  </Typography>
+              <Grid item width="50%">
+                <Grid
+                  container
+                  display="flex"
+                  justifyContent={"center"}
+                  direction={"column"}
+                >
+                  <Grid item>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      fontWeight={500}
+                      sx={{ mt: 2 }}
+                    >
+                      {new Date(task.incidentDate).toLocaleDateString()}
+                    </Typography>
+                  </Grid>
+                  <Grid item>
+                    <Typography variant="p" color="primary.text" sx={{ mb: 2 }}>
+                      {task.incidentCategory}
+                    </Typography>
+                  </Grid>
                 </Grid>
               </Grid>
 
@@ -116,19 +117,18 @@ function Task({ id, task, onRefresh }) {
                   </Grid>
                 )}
                 <Grid item>
-                  {task.reviewer && (
-                    <Grid container item spacing={1} alignItems="center">
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        fontWeight={500}
-                        p={1.3}
-                      >
-                        Reviewer:
-                      </Typography>
-                      <ProfileAvatar user={task.reviewer} />
-                    </Grid>
-                  )}
+                  <Grid container item spacing={1} alignItems="center">
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      fontWeight={500}
+                      p={1.3}
+                    >
+                      Reviewer:
+                    </Typography>
+
+                    <ProfileAvatar user={task.reviewer} />
+                  </Grid>
                 </Grid>
               </Grid>
             </Grid>

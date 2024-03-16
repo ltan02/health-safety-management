@@ -9,6 +9,7 @@ import {
   Grid,
   Avatar,
   TextareaAutosize,
+  Menu,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import useAxios from "../../hooks/useAxios";
@@ -18,6 +19,7 @@ import Profile from "../users/Profile";
 import { convertToPacificTime } from "../../utils/date";
 import { dateToDaysAgo } from "../../utils/date";
 import { useBoard } from "../../context/BoardContext";
+import ChangeCircleIcon from "@mui/icons-material/ChangeCircle";
 
 const modalStyle = {
   position: "absolute",
@@ -47,6 +49,9 @@ export default function IncidentDetailModal({
 
   const [incident, setIncident] = useState(selectedIncident);
   const [incidentState, setIncidentState] = useState(selectedIncident.statusId);
+  const [openReviewer, setOpenReviewer] = useState(false);
+  const [employees, setEmployees] = useState([]);
+  const [anchorEl, setAnchorEl] = useState(null);
 
   if (!incident) return <></>;
 
@@ -73,6 +78,45 @@ export default function IncidentDetailModal({
     if (onRefresh) {
       onRefresh();
     }
+  };
+
+  const handleSwitchReviewer = async (reviewerId) => {
+    sendRequest({
+      url: `/incidents/${incidentId}/reviewer/${reviewerId}`,
+      method: "POST",
+    });
+
+    setIncident((prevIncident) => {
+      const newIncident = {
+        ...prevIncident,
+        reviewerId: reviewerId,
+      };
+      return newIncident;
+    });
+
+    if (onRefresh) {
+      onRefresh();
+    }
+    setOpenReviewer(false);
+    onClose();
+  };
+
+  const fetchEmployees = async () => {
+    const response = await sendRequest({
+      url: "/users",
+      method: "GET",
+    });
+    setEmployees(response);
+  };
+
+  const handleOpenModal = async (e) => {
+    setAnchorEl(e.currentTarget);
+    await fetchEmployees();
+    setOpenReviewer(true);
+  };
+
+  const handleClose = () => {
+    setOpenReviewer(false);
   };
 
   return (
@@ -314,17 +358,42 @@ export default function IncidentDetailModal({
                     </Typography>
                   </Grid>
                   <Grid item xs={6}>
-                    {incident.reviewer && (
-                      <Grid container spacing={1} alignItems="center">
-                        <Grid item>
-                          <Profile user={incident.reviewer} />
-                        </Grid>
-                        <Grid item>
-                          {incident.reviewer.firstName}{" "}
-                          {incident.reviewer.lastName}
-                        </Grid>
+                    <Grid container spacing={1} alignItems="center">
+                      <Grid item>
+                        <Profile user={incident.reviewer} />
                       </Grid>
-                    )}
+                      <Grid item>
+                        {incident.reviewer?.firstName ?? "Unassigned"}
+                        {incident.reviewer?.lastName ?? ""}
+                        <IconButton onClick={handleOpenModal}>
+                          <ChangeCircleIcon />
+                        </IconButton>
+                        {openReviewer && (
+                          <Menu
+                            id="basic-menu"
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={handleClose}
+                            MenuListProps={{
+                              "aria-labelledby": "basic-button",
+                            }}
+                          >
+                            {employees?.map((employee) => {
+                              return (
+                                <MenuItem
+                                  key={employee.id}
+                                  onClick={() =>
+                                    handleSwitchReviewer(employee.id)
+                                  }
+                                >
+                                  {employee.firstName} {employee.lastName}
+                                </MenuItem>
+                              );
+                            })}
+                          </Menu>
+                        )}
+                      </Grid>
+                    </Grid>
                   </Grid>
                 </Grid>
               </Box>
