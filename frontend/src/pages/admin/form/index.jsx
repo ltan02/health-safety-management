@@ -23,11 +23,19 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { styled } from "@mui/material/styles";
 import FormCustomizationModal from "./FormCustomizationModal";
-import { FIELD_DATA_LIST } from "./initial_form";
 import useForm from "../../../hooks/useForm";
 
 function AdminForm() {
-  const {fetchForms, forms, updateFieldCoordinate} = useForm();
+  const {
+    fetchForms,
+    forms,
+    updateFieldCoordinate,
+    addField,
+    sortedRows,
+    groupedByRows,
+    getLastCoordinate,
+    deleteField,
+  } = useForm();
   const [fields, setFields] = useState({});
   const [selectingForm, setSelectingForm] = useState({});
 
@@ -45,6 +53,18 @@ function AdminForm() {
   const handleUpdateCoordinate = (fieldId, coordinate) => {
     updateFieldCoordinate(selectingForm.id, fieldId, coordinate);
   };
+
+  const handleAddNewField = (fieldData) => {
+    addField(selectingForm.id, fieldData);
+  };
+
+  const handleSort = () => {
+    return sortedRows(groupedByRows(fields));
+  };
+  
+  const handleDeleteField = (fieldId) => { 
+    deleteField(selectingForm.id, fieldId);
+  }
 
   useEffect(() => {
     fetchForms();
@@ -95,7 +115,10 @@ function AdminForm() {
                   <Typography variant="body2">{forms[formId].name}</Typography>
                 </TableCell>
                 <TableCell align="left">
-                  <Typography variant="body2">{forms[formId].author.firstName} {forms[formId].author.secondName}</Typography>
+                  <Typography variant="body2">
+                    {forms[formId].author.firstName}{" "}
+                    {forms[formId].author.secondName}
+                  </Typography>
                 </TableCell>
                 <TableCell align="left">
                   <Typography variant="body2">
@@ -108,7 +131,10 @@ function AdminForm() {
                   </Typography>
                 </TableCell>
                 <TableCell align="right">
-                  <IconButton size="small" onClick={() => setSelectingForm(forms[formId])}>
+                  <IconButton
+                    size="small"
+                    onClick={() => setSelectingForm(forms[formId])}
+                  >
                     <AddCircleOutlineIcon />
                   </IconButton>
                 </TableCell>
@@ -122,6 +148,10 @@ function AdminForm() {
         updateFieldCoordinate={handleUpdateCoordinate}
         handleClose={handleClose}
         fields={fields}
+        handleAddNewField={handleAddNewField}
+        sortedRows={handleSort}
+        getLastCoordinate={() => getLastCoordinate(fields)}
+        deleteField={handleDeleteField}
       />
     </Container>
   );

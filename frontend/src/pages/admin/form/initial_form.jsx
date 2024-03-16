@@ -89,7 +89,7 @@ export const FIELD_ELEMENT = {
   }) => (
     <FormControl fullWidth {...props}>
       <Typography variant={VARIANT_TYPES.LABEL}>{label}</Typography>
-      <Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>
+      <Typography variant={VARIANT_TYPES.BODY}> {description} {required ? "(Required)" : "(Optional)"}</Typography>
       <TextField
         onChange={onChange}
         name={name}
@@ -112,7 +112,7 @@ export const FIELD_ELEMENT = {
   }) => (
     <FormControl fullWidth {...props}>
       <Typography variant={VARIANT_TYPES.LABEL}>{label}</Typography>
-      <Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>
+      <Typography variant={VARIANT_TYPES.BODY}>{description}{required ? "(Required)" : "(Optional)"}</Typography>
       <TextField
         onChange={onChange}
         name={name}
@@ -135,7 +135,7 @@ export const FIELD_ELEMENT = {
   }) => (
     <FormControl fullWidth {...props}>
       <Typography variant={VARIANT_TYPES.LABEL}>{label}</Typography>
-      <Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>
+      <Typography variant={VARIANT_TYPES.BODY}>{description}{required ? "(Required)" : "(Optional)"}</Typography>
       <TextField
         {...props}
         type="number"
@@ -152,15 +152,17 @@ export const FIELD_ELEMENT = {
     description,
     onChange,
     value,
+    required,
     ...props
   }) => (
     <FormControl fullWidth {...props}>
       <Typography variant={VARIANT_TYPES.LABEL}>{label}</Typography>
-      <Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>
+      <Typography variant={VARIANT_TYPES.BODY}>{description}{required ? "(Required)" : "(Optional)"}</Typography>
       <TextField
         {...props}
         type="datetime-local"
         onChange={onChange}
+        required={required}
         value={value}
         variant={VARIANT_TYPES.OUTLINED}
         disabled={props.disabled}
@@ -174,17 +176,19 @@ export const FIELD_ELEMENT = {
     onChange,
     value,
     name,
+    required,
     ...props
   }) => (
     <FormControl fullWidth {...props} variant="outlined" margin="normal">
       <Typography variant={VARIANT_TYPES.LABEL} gutterBottom>{label}</Typography>
-      <Typography variant={VARIANT_TYPES.BODY} gutterBottom>{description}</Typography>
+      <Typography variant={VARIANT_TYPES.BODY} gutterBottom>{description}{required ? "(Required)" : "(Optional)"}</Typography>
       <Select
         labelId="multi-select-label"
         name={name}
         multiple
         value={value}
         onChange={onChange}
+        required={required}
         input={<OutlinedInput label={label} />}
         renderValue={(selected) => (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
@@ -218,17 +222,19 @@ export const FIELD_ELEMENT = {
     onChange,
     value,
     name,
+    required,
     ...props
   }) => (
     <FormControl fullWidth {...props}>
       <Typography variant={VARIANT_TYPES.LABEL}>{label}</Typography>
-      <Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>
+      <Typography variant={VARIANT_TYPES.BODY}>{description}{required ? "(Required)" : "(Optional)"}</Typography>
       <Select
         labelId="single-select-label"
         value={value}
         onChange={onChange}
         name={name}
         disabled={props.disabled}
+        required={required}
       >
         {options.map((option) => (
           <MenuItem key={option.value} value={option.value}>
@@ -253,17 +259,17 @@ export const FIELD_ELEMENT = {
 };
 
 export const FIELD_ADD_FORM = {
-  [FIELD_TYPES.TEXT_FIELD]: ({onTitleChange, onDescriptionChange})=> (
-    <AddInputField type={FIELD_TYPES.TEXT_FIELD} onTitleChange={onTitleChange} onDescriptionChange={onDescriptionChange}/>
+  [FIELD_TYPES.TEXT_FIELD]: ({onTitleChange, onDescriptionChange, onPlaceHolderChange, onRequiredChange})=> (
+    <AddInputField type={FIELD_TYPES.TEXT_FIELD} onTitleChange={onTitleChange} onDescriptionChange={onDescriptionChange} onPlaceHolderChange={onPlaceHolderChange} onRequiredChange={onRequiredChange}/>
   ),
-  [FIELD_TYPES.TEXT_BOX]: ({onTitleChange, onDescriptionChange})=> (
-    <AddInputField type={FIELD_TYPES.TEXT_BOX} onTitleChange={onTitleChange} onDescriptionChange={onDescriptionChange}/>
+  [FIELD_TYPES.TEXT_BOX]: ({onTitleChange, onDescriptionChange, onPlaceHolderChange, onRequiredChange})=> (
+    <AddInputField type={FIELD_TYPES.TEXT_BOX} onTitleChange={onTitleChange} onDescriptionChange={onDescriptionChange} onPlaceHolderChange={onPlaceHolderChange} onRequiredChange={onRequiredChange}/>
   ),
-  [FIELD_TYPES.NUMBER_FIELD]: ({onTitleChange, onDescriptionChange})=> (
-    <AddInputField type={FIELD_TYPES.NUMBER_FIELD} onTitleChange={onTitleChange} onDescriptionChange={onDescriptionChange}/>
+  [FIELD_TYPES.NUMBER_FIELD]: ({onTitleChange, onDescriptionChange, onPlaceHolderChange, onRequiredChange})=> (
+    <AddInputField type={FIELD_TYPES.NUMBER_FIELD} onTitleChange={onTitleChange} onDescriptionChange={onDescriptionChange} onPlaceHolderChange={onPlaceHolderChange} onRequiredChange={onRequiredChange}/>
   ),
-  [FIELD_TYPES.DATETIME_LOCAL]: ({onTitleChange, onDescriptionChange})=> (
-    <AddInputField type={FIELD_TYPES.DATETIME_LOCAL} onTitleChange={onTitleChange} onDescriptionChange={onDescriptionChange}/>
+  [FIELD_TYPES.DATETIME_LOCAL]: ({onTitleChange, onDescriptionChange, onPlaceHolderChange, onRequiredChange})=> (
+    <AddInputField type={FIELD_TYPES.DATETIME_LOCAL} onTitleChange={onTitleChange} onDescriptionChange={onDescriptionChange} onPlaceHolderChange={onPlaceHolderChange} onRequiredChange={onRequiredChange}/>
   ),
   [FIELD_TYPES.SELECTION_MULTI]: ({onTitleChange, onDescriptionChange, onOptionChange})=> (
     <AddSelectionField type={FIELD_TYPES.SELECTION_MULTI} onTitleChange={onTitleChange} onDescriptionChange={onDescriptionChange} onOptionChange={onOptionChange}/>
@@ -271,8 +277,8 @@ export const FIELD_ADD_FORM = {
   [FIELD_TYPES.SELECTION_SINGLE]: ({onTitleChange, onDescriptionChange, onOptionChange})=> (
     <AddSelectionField type={FIELD_TYPES.SELECTION_SINGLE} onTitleChange={onTitleChange} onDescriptionChange={onDescriptionChange} onOptionChange={onOptionChange}/>
   ),
-  [FIELD_TYPES.FILE_ATTACHMENT]: ({onTitleChange, onDescriptionChange})=> (
-    <AddFileField type={FIELD_TYPES.FILE_ATTACHMENT} onTitleChange={onTitleChange} onDescriptionChange={onDescriptionChange}/>
+  [FIELD_TYPES.FILE_ATTACHMENT]: ({onTitleChange, onDescriptionChange, onPlaceHolderChange, onRequiredChange})=> (
+    <AddFileField type={FIELD_TYPES.FILE_ATTACHMENT} onTitleChange={onTitleChange} onDescriptionChange={onDescriptionChange} onPlaceHolderChange={onPlaceHolderChange} onRequiredChange={onRequiredChange}/>
 
   )
 }

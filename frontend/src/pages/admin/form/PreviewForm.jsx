@@ -2,24 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Container, Typography, Button, Grid } from '@mui/material';
 import { FIELD_ELEMENT, FIELD_TYPES } from './initial_form';
 
-function PreviewForm({ fields }) {
+function PreviewForm({ fields, sortedRows }) {
   const [fieldData, setFieldData] = useState({});
 
-  const groupedByRows = fields.reduce((acc, field) => {
-    const { y } = field.coordinate;
-    if (!acc[y]) {
-      acc[y] = [];
-    }
-    acc[y].push(field);
-    return acc;
-  }, {});
-
-  const sortedRows = Object.keys(groupedByRows)
-    .sort((a, b) => a - b)
-    .map(y => ({
-      row: y,
-      fields: groupedByRows[y].sort((a, b) => a.coordinate.x - b.coordinate.x),
-    }));
 
   const handleChange = (event, field) => {
     const { name, value } = event.target;
@@ -76,7 +61,7 @@ function PreviewForm({ fields }) {
       </Typography>
       <form onSubmit={handleSubmit}>
         <Grid container spacing={2} alignItems="top">
-          {sortedRows.map((row, rowIndex) => (
+          {sortedRows().map((row, rowIndex) => (
             <Grid container spacing={2} key={rowIndex} alignItems="center">
               {row.fields.map((fieldData) => {
                 const FieldComponent = FIELD_ELEMENT[fieldData.type];

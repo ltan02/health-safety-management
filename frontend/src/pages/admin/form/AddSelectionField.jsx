@@ -14,10 +14,10 @@ import {
 import { VARIANT_TYPES } from "./initial_form";
 
 function AddSelectionField({
-
   onTitleChange,
   onDescriptionChange,
   onOptionChange,
+  onRequiredChange,
 }) {
   const [options, setOptions] = useState([{ value: "", label: "" }]);
 
@@ -59,6 +59,10 @@ function AddSelectionField({
         fullWidth
         label="Description"
       />
+      <Select fullWidth variant={VARIANT_TYPES.STANDARD} onChange={onRequiredChange} label="Required" defaultValue={false}>
+        <MenuItem value={true}>Required</MenuItem>
+        <MenuItem value={false}>Optional</MenuItem>
+      </Select>
       {options.map((option, index) => (
         <Grid container spacing={1} alignItems="center" key={index}>
           <Grid item xs>

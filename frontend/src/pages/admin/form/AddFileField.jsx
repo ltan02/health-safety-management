@@ -26,7 +26,7 @@ function AddFileField({
         fullWidth
         label="Description"
       />
-      <TextField
+      {/* <TextField
         placeholder={`${type.charAt(0).toUpperCase() + type.slice(1)} type field`}
         variant={VARIANT_TYPES.OUTLINED}
         margin="dense"
@@ -37,7 +37,7 @@ function AddFileField({
         type='file'
         disabled
         helperText={`This is a preview of a ${type} field.`}
-      />
+      /> */}
     </FormControl>
   );
 }
