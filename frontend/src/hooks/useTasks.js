@@ -44,6 +44,7 @@ export default function useTasks() {
         });
 
         setTasks(newTasks);
+        console.log(newTasks);
     }, [adminColumns, employeeColumns]);
 
     useEffect(() => {
