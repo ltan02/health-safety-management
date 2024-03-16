@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Container, Typography, Button, Grid, Fab } from "@mui/material";
+import { Container, Typography, Button, Grid, Modal, Box } from "@mui/material";
 import DoneIcon from "@mui/icons-material/Done";
 import FieldComponentWrapper from "./FieldComponentWrapper";
 import {
@@ -16,10 +16,12 @@ import {
   rectSortingStrategy,
 } from "@dnd-kit/sortable";
 
-function EditFieldForm({ updateFieldCoordinate, fields }) {
+function EditFieldForm({ updateFieldCoordinate, fields, sortedRows, deleteField }) {
   const [fieldsData, setFieldsData] = useState([]);
   const [activeId, setActiveId] = useState(null);
   const [isEdited, setIsEdited] = useState(false);
+  const [activeField, setActiveField] = useState(null);
+  const [open, setOpen] = useState(false);
   const sensors = useSensors(useSensor(PointerSensor));
 
   useEffect(() => {
@@ -55,7 +57,6 @@ function EditFieldForm({ updateFieldCoordinate, fields }) {
 
   const handleUpdateCoordinate = async () => {
     setIsEdited(false);
-    console.log(fieldsData);
     return Promise.all(
       fieldsData.map(async (field) => {
         return await updateFieldCoordinate(field.id, field.coordinate);
@@ -63,26 +64,20 @@ function EditFieldForm({ updateFieldCoordinate, fields }) {
     );
   };
 
-  const sortedRows = fieldsData.reduce((acc, field) => {
-    const { y } = field.coordinate;
-    if (!acc[y]) {
-      acc[y] = [];
-    }
-    acc[y].push(field);
-    return acc;
-  }, {});
 
-  const sortedRowKeys = Object.keys(sortedRows)
-    .sort((a, b) => a - b)
-    .map((y) => ({
-      row: y,
-      fields: sortedRows[y].sort((a, b) => a.coordinate.x - b.coordinate.x),
-    }));
-
-  const onHandleDelete = (fieldData) => {
-    const newFormData = fieldsData.filter((item) => item.id !== fieldData.id);
+  const onHandleDelete = () => {
+    const newFormData = fieldsData.filter((item) => item.id !== activeField.id);
     setFieldsData(newFormData);
+    console.log(newFormData)
+    console.log(activeField.id)
+    setOpen(false);
+    deleteField(activeField.id);
   };
+
+  const handleOpenDeleteModal = (fieldData) => {
+    setOpen(true);
+    setActiveField(fieldData);
+  }
 
   return (
     <Container style={{ height: "700px", width: "700px", overflow: "auto" }}>
@@ -101,13 +96,13 @@ function EditFieldForm({ updateFieldCoordinate, fields }) {
             strategy={rectSortingStrategy}
           >
             <Grid container spacing={2} alignItems="top">
-              {sortedRowKeys.map((row, rowIndex) => (
+              {sortedRows().map((row, rowIndex) => (
                 <Grid container spacing={2} key={rowIndex} alignItems="center">
                   {row.fields.map((fieldData) => (
                     <Grid item xs={12} sm={6} key={fieldData.id}>
                       <FieldComponentWrapper
                         fieldData={fieldData}
-                        onDelete={onHandleDelete}
+                        onDelete={() => handleOpenDeleteModal(fieldData)}
                       />
                     </Grid>
                   ))}
@@ -144,6 +139,60 @@ function EditFieldForm({ updateFieldCoordinate, fields }) {
           Save
         </Button>
       )}
+      {open && (
+  <Modal
+    open={open}
+    onClose={() => setOpen(false)}
+    aria-labelledby="delete-confirmation-modal"
+    aria-describedby="delete-confirmation-modal-description"
+    closeAfterTransition
+    BackdropProps={{
+      timeout: 500,
+    }}
+  >
+    <Box
+      sx={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 400,
+        bgcolor: 'background.paper',
+        border: '2px solid #000',
+        boxShadow: 24,
+        p: 4,
+      }}
+    >
+      <Typography id="delete-confirmation-modal" variant="h6" component="h2" align="center" gutterBottom>
+        Are you sure you want to delete this field?
+      </Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-around',
+          mt: 3,
+        }}
+      >
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={() => setOpen(false)}
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={onHandleDelete}
+        >
+          Confirm
+        </Button>
+      </Box>
+    </Box>
+  </Modal>
+)
+
+      }
     </Container>
   );
 }
