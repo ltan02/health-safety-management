@@ -1,6 +1,6 @@
 import { Box, Grid } from "@mui/material";
 import { BarChart, LineChart, SparkLineChart, PieChart, ScatterChart } from "@mui/x-charts";
-import { data } from "../initialData.js";
+import { scatterPlotData } from "../initialData.js";
 
 function ReportDashboard() {
     return (
@@ -54,11 +54,11 @@ function ReportDashboard() {
                         series={[
                             {
                                 label: "Series A",
-                                data: data.map((v) => ({ x: v.x1, y: v.y1, id: v.id })),
+                                data: scatterPlotData.map((v) => ({ x: v.x1, y: v.y1, id: v.id })),
                             },
                             {
                                 label: "Series B",
-                                data: data.map((v) => ({ x: v.x1, y: v.y2, id: v.id })),
+                                data: scatterPlotData.map((v) => ({ x: v.x1, y: v.y2, id: v.id })),
                             },
                         ]}
                     />

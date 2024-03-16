@@ -14,12 +14,14 @@ const modalStyle = {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: "90vw",
+    width: "70vw",
     maxHeight: "80vh",
     overflowY: "auto",
     bgcolor: "background.paper",
     boxShadow: 24,
     p: 4,
+    border: "2rem solid",
+    borderColor: "#7D7D7D"
 };
 
 export default function IncidentDetailModal({ incidentId, open, onClose, onRefresh }) {
@@ -107,25 +109,27 @@ export default function IncidentDetailModal({ incidentId, open, onClose, onRefre
                         sx={{
                             display: "flex",
                             flexDirection: "column",
-                            width: "60%",
+                            width: "50%",
                         }}
                     >
-                        <Typography id="issue-detail-modal-title" variant="h4" component="h2">
+                        <Typography id="issue-detail-modal-title" variant="h5" component="h2"
+                        sx={{fontWeight: "bold"}}>
                             {`${incident.incidentCategory} on ${incident.incidentDate}`}
                         </Typography>
                         {Object.keys(incident?.customFields ?? {}).map((fieldName) => {
                             return (
                                 <Fragment key={fieldName}>
-                                    <Typography sx={{ mt: 2, mb: 0.5, fontWeight: 600 }}>
+                                    <Typography sx={{ mt: 2, mb: 0.5, fontWeight: 600, color: "secondary.main"}}>
                                         {formatCamelCaseToNormalText(fieldName)}
                                     </Typography>
                                     <Typography variant="body2">{incident.customFields[fieldName]}</Typography>
                                 </Fragment>
                             );
                         })}
-                        <Typography sx={{ mt: 2, mb: 0.5, fontWeight: 600 }}>Comments</Typography>
-                        <Box sx={{ display: "flex", mt: 2, gap: 2, width: "100%", alignItems: "center" }}>
-                            <Avatar sx={{ bgcolor: "blue", width: "30px", height: "30px", fontSize: "14px" }}>
+                        <Typography sx={{ mt: 2, mb: 0.5, fontWeight: 600, color: "secondary.main"}}>Comments</Typography>
+                        <Box sx={{ display: "flex", mt: 2, gap: 2, width: "100%", alignItems: "center",
+                            paddingLeft: "0.5rem"}}>
+                            <Avatar sx={{ bgcolor: "#DB536A", width: "30px", height: "30px", fontSize: "14px" }}>
                                 {`${user.firstName[0]}${user.lastName[0]}`}
                             </Avatar>
                             <TextareaAutosize
@@ -139,8 +143,8 @@ export default function IncidentDetailModal({ incidentId, open, onClose, onRefre
                                     border: "none",
                                     resize: "none",
                                     outline: "none",
-                                    borderRadius: "4px",
-                                    lineHeight: "20px",
+                                    borderRadius: "7px",
+                                    lineHeight: "50px",
                                 }}
                             />
                         </Box>
@@ -149,7 +153,7 @@ export default function IncidentDetailModal({ incidentId, open, onClose, onRefre
                         sx={{
                             display: "flex",
                             flexDirection: "column",
-                            width: "40%",
+                            width: "50%",
                             alignItems: "flex-start",
                             rowGap: 2,
                         }}
@@ -162,6 +166,7 @@ export default function IncidentDetailModal({ incidentId, open, onClose, onRefre
                             sx={{
                                 backgroundColor: "#f1f2f4",
                                 border: "none",
+                                height: "3rem",
                                 borderRadius: "5px",
                                 "&:hover": {
                                     backgroundColor: "#dddfe5",
@@ -189,6 +194,7 @@ export default function IncidentDetailModal({ incidentId, open, onClose, onRefre
                             sx={{
                                 border: 1,
                                 borderRadius: "5px",
+                                borderColor: "#464646",
                                 width: "100%",
                             }}
                         >
@@ -196,33 +202,37 @@ export default function IncidentDetailModal({ incidentId, open, onClose, onRefre
                                 sx={{
                                     p: 2,
                                     borderBottom: 1,
+                                    borderColor: "#464646",
                                     fontSize: "16px",
+                                    fontWeight: "bold",
+                                    fontFamily: "Helvetica",
+                                    color: "secondary.main"
                                 }}
                             >
                                 Details
                             </Box>
                             <Box sx={{ mt: 2, px: 2, pb: 2 }}>
-                                <Grid container spacing={2} sx={{ rowGap: 2 }}>
+                                <Grid container spacing={2} sx={{ rowGap: 1 }}>
                                     <Grid item xs={6}>
-                                        <Typography>Date of Incident</Typography>
+                                        <Typography fontWeight={"bold"} color={"secondary.main"}>Date of Incident</Typography>
                                     </Grid>
                                     <Grid item xs={6}>
                                         {incident && <Typography>{incident.incidentDate}</Typography>}
                                     </Grid>
                                     <Grid item xs={6}>
-                                        <Typography>Category</Typography>
+                                        <Typography fontWeight={"bold"} color={"secondary.main"}>Category</Typography>
                                     </Grid>
                                     <Grid item xs={6}>
                                         {incident && <Typography>{incident.incidentCategory}</Typography>}
                                     </Grid>
                                     <Grid item xs={6}>
-                                        <Typography>Reporter</Typography>
+                                        <Typography fontWeight={"bold"} color={"secondary.main"}>Reporter</Typography>
                                     </Grid>
                                     <Grid item xs={6}>
                                         {incident && <Profile user={incident.reporter} />}
                                     </Grid>
                                     <Grid item xs={6}>
-                                        <Typography>Employees Involved</Typography>
+                                        <Typography fontWeight={"bold"} color={"secondary.main"}>Employees Involved</Typography>
                                     </Grid>
                                     <Grid item xs={6} sx={{ rowGap: 1 }}>
                                         {incident &&
@@ -239,7 +249,7 @@ export default function IncidentDetailModal({ incidentId, open, onClose, onRefre
                                 </Grid>
                             </Box>
                         </Box>
-                        <Box>
+                        <Box sx={{display:"flex", justifyContent: "space-between", width: "100%",}}>
                             <Typography color="#808080" fontSize="14px">{`Created ${dateToDaysAgo(
                                 convertToPacificTime(incident.createdAt),
                             )}`}</Typography>

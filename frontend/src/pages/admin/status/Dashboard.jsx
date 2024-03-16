@@ -12,16 +12,20 @@ import { Container, Grid } from "@mui/material";
 import Column from "./Column";
 import Task from "./Task";
 import UnassignedColumn from "./UnassignedColumn";
-import { STATE } from "../initial_tasks";
+import useAxios from "../../../hooks/useAxios";
+import { useAuthContext } from "../../../context/AuthContext";
+import { isPrivileged } from "../../../utils/permissions";
 
-function Dashboard({ initialWorkflows, columns, state }) {
-    const [tasks, setTasks] = useState({});
+function Dashboard({ columns, state, updateBoardStatus, boardId }) {
+    const { user } = useAuthContext();
+    const [tasks, setTasks] = useState({ UNASSIGNED: [] });
     const [activeId, setActiveId] = useState(null);
     const [workflowColumns, setWorkflowColumns] = useState(columns);
     const sensors = useSensors(useSensor(PointerSensor));
     const dropAnimation = {
         ...defaultDropAnimation,
     };
+    const { sendRequest } = useAxios();
 
     function handleRenameColumn(columnId, name) {
         const newColumns = workflowColumns.map((column) => {
@@ -33,54 +37,61 @@ function Dashboard({ initialWorkflows, columns, state }) {
         setWorkflowColumns(newColumns);
     }
 
+    const updateStatus = async (statusId, toColumnId) => {
+        if (Object.keys(tasks).some((columnId) => tasks[columnId].some((task) => task.id === toColumnId))) {
+            toColumnId = "UNASSIGNED";
+        }
+
+        sendRequest({
+            url: `/boards/${boardId}/status/${statusId}`,
+            method: "POST",
+            body: { type: isPrivileged(user.role) ? "ADMIN" : "EMPLOYEE", toColumnId },
+        });
+    };
+
     function handleDragOver(event) {
         const { active, over } = event;
-        // Calculate the source and destination columns and the index of the task to be moved
-        // i will make this as hook later but not now
-        let newTasks = JSON.parse(JSON.stringify(tasks));
-        let sourceColumn = Object.keys(newTasks).find((column) => {
-            return newTasks[column].find((task) => task.id === active.id);
-        });
+        if (!over) return;
 
-        let destinationColumn = Object.keys(newTasks).find((column) => {
-            return newTasks[column].find((task) => task.id === over?.id);
-        });
+        const sourceColumnId = Object.keys(tasks).find((columnId) =>
+            tasks[columnId].find((task) => task.id === active.id),
+        );
 
-        let overIndex = Object.entries(newTasks)
-            .map(([, subs]) => {
-                return subs.findIndex((task) => task.id === over?.id);
-            })
-            .filter((index) => index !== -1)[0];
+        let destinationColumnId;
+        if (Object.keys(tasks).includes(over.id)) {
+            destinationColumnId = over.id;
+        } else {
+            destinationColumnId = Object.keys(tasks).find((columnId) =>
+                tasks[columnId].find((task) => task.id === over.id),
+            );
+        }
 
-        let activeIndex = Object.entries(newTasks)
-            .map(([, subs]) => {
-                return subs.findIndex((task) => task.id === active.id);
-            })
-            .filter((index) => index !== -1)[0];
-        if (sourceColumn && over.id !== active.id) {
-            if (destinationColumn === undefined) {
-                newTasks[over.id].push(newTasks[sourceColumn][activeIndex]);
-                newTasks[sourceColumn].splice(activeIndex, 1);
-                sourceColumn = over.id;
-            } else {
-                if (sourceColumn !== destinationColumn) {
-                    newTasks[sourceColumn][activeIndex].status = destinationColumn;
-                    newTasks[destinationColumn].push(newTasks[sourceColumn][activeIndex]);
-                    newTasks[sourceColumn].splice(activeIndex, 1);
-                    sourceColumn = destinationColumn;
-                } else if (overIndex != -1) {
-                    activeIndex = Object.entries(newTasks)
-                        .map(([, subs]) => {
-                            return subs.findIndex((task) => task.id === active.id);
-                        })
-                        .filter((index) => index !== -1)[0];
-                    const temp = newTasks[sourceColumn][activeIndex];
-                    newTasks[sourceColumn][activeIndex] = newTasks[destinationColumn][overIndex];
-                    newTasks[destinationColumn][overIndex] = temp;
+        if (!sourceColumnId || !destinationColumnId) {
+            return;
+        }
+
+        setTasks((prevTasks) => {
+            const newTasks = { ...prevTasks };
+            const activeTask = newTasks[sourceColumnId].find((task) => task.id === active.id);
+            const movingTaskIndex = newTasks[sourceColumnId].findIndex((task) => task.id === active.id);
+            const targetIndex = newTasks[destinationColumnId].findIndex((task) => task.id === over.id);
+
+            newTasks[sourceColumnId] = newTasks[sourceColumnId].filter((task) => task.id !== active.id);
+
+            if (!newTasks[destinationColumnId].some((task) => task.id === active.id)) {
+                if (sourceColumnId === destinationColumnId) {
+                    newTasks[destinationColumnId].splice(
+                        movingTaskIndex < targetIndex ? targetIndex : targetIndex,
+                        0,
+                        activeTask,
+                    );
+                } else {
+                    newTasks[destinationColumnId].splice(targetIndex, 0, activeTask);
                 }
             }
-        }
-        setTasks(newTasks);
+
+            return newTasks;
+        });
     }
 
     function handleStart(event) {
@@ -88,33 +99,58 @@ function Dashboard({ initialWorkflows, columns, state }) {
         setActiveId(active.id);
     }
 
-    function handleDragEnd() {
+    function handleDragEnd(event) {
+        const { active, over } = event;
+
+        if (over) {
+            const newColumnId = Object.keys(tasks).find((columnId) =>
+                tasks[columnId].find((task) => task.id === active.id),
+            );
+
+            if (!newColumnId) {
+                setActiveId(null);
+                return;
+            }
+
+            updateBoardStatus(active.id, newColumnId, isPrivileged(user.role));
+            updateStatus(active.id, newColumnId);
+        }
+
         setActiveId(null);
     }
 
     useEffect(() => {
-      setTasks((currentTasks) => {
-          const newTasks = { ...currentTasks };
-  
-          columns.forEach((column) => {
-              if (!newTasks[column.id]) {
-                  newTasks[column.id] = [];
-              }
-  
-              const uniqueTasksForColumn = Array.from(new Set([...newTasks[column.id], ...column.statusIds]))
-                  .map(statusId => state.find(task => task.id === statusId))
-                  .filter(task => task !== undefined);
-  
-              newTasks[column.id] = uniqueTasksForColumn;
-          });
-  
-          return newTasks;
-      });
-      setWorkflowColumns(columns);
-  }, [columns, state, setTasks]);
+        if (!columns || !state) {
+            return;
+        }
+
+        setTasks((currentTasks) => {
+            const newTasks = { ...currentTasks, UNASSIGNED: [] };
+
+            const assignedTaskIds = new Set();
+
+            columns.forEach((column) => {
+                newTasks[column.id] = column.statusIds
+                    .map((statusId) => state.find((task) => task.id === statusId))
+                    .filter((task) => task);
+
+                newTasks[column.id].forEach((task) => assignedTaskIds.add(task.id));
+            });
+
+            state.forEach((task) => {
+                if (!assignedTaskIds.has(task.id)) {
+                    newTasks["UNASSIGNED"].push(task);
+                }
+            });
+
+            return newTasks;
+        });
+
+        setWorkflowColumns(columns);
+    }, [columns, state]);
 
     return (
-        <Container>
+        <Container disableGutters sx={{ width: "100%", height: "100%" }}>
             <DndContext
                 sensors={sensors}
                 collisionDetection={closestCorners}
@@ -122,17 +158,18 @@ function Dashboard({ initialWorkflows, columns, state }) {
                 onDragOver={handleDragOver}
                 onDragStart={handleStart}
             >
-                <Grid container direction="row">
+                <Grid container direction="row" sx={{ width: "100%", height: "100%" }}>
                     <Grid item>
                         <UnassignedColumn
-                            id={STATE.UNASSIGNED}
-                            title="Unassigned"
-                            tasks={(tasks && tasks[state.UNASSIGNED]) || []}
+                            id={"UNASSIGNED"}
+                            title="Unassigned statuses"
+                            tasks={(tasks && tasks["UNASSIGNED"]) || []}
                             activeId={activeId}
+                            isOverlayActive={activeId && columns.some((column) => column.statusIds.includes(activeId))}
                         />
                     </Grid>
                     <Grid item style={{ overflowX: "auto", flex: 1 }}>
-                        <Grid container direction="row" wrap="nowrap" spacing={2}>
+                        <Grid container direction="row" wrap="nowrap" spacing={-1}>
                             {workflowColumns.map((column) => (
                                 <Grid key={column.id} item>
                                     <Column
@@ -141,6 +178,7 @@ function Dashboard({ initialWorkflows, columns, state }) {
                                         tasks={(tasks && tasks[column.id]) || []}
                                         activeId={activeId}
                                         handleRenameColumn={handleRenameColumn}
+                                        isOverlayActive={activeId && !column.statusIds.includes(activeId)}
                                     />
                                 </Grid>
                             ))}
