@@ -20,6 +20,7 @@ public class Incident {
     private List<Comment> comments;
     private Date createdAt;
     private Date lastUpdatedAt;
+    private String reviewer;
 
     public Incident() {}
 

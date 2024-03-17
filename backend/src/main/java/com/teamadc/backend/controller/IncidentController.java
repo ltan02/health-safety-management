@@ -59,7 +59,7 @@ public class IncidentController {
 
             List<BasicIncidentResponse> response = new ArrayList<>();
             for (Incident incident : incidents) {
-                response.add(new BasicIncidentResponse(incident.getId(), incident.getIncidentDate(), incident.getIncidentCategory(), incident.getReporter(), incident.getEmployeesInvolved(), incident.getStatusId()));
+                response.add(new BasicIncidentResponse(incident.getId(), incident.getIncidentDate(), incident.getIncidentCategory(), incident.getReporter(), incident.getEmployeesInvolved(), incident.getStatusId(), incident.getReviewer()));
             }
 
             return ResponseEntity.ok(response);
@@ -143,4 +143,35 @@ public class IncidentController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    @PostMapping("/{incidentId}/reviewer/{reviewerId}")
+    public ResponseEntity<Incident> assignReviewer(@PathVariable String incidentId, @PathVariable String reviewerId) {
+        try {
+            Incident incident = incidentService.assignReviewer(incidentId, reviewerId);
+            return ResponseEntity.ok(incident);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @DeleteMapping("/{incidentId}/reviewer")
+    public ResponseEntity<Incident> removeReviewer(@PathVariable String incidentId) {
+        try {
+            Incident incident = incidentService.removeReviewer(incidentId);
+            return ResponseEntity.ok(incident);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/reviewer/{reviewerId}")
+    public ResponseEntity<List<Incident>> getIncidentsByReviewer(@PathVariable String reviewerId) {
+        try {
+            List<Incident> incidents = incidentService.getIncidentsByReviewer(reviewerId);
+            return ResponseEntity.ok(incidents);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
 }
