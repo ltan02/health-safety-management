@@ -121,60 +121,35 @@ function Dashboard({ columns, updateBoardStatus, boardId, view, addColumn, delet
     function handleDragOver(event) {
         const { active, over } = event;
         if (!over) return;
-
-        const sourceColumnId = columns.find((column) => column.statusIds.includes(active.id)).id;
-
-        let destinationColumnId;
-        if (!tasks.some((column) => column.statusIds.includes(over.id))) {
-            destinationColumnId = over.id;
-        } else {
-            destinationColumnId = tasks.find((column) => column.statusIds.includes(over.id)).id;
-        }
-
-        if (!sourceColumnId || !destinationColumnId) {
+    
+        const sourceColumn = tasks.find((column) => column.statusIds.includes(active.id));
+        const destinationColumn = tasks.find((column) => column.id === over.id || column.statusIds.includes(over.id));
+    
+        if (!sourceColumn || !destinationColumn) {
             return;
         }
+    
+        if (sourceColumn.id === destinationColumn.id) {
+            return;
+        }
+    
+        const newTasks = tasks.map((col) => ({
+            ...col,
+            statuses: [...col.statuses],
+            statusIds: [...col.statusIds]
+        }));
+    
+        const taskBeingDragged = sourceColumn.statuses.find((status) => status.id === active.id);
+    
+        const updatedSourceColumn = newTasks.find((col) => col.id === sourceColumn.id);
+        updatedSourceColumn.statuses = updatedSourceColumn.statuses.filter((status) => status.id !== active.id);
+        updatedSourceColumn.statusIds = updatedSourceColumn.statusIds.filter((id) => id !== active.id);
 
-        setTasks((prevTasks) => {
-            const newTasks = [...prevTasks];
-            const movingTaskIndex = columns
-                .find((column) => column.id === sourceColumnId)
-                .statuses.findIndex((status) => status.id === active.id);
-            const targetIndex = tasks
-                .find((column) => column.id === destinationColumnId)
-                .statuses.findIndex((status) => status.id === over.id);
-
-            newTasks.find((column) => column.id === sourceColumnId).statuses = newTasks
-                .find((column) => column.id === sourceColumnId)
-                .statuses.filter((task) => task.id !== active.id);
-            newTasks.find((column) => column.id === sourceColumnId).statusIds = newTasks
-                .find((column) => column.id === sourceColumnId)
-                .statusIds.filter((id) => id !== active.id);
-
-            if (
-                !newTasks
-                    .find((column) => column.id === destinationColumnId)
-                    .statuses.some((task) => task.id === active.id)
-            ) {
-                if (sourceColumnId === destinationColumnId) {
-                    newTasks
-                        .find((column) => column.id === destinationColumnId)
-                        .statuses.splice(movingTaskIndex < targetIndex ? targetIndex : targetIndex, 0, activeTask);
-                    newTasks
-                        .find((column) => column.id === destinationColumnId)
-                        .statusIds.splice(movingTaskIndex < targetIndex ? targetIndex : targetIndex, 0, activeTask.id);
-                } else {
-                    newTasks
-                        .find((column) => column.id === destinationColumnId)
-                        .statuses.splice(targetIndex, 0, activeTask);
-                    newTasks
-                        .find((column) => column.id === destinationColumnId)
-                        .statusIds.splice(targetIndex, 0, activeTask.id);
-                }
-            }
-
-            return newTasks;
-        });
+        const updatedDestinationColumn = newTasks.find((col) => col.id === destinationColumn.id);
+        updatedDestinationColumn.statuses.push(taskBeingDragged);
+        updatedDestinationColumn.statusIds.push(taskBeingDragged.id);
+    
+        setTasks(newTasks);
     }
 
     function handleStart(event) {
