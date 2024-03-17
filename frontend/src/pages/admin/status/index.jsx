@@ -1,16 +1,12 @@
 import Dashboard from "./Dashboard";
-import { useAuthContext } from "../../../context/AuthContext";
 import { useBoard } from "../../../context/BoardContext";
-import { isPrivileged } from "../../../utils/permissions";
 import { useState } from "react";
 import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 
 function AdminStatus() {
-    const { user } = useAuthContext();
-    const { adminColumns, employeeColumns, statuses, updateStatus, boardDetails } = useBoard();
+    const { adminColumns, employeeColumns, statuses, updateStatus, boardDetails, addColumn, deleteColumn } = useBoard();
     const [view, setView] = useState("ADMIN");
-
-    const columns = isPrivileged(user.role) ? adminColumns : employeeColumns;
+    const columns = view === "ADMIN" ? adminColumns : employeeColumns;
 
     const handleView = (event, newView) => {
         setView(newView);
@@ -66,9 +62,12 @@ function AdminStatus() {
             <div style={{ width: "90%", height: "100vh", padding: 0 }}>
                 <Dashboard
                     columns={columns}
-                    state={statuses}
+                    statuses={statuses}
                     updateBoardStatus={updateStatus}
                     boardId={boardDetails.id}
+                    view={view}
+                    addColumn={addColumn}
+                    deleteColumn={deleteColumn}
                 />
             </div>
         </div>
