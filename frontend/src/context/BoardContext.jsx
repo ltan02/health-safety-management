@@ -16,31 +16,27 @@ export const BoardProvider = ({ children }) => {
         const boards = await sendRequest({ url: "/boards", method: "GET" });
         const boardResponse = boards[0];
 
-        const fetchColumns = async (columnIds) => {
-            const columnPromises = columnIds.map((id) => sendRequest({ url: `/columns/${id}`, method: "GET" }));
-            const columns = await Promise.all(columnPromises);
+        const columnIds = [...boardResponse.adminColumnIds, ...boardResponse.employeeColumnIds];
+        const columnPromises = columnIds.map(id => sendRequest({ url: `/columns/${id}`, method: "GET" }));
+        const columns = await Promise.all(columnPromises);
 
-            const statusIds = [...new Set(columns.flatMap((column) => column.statusIds))];
-            const statusPromises = statusIds.map((id) => sendRequest({ url: `/status/${id}`, method: "GET" }));
-            const statuses = await Promise.all(statusPromises);
+        const statusIds = [...new Set(columns.flatMap(column => column.statusIds))];
+        const statusPromises = statusIds.map(id => sendRequest({ url: `/status/${id}`, method: "GET" }));
+        const statuses = await Promise.all(statusPromises);
+        setStatuses(statuses);
 
-            return columns.map((column) => ({
-                ...column,
-                statuses: column.statusIds.map((id) => statuses.find((status) => status.id === id)),
-            }));
-        };
+        const statusMap = statuses.reduce((acc, status) => {
+            acc[status.id] = status;
+            return acc;
+        }, {});
 
-        const fetchStatus = async (statusIds) => {
-            const statusPromises = statusIds.map((id) => sendRequest({ url: `/status/${id}`, method: "GET" }));
-            const statuses = await Promise.all(statusPromises);
-            setStatuses(statuses);
-        };
+        const mapColumns = (column) => ({
+            ...column,
+            statuses: column.statusIds.map(id => statusMap[id]),
+        });
 
-        const [adminColumns, employeeColumns] = await Promise.all([
-            fetchColumns(boardResponse.adminColumnIds),
-            fetchColumns(boardResponse.employeeColumnIds),
-            fetchStatus(boardResponse.statusIds),
-        ]);
+        let adminColumns = columns.filter(column => boardResponse.adminColumnIds.includes(column.id)).map(mapColumns);
+        let employeeColumns = columns.filter(column => boardResponse.employeeColumnIds.includes(column.id)).map(mapColumns);
 
         adminColumns.push({
             id: "UNASSIGNED",
@@ -158,6 +154,8 @@ export const BoardProvider = ({ children }) => {
                     .find((column) => column.id === "UNASSIGNED")
                     .statuses.push(...newBoard.adminColumns.find((column) => column.id === columnId).statuses);
                 newBoard.adminColumns = newBoard.adminColumns.filter((column) => column.id !== columnId);
+
+                console.log(JSON.stringify(newBoard, null, 2));
 
                 const adminColumns = newBoard.adminColumns;
                 adminColumns.sort((a, b) => a.order - b.order);

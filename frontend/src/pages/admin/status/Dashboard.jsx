@@ -98,7 +98,7 @@ function Dashboard({ columns, updateBoardStatus, boardId, view, addColumn, delet
     }
 
     const updateStatus = async (statusId, toColumnId) => {
-        sendRequest({
+        await sendRequest({
             url: `/boards/${boardId}/status/${statusId}`,
             method: "POST",
             body: { type: view === "ADMIN" ? "ADMIN" : "EMPLOYEE", toColumnId },
@@ -112,7 +112,7 @@ function Dashboard({ columns, updateBoardStatus, boardId, view, addColumn, delet
             method: "DELETE",
             body: { boardType: view === "ADMIN" ? "ADMIN" : "EMPLOYEE" },
         });
-        sendRequest({
+        await sendRequest({
             url: `/columns/${columnId}`,
             method: "DELETE",
         });
@@ -229,7 +229,7 @@ function Dashboard({ columns, updateBoardStatus, boardId, view, addColumn, delet
             body: { name: columnName, order: columns.length - 1, statusIds: [] },
         });
         addColumn(response, view === "ADMIN");
-        sendRequest({ url: `/boards/${boardId}/columns/${response.id}`, method: "POST", body: { boardType: view } });
+        await sendRequest({ url: `/boards/${boardId}/columns/${response.id}`, method: "POST", body: { boardType: view } });
 
         setColumnName("");
         setCreateNewColumn(false);
