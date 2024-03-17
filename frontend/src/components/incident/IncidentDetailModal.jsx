@@ -107,7 +107,7 @@ export default function IncidentDetailModal({
       url: "/users",
       method: "GET",
     });
-    setEmployees(response);
+    setEmployees(response.filter((employee) => isPrivileged(employee.role)));
   };
 
   const handleOpenModal = async (e) => {
