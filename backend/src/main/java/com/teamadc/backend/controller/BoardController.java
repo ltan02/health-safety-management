@@ -1,5 +1,6 @@
 package com.teamadc.backend.controller;
 
+import com.teamadc.backend.dto.request.CreateColumnRequest;
 import com.teamadc.backend.dto.request.UpdateStatusRequest;
 import com.teamadc.backend.model.Board;
 import com.teamadc.backend.model.Column;
@@ -168,4 +169,70 @@ public class BoardController {
         }
     }
 
+    @PostMapping("/{boardId}/columns/{columnId}")
+    public ResponseEntity<Board> addColumn(@PathVariable String boardId, @PathVariable String columnId, @RequestBody CreateColumnRequest req) {
+        try {
+            Board existingBoard = boardService.getBoardById(boardId);
+            if (existingBoard == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            Column column = columnService.getColumnById(columnId);
+            if (column == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            List<String> columnIds = req.getBoardType().equals("ADMIN") ? existingBoard.getAdminColumnIds() : existingBoard.getEmployeeColumnIds();
+            if (columnIds.contains(columnId)) {
+                return ResponseEntity.ok(existingBoard);
+            }
+
+            if (req.getBoardType().equals("ADMIN")) {
+                List<String> adminColumnIds = existingBoard.getAdminColumnIds();
+                adminColumnIds.add(columnId);
+                existingBoard.setAdminColumnIds(adminColumnIds);
+            } else {
+                List<String> employeeColumnIds = existingBoard.getEmployeeColumnIds();
+                employeeColumnIds.add(columnId);
+                existingBoard.setEmployeeColumnIds(employeeColumnIds);
+            }
+
+            boardService.createOrUpdateBoard(existingBoard);
+
+            return ResponseEntity.ok(existingBoard);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @DeleteMapping("/{boardId}/columns/{columnId}")
+    public ResponseEntity<Board> removeColumn(@PathVariable String boardId, @PathVariable String columnId, @RequestBody CreateColumnRequest req) {
+        try {
+            Board existingBoard = boardService.getBoardById(boardId);
+            if (existingBoard == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            List<String> columnIds = req.getBoardType().equals("ADMIN") ? existingBoard.getAdminColumnIds() : existingBoard.getEmployeeColumnIds();
+            if (!columnIds.contains(columnId)) {
+                return ResponseEntity.ok(existingBoard);
+            }
+
+            if (req.getBoardType().equals("ADMIN")) {
+                List<String> adminColumnIds = existingBoard.getAdminColumnIds();
+                adminColumnIds.remove(columnId);
+                existingBoard.setAdminColumnIds(adminColumnIds);
+            } else {
+                List<String> employeeColumnIds = existingBoard.getEmployeeColumnIds();
+                employeeColumnIds.remove(columnId);
+                existingBoard.setEmployeeColumnIds(employeeColumnIds);
+            }
+
+            boardService.createOrUpdateBoard(existingBoard);
+
+            return ResponseEntity.ok(existingBoard);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 }

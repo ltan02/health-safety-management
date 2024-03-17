@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 
 function AdminStatus() {
-    const { adminColumns, employeeColumns, statuses, updateStatus, boardDetails } = useBoard();
+    const { adminColumns, employeeColumns, statuses, updateStatus, boardDetails, addColumn, deleteColumn } = useBoard();
     const [view, setView] = useState("ADMIN");
     const columns = view === "ADMIN" ? adminColumns : employeeColumns;
 
@@ -66,6 +66,8 @@ function AdminStatus() {
                     updateBoardStatus={updateStatus}
                     boardId={boardDetails.id}
                     view={view}
+                    addColumn={addColumn}
+                    deleteColumn={deleteColumn}
                 />
             </div>
         </div>

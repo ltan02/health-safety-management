@@ -80,6 +80,9 @@ export const BoardProvider = ({ children }) => {
             ],
         });
 
+        adminColumns.sort((a, b) => a.order - b.order);
+        employeeColumns.sort((a, b) => a.order - b.order);
+
         setAdminColumns(adminColumns);
         setEmployeeColumns(employeeColumns);
         setBoardDetails({ ...boardResponse, adminColumns, employeeColumns });
@@ -116,6 +119,67 @@ export const BoardProvider = ({ children }) => {
         [adminColumns, employeeColumns, statuses],
     );
 
+    const addColumn = useCallback(
+        (column, admin = true) => {
+            const columns = admin ? adminColumns : employeeColumns;
+            const setColumns = admin ? setAdminColumns : setEmployeeColumns;
+
+            const newColumns = [...columns, { ...column, statuses: [] }];
+            newColumns.sort((a, b) => a.order - b.order);
+
+            setColumns(newColumns);
+
+            if (admin) {
+                setBoardDetails((prev) => ({
+                    ...prev,
+                    adminColumns: newColumns,
+                    adminColumnIds: newColumns.map((c) => c.id),
+                }));
+            } else {
+                setBoardDetails((prev) => ({
+                    ...prev,
+                    employeeColumns: newColumns,
+                    employeeColumnIds: newColumns.map((c) => c.id),
+                }));
+            }
+        },
+        [adminColumns, employeeColumns],
+    );
+
+    const deleteColumn = useCallback((columnId, admin = true) => {
+        setBoardDetails((prev) => {
+            const newBoard = { ...prev };
+            if (admin) {
+                newBoard.adminColumnIds = newBoard.adminColumnIds.filter((id) => id !== columnId);
+                newBoard.adminColumns
+                    .find((column) => column.id === "UNASSIGNED")
+                    .statusIds.push(...newBoard.adminColumns.find((column) => column.id === columnId).statusIds);
+                newBoard.adminColumns
+                    .find((column) => column.id === "UNASSIGNED")
+                    .statuses.push(...newBoard.adminColumns.find((column) => column.id === columnId).statuses);
+                newBoard.adminColumns = newBoard.adminColumns.filter((column) => column.id !== columnId);
+
+                const adminColumns = newBoard.adminColumns;
+                adminColumns.sort((a, b) => a.order - b.order);
+                setAdminColumns(adminColumns);
+            } else {
+                newBoard.employeeColumnIds = newBoard.employeeColumnIds.filter((id) => id !== columnId);
+                newBoard.employeeColumns
+                    .find((column) => column.id === "UNASSIGNED")
+                    .statusIds.push(...newBoard.employeeColumns.find((column) => column.id === columnId).statusIds);
+                newBoard.employeeColumns
+                    .find((column) => column.id === "UNASSIGNED")
+                    .statuses.push(...newBoard.employeeColumns.find((column) => column.id === columnId).statuses);
+                newBoard.employeeColumns = newBoard.employeeColumns.filter((column) => column.id !== columnId);
+
+                const employeeColumns = newBoard.employeeColumns;
+                employeeColumns.sort((a, b) => a.order - b.order);
+                setEmployeeColumns(employeeColumns);
+            }
+            return newBoard;
+        });
+    }, []);
+
     useEffect(() => {
         fetchBoardInfo();
     }, []);
@@ -128,8 +192,19 @@ export const BoardProvider = ({ children }) => {
             employeeColumns,
             updateBoard: fetchBoardInfo,
             updateStatus: updateStatusLocally,
+            addColumn,
+            deleteColumn,
         }),
-        [boardDetails, statuses, adminColumns, employeeColumns, fetchBoardInfo, updateStatusLocally],
+        [
+            boardDetails,
+            statuses,
+            adminColumns,
+            employeeColumns,
+            fetchBoardInfo,
+            updateStatusLocally,
+            addColumn,
+            deleteColumn,
+        ],
     );
 
     return <BoardContext.Provider value={value}>{children}</BoardContext.Provider>;

@@ -1,8 +1,6 @@
 package com.teamadc.backend.model;
 
 import com.google.cloud.firestore.annotation.DocumentId;
-import com.teamadc.backend.enums.EmployeeIncidentStatus;
-import com.teamadc.backend.enums.SafetyWardenIncidentStatus;
 import lombok.Getter;
 import lombok.Setter;
 
