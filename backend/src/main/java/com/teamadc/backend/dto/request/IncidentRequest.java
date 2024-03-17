@@ -27,9 +27,11 @@ public class IncidentRequest {
 
     private List<Comment> comments;
 
+    private String reviewer;
+
     public IncidentRequest() {}
 
-    public IncidentRequest(String incidentDate, String incidentCategory, String reporter, List<String> employeesInvolved, List<CustomFieldRequest> customFields, String statusId, List<Comment> comments) {
+    public IncidentRequest(String incidentDate, String incidentCategory, String reporter, List<String> employeesInvolved, List<CustomFieldRequest> customFields, String statusId, List<Comment> comments, String reviewer) {
         this.incidentDate = incidentDate;
         this.incidentCategory = incidentCategory;
         this.reporter = reporter;
@@ -37,9 +39,10 @@ public class IncidentRequest {
         this.customFields = customFields;
         this.statusId = statusId;
         this.comments = comments;
+        this.reviewer = reviewer;
     }
 
-    public IncidentRequest(String id, String incidentDate, String incidentCategory, String reporter, List<String> employeesInvolved, List<CustomFieldRequest> customFields, String statusId, List<Comment> comments) {
+    public IncidentRequest(String id, String incidentDate, String incidentCategory, String reporter, List<String> employeesInvolved, List<CustomFieldRequest> customFields, String statusId, List<Comment> comments, String reviewer) {
         this.id = id;
         this.incidentDate = incidentDate;
         this.incidentCategory = incidentCategory;
@@ -48,5 +51,6 @@ public class IncidentRequest {
         this.customFields = customFields;
         this.statusId = statusId;
         this.comments = comments;
+        this.reviewer = reviewer;
     }
 }

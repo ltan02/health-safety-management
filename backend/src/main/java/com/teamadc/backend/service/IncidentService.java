@@ -68,4 +68,20 @@ public class IncidentService {
 
         return incident;
     }
+
+    public Incident assignReviewer(String incidentId, String reviewerId) throws InterruptedException, ExecutionException {
+        Incident incident = incidentRepository.findById(incidentId);
+        incident.setReviewer(reviewerId);
+        return incidentRepository.save(incident);
+    }
+
+    public Incident removeReviewer(String incidentId) throws InterruptedException, ExecutionException {
+        Incident incident = incidentRepository.findById(incidentId);
+        incident.setReviewer(null);
+        return incidentRepository.save(incident);
+    }
+    
+    public List<Incident> getIncidentsByReviewer(String reviewerId) throws InterruptedException, ExecutionException {
+        return incidentRepository.findAll().stream().filter(incident -> incident.getReviewer().equals(reviewerId)).toList();
+    }
 }
