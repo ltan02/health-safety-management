@@ -66,7 +66,13 @@ function Task({ id, task, onRefresh }) {
               fontWeight={500}
               fontSize="1rem"
               color="primary.text"
-              sx={{ mb: 2 }}
+              sx={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                display: "-webkit-box",
+                WebkitLineClamp: "2",
+                WebkitBoxOrient: "vertical",
+              }}
             >
               {task.customFields.description}
             </Typography>
