@@ -162,6 +162,7 @@ function Dashboard() {
                         refreshDashboard;
                     }}
                     onRefresh={refreshDashboard}
+                    selectedIncident={selectedTask}
                 />
             )}
     </Container>
