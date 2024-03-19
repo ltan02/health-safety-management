@@ -15,14 +15,14 @@ export const PAGE_TYPE = {
 
 export const PRIVILEGED_SIDEBAR_CONTENTS = {
     [PAGE_TYPE.ADMIN]: {
-        ["Workflows"]: <RedirectButton to="/">Workflows</RedirectButton>,
+        ["Workflows"]: <RedirectButton to="/workflow">Workflows</RedirectButton>,
         ["Form Customization"]: <RedirectButton to="/form">Form Customization</RedirectButton>,
         ["Columns and Statuses"]: <RedirectButton to="/status">Columns and Statuses</RedirectButton>,
         ["Workflow Management"]: <RedirectButton to="/management">Workflow Management</RedirectButton>,
     },
     [PAGE_TYPE.INCIDENT]: {
-        ["Incident Board"]: <RedirectButton to="/incident">Incident Board</RedirectButton>,
-        ["Incident Reports"]: <RedirectButton to="/incident/report">Incident Reports</RedirectButton>,
+        ["Incident Board"]: <RedirectButton to="/">Incident Board</RedirectButton>,
+        ["Incident Reports"]: <RedirectButton to="/incidents">Incident Reports</RedirectButton>,
     },
     [PAGE_TYPE.REPORT]: {
         ["Role"]: <RoleSwitchModal>Role</RoleSwitchModal>,
@@ -34,7 +34,7 @@ export const PRIVILEGED_SIDEBAR_CONTENTS = {
 export const EMPLOYEE_SIDEBAR_CONTENTS = {
     [PAGE_TYPE.INCIDENT]: {
         ["Incident Board"]: <RedirectButton to="/">Incident Board</RedirectButton>,
-        ["Incident Reports"]: <RedirectButton to="/report">Incident Reports</RedirectButton>,
+        ["Incident Reports"]: <RedirectButton to="/incidents">Incident Reports</RedirectButton>,
     },
 };
 
