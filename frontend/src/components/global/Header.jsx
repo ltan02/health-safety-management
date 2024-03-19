@@ -86,7 +86,7 @@ function Header() {
                         >
                             <Button
                                 color="inherit"
-                                onClick={directTo("/workflow")}
+                                onClick={directTo("/admin/workflow")}
                                 sx={{
                                     "&:hover": { borderBottom: "3px solid" },
                                     padding: "0.9rem",
