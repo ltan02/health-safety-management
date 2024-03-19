@@ -11,7 +11,7 @@ const style = {
     p: 4,
     borderRadius: 1,
     outline: "none",
-    height: "30%",
+    height: "50%",
 };
 
 function AddStatusModal({ open, handleClose }) {
