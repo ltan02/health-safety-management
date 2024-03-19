@@ -62,13 +62,13 @@ function App() {
                     <Routes>
                         {isPrivileged(user.role) ? (
                             <>
-                                <Route path="/" element={<AdminWorkflow />} />
+                                <Route path="workflow" element={<AdminWorkflow />} />
                                 <Route path="management" element={<AdminManagement />} />
                                 <Route path="form" element={<AdminForm />} />
                                 <Route path="status" element={<AdminStatus />} />
-                                <Route path="incident">
+                                <Route path="/">
                                     <Route index element={<Incident />} />
-                                    <Route path="report" element={<IncidentReport />} />
+                                    <Route path="incidents" element={<IncidentReport />} />
                                 </Route>
                                 <Route path="report">
                                     <Route index element={<ReportOverview />} />
@@ -82,7 +82,7 @@ function App() {
                         ) : (
                             <>
                                 <Route index element={<Incident />} />
-                                <Route path="/report" element={<IncidentReport />} />
+                                <Route path="/incidents" element={<IncidentReport />} />
                             </>
                         )}
                         <Route path="*" element={<Navigate to="/" replace />} />
