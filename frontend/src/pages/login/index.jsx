@@ -43,12 +43,12 @@ function Login() {
             setShowMissingEmail(true);
         } else if (password === "") {
             setShowMissingPassword(true);
+        } else {
+            signIn(email, password).catch((e) => {
+                console.error("Login error: ", e);
+                setShowInvalidDetails(true);
+            });
         }
-
-        signIn(email, password).catch((e) => {
-            console.error("Login error: ", e);
-            setShowInvalidDetails(true);
-        });
     };
 
     useEffect(() => {
@@ -115,9 +115,21 @@ function Login() {
                             />
                         </FormControl>
 
-                        {showMissingEmail && (<Alert severity="error" sx={{ marginTop: 1 }}>Email field must not be left blank</Alert>)}
-                        {showMissingPassword && (<Alert severity="error" sx={{ marginTop: 1 }}>Password field must not be left blank</Alert>)}
-                        {showInvalidDetails && (<Alert severity="error" sx={{ marginTop: 1 }}>Your email or password are incorrect. Please try again!</Alert>)}
+                        {showMissingEmail && (
+                            <Alert severity="error" sx={{ marginTop: 1 }}>
+                                Email field must not be left blank
+                            </Alert>
+                        )}
+                        {showMissingPassword && (
+                            <Alert severity="error" sx={{ marginTop: 1 }}>
+                                Password field must not be left blank
+                            </Alert>
+                        )}
+                        {showInvalidDetails && (
+                            <Alert severity="error" sx={{ marginTop: 1 }}>
+                                Your email or password are incorrect. Please try again!
+                            </Alert>
+                        )}
 
                         <Button
                             onClick={handleSubmit}
