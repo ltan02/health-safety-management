@@ -62,10 +62,12 @@ function App() {
                     <Routes>
                         {isPrivileged(user.role) ? (
                             <>
-                                <Route path="workflow" element={<AdminWorkflow />} />
-                                <Route path="management" element={<AdminManagement />} />
-                                <Route path="form" element={<AdminForm />} />
-                                <Route path="status" element={<AdminStatus />} />
+                                <Route path="admin">
+                                    <Route path="workflow" element={<AdminWorkflow />} />
+                                    <Route path="management" element={<AdminManagement />} />
+                                    <Route path="form" element={<AdminForm />} />
+                                    <Route path="status" element={<AdminStatus />} />
+                                </Route>
                                 <Route path="/">
                                     <Route index element={<Incident />} />
                                     <Route path="incidents" element={<IncidentReport />} />

@@ -17,7 +17,7 @@ import { isPrivileged } from "../../utils/permissions.js";
 function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
     const toggleDrawer = (open) => () => handleSidebarToggle(open);
     const { user } = useAuthContext();
-    const [pageType, setPageType] = useState(isPrivileged(user.role) ? PAGE_TYPE.ADMIN : PAGE_TYPE.INCIDENT);
+    const [pageType, setPageType] = useState(PAGE_TYPE.INCIDENT);
     let location = useLocation();
 
     useEffect(() => {
