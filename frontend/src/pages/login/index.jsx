@@ -43,12 +43,12 @@ function Login() {
             setShowMissingEmail(true);
         } else if (password === "") {
             setShowMissingPassword(true);
+        } else {
+            signIn(email, password).catch((e) => {
+                console.error("Login error: ", e);
+                setShowInvalidDetails(true);
+            });
         }
-
-        signIn(email, password).catch((e) => {
-            console.error("Login error: ", e);
-            setShowInvalidDetails(true);
-        });
     };
 
     useEffect(() => {
