@@ -7,6 +7,8 @@ from dotenv import load_dotenv
 from firebase_admin import firestore
 import os
 import json
+from vertexai.generative_models import ChatSession, GenerativeModel
+import uvicorn
 
 
 load_dotenv()
@@ -23,10 +25,12 @@ aiplatform.init(project="pwc-project-b3778", location="us-central1", credentials
 model = TextGenerationModel.from_pretrained("text-bison@001")
 app = FastAPI()
 
+
 class IncidentModel(BaseModel):
     incident: str
 
-@app.post("/generate-text/")
+
+@app.post("/categorize/")
 async def generate_text(incident_model: IncidentModel):
     incident = incident_model.incident
     prompt = f"Classify the following incident: '{incident}' into one of the following categories: {categories}. " \
@@ -44,6 +48,46 @@ async def generate_text(incident_model: IncidentModel):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
+class ChatPrompt(BaseModel):
+    prompt: str
+
+
+model2 = GenerativeModel("gemini-1.0-pro")
+chat_session = model2.start_chat(response_validation=False)
+
+users_ref = db.collection('incidents')
+docs = users_ref.stream()
+
+texts = []
+for doc in docs:
+    texts.append(str(doc.to_dict()))
+
+prompt = "You are a querying bot for PwC that answers user questions based on the following incidents - " + str(
+        texts) \
+             + ". Once read, reply with  - 'Data loaded'. Answer only incidents-related questions, for other " \
+               "questions, say - 'Query not related to incidents, try again.'"
+
+del texts
+
+t = []
+r = chat_session.send_message(prompt, stream=True)
+for c in r:
+    t.append(c.text)
+print("".join(t))
+
+
+@app.post("/chat/")
+async def get_chat_response(chat_prompt: ChatPrompt) -> dict:
+    text_response = []
+    try:
+        responses = chat_session.send_message(chat_prompt.prompt, stream=True)
+        for chunk in responses:
+            text_response.append(chunk.text)
+        return {"response": "".join(text_response)}
+    except Exception as e:
+        return {"response": "Please try again with a different query."}
+
+
 if __name__ == "__main__":
-    import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
