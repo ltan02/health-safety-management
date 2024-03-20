@@ -11,6 +11,7 @@ import InfoIcon from "@mui/icons-material/Info";
 import WorkflowModal from "../../../components/workflows/WorkflowModal";
 import AddStatusModal from "../../../components/workflows/AddStatusModal";
 import CustomEdge from "../../../components/workflows/CustomEdge";
+import DiscardChangesModal from "../../../components/workflows/DiscardChangesModal";
 
 const edgeTypes = {
     customEdge: CustomEdge,
@@ -24,11 +25,22 @@ function AdminManagement() {
     const [transitionName, setTransitionName] = React.useState("");
     const [fromStatusNames, setFromStatusNames] = React.useState(null);
     const [toStatusNames, setToStatusNames] = React.useState(null);
+    const [discardChangesModalOpen, setDiscardChangesModalOpen] = React.useState(false);
 
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges] = useEdgesState([]);
-    const { states, transitions, loading, fetchWorkflow, updateCoordinate, addState, deleteState, createTransition } =
-        useWorkflow();
+    const {
+        states,
+        transitions,
+        loading,
+        fetchWorkflow,
+        updateCoordinate,
+        addState,
+        deleteState,
+        createTransition,
+        discardChanges,
+        saveChanges,
+    } = useWorkflow();
 
     const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
@@ -94,6 +106,11 @@ function AdminManagement() {
 
     const handleToStatusChange = (event) => {
         setToStatusNames(event.target.value);
+    };
+
+    const handleDiscardChanges = () => {
+        discardChanges();
+        setDiscardChangesModalOpen(false);
     };
 
     useEffect(() => {
@@ -244,7 +261,7 @@ function AdminManagement() {
                     </div>
                     <div>
                         <Button
-                            onClick={() => {}}
+                            onClick={() => saveChanges()}
                             variant="contained"
                             sx={{
                                 height: "32px",
@@ -258,7 +275,7 @@ function AdminManagement() {
                             Update workflow
                         </Button>
                         <Button
-                            onClick={() => {}}
+                            onClick={() => setDiscardChangesModalOpen(true)}
                             variant="text"
                             sx={{
                                 height: "32px",
@@ -312,7 +329,7 @@ function AdminManagement() {
                                 setToStatusNames(null);
                                 setTransitionName("");
                             }}
-                            statuses={states}
+                            statuses={states.filter((state) => state.data.label !== "START")}
                             transitionName={transitionName}
                             handleTransitionNameChange={handleTransitionNameChange}
                             handleAddTransition={handleAddTransition}
@@ -320,6 +337,13 @@ function AdminManagement() {
                             handleFromStatusChange={handleFromStatusChange}
                             toStatusNames={toStatusNames}
                             handleToStatusChange={handleToStatusChange}
+                        />
+                    )}
+                    {discardChangesModalOpen && (
+                        <DiscardChangesModal
+                            open={discardChangesModalOpen}
+                            handleClose={() => setDiscardChangesModalOpen(false)}
+                            handleDiscardChanges={handleDiscardChanges}
                         />
                     )}
                     <ReactFlow

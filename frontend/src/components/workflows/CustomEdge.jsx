@@ -1,4 +1,4 @@
-import { getMarkerEnd, getSmoothStepPath } from "reactflow";
+import { getSmoothStepPath } from "reactflow";
 
 const CustomEdge = ({
     id,
@@ -12,12 +12,18 @@ const CustomEdge = ({
     markerEnd,
     data,
 }) => {
-    const [edgePath, labelX, labelY] = getSmoothStepPath({ sourceX, sourceY, sourcePosition, targetX, targetY, targetPosition });
-    const markerEndId = getMarkerEnd(markerEnd, id);
+    const [edgePath, labelX, labelY] = getSmoothStepPath({
+        sourceX,
+        sourceY,
+        sourcePosition,
+        targetX,
+        targetY,
+        targetPosition,
+    });
 
     return (
         <>
-            <path id={id} style={style} className="react-flow__edge-path" d={edgePath} markerEnd={markerEndId} />
+            <path id={id} style={style} className="react-flow__edge-path" d={edgePath} markerEnd={markerEnd} />
             <foreignObject width={65} height={50} x={labelX - 32.5} y={labelY - 7.5} style={{ overflow: "visible" }}>
                 <div
                     style={{

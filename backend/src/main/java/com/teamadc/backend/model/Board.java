@@ -16,27 +16,27 @@ public class Board {
     private List<String> adminColumnIds;
     private List<String> employeeColumnIds;
     private List<String> statusIds;
-    private String workflowId;
+    private List<String> workflowIds;
 
     public Board() {}
 
-    public Board(String id, String name, boolean isActive, List<String> adminColumnIds, List<String> employeeColumnIds, List<String> statusIds, String workflowId) {
+    public Board(String id, String name, boolean isActive, List<String> adminColumnIds, List<String> employeeColumnIds, List<String> statusIds, List<String> workflowIds) {
         this.id = id;
         this.name = name;
         this.isActive = isActive;
         this.adminColumnIds = adminColumnIds;
         this.employeeColumnIds = employeeColumnIds;
         this.statusIds = statusIds;
-        this.workflowId = workflowId;
+        this.workflowIds = workflowIds;
     }
 
-    public Board(String name, boolean isActive, List<String> adminColumnIds, List<String> employeeColumnIds, List<String> statusIds, String workflowId) {
+    public Board(String name, boolean isActive, List<String> adminColumnIds, List<String> employeeColumnIds, List<String> statusIds, List<String> workflowIds) {
         this.name = name;
         this.isActive = isActive;
         this.adminColumnIds = adminColumnIds;
         this.employeeColumnIds = employeeColumnIds;
         this.statusIds = statusIds;
-        this.workflowId = workflowId;
+        this.workflowIds = workflowIds;
     }
 
 }

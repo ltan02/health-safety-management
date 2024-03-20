@@ -1,9 +1,14 @@
 import { useCallback, useState } from "react";
-import useAxios from "./useAxios";
 import { v4 as uuidv4 } from "uuid";
+import { MarkerType } from "reactflow";
+import _ from "lodash";
+import useAxios from "./useAxios";
 
 export default function useWorkflow() {
     const [workflows, setWorkflows] = useState([]);
+    const [activeWorkflow, setActiveWorkflow] = useState({});
+    const [originalStates, setOriginalStates] = useState([]);
+    const [originalTransitions, setOriginalTransitions] = useState([]);
     const [states, setStates] = useState([]);
     const [transitions, setTransitions] = useState([]);
 
@@ -15,6 +20,8 @@ export default function useWorkflow() {
                 url: "/workflows/active",
                 method: "GET",
             });
+
+            setActiveWorkflow(response);
 
             const statePromises = response.stateIds.map((id) =>
                 sendRequest({
@@ -50,14 +57,15 @@ export default function useWorkflow() {
                     x: state.coordinates?.x ?? 0,
                     y: state.coordinates?.y ?? 0,
                 },
-                deletable: state?.name !== "Start",
+                deletable: state?.name !== "START",
                 data: {
                     label:
                         fetchedStatuses.find((status) => status.id === state.statusId)?.name ??
                         state.name.toUpperCase(),
+                    statusId: state.statusId,
                 },
                 style:
-                    state?.name === "Start"
+                    state?.name === "START"
                         ? {
                               display: "flex",
                               justifyContent: "center",
@@ -85,29 +93,39 @@ export default function useWorkflow() {
                           },
             }));
 
-            const newTransitions = fetchedTransitions.map((transition) => ({
-                id: transition.id,
-                source: transition.fromStateId,
-                target: transition.toStateId,
-                label: transition.label,
-                type: "customEdge",
-                deletable: false,
-                focusable: false,
-                markerEnd: { type: "arrow", color: "#5d5d5d" },
-                style: {
-                    stroke: "#5d5d5d",
-                    strokeWidth: 1,
-                },
-                data: {
+            const transitionIndexMap = new Map();
+            const newTransitions = fetchedTransitions.map((transition) => {
+                const key = `${transition.fromStateId}-${transition.toStateId}`;
+                const index = transitionIndexMap.get(key) || 0;
+                transitionIndexMap.set(key, index + 1);
+
+                return {
+                    id: transition.id,
+                    source: transition.fromStateId,
+                    target: transition.toStateId,
                     label: transition.label,
-                    labelStyle: {
-                        fontSize: "5px",
+                    type: "customEdge",
+                    deletable: false,
+                    focusable: false,
+                    markerEnd: { type: MarkerType.ArrowClosed, width: 10, height: 10, color: "#5d5d5d" },
+                    style: {
+                        stroke: "#5d5d5d",
+                        strokeWidth: 1,
                     },
-                },
-            }));
+                    data: {
+                        label: transition.label,
+                        labelStyle: {
+                            fontSize: "5px",
+                        },
+                        index: index,
+                    },
+                };
+            });
 
             setStates(newStates);
+            setOriginalStates(newStates);
             setTransitions(newTransitions);
+            setOriginalTransitions(newTransitions);
         } catch (error) {
             console.error(error);
         }
@@ -125,7 +143,11 @@ export default function useWorkflow() {
     }, []);
 
     const createTransition = useCallback((source, target, label = null) => {
+        console.log("HERE");
         setTransitions((prev) => {
+            const existingTransitions = prev.filter((t) => t.source === source.id && t.target === target.id);
+            const newIndex = existingTransitions.length;
+
             return [
                 ...prev,
                 {
@@ -136,7 +158,7 @@ export default function useWorkflow() {
                     type: "customEdge",
                     deletable: false,
                     focusable: false,
-                    markerEnd: { type: "arrow", color: "#5d5d5d" },
+                    markerEnd: { type: MarkerType.ArrowClosed, width: 10, height: 10, color: "#5d5d5d" },
                     style: {
                         stroke: "#5d5d5d",
                         strokeWidth: 1,
@@ -146,6 +168,7 @@ export default function useWorkflow() {
                         labelStyle: {
                             fontSize: "5px",
                         },
+                        index: newIndex,
                     },
                 },
             ];
@@ -159,27 +182,46 @@ export default function useWorkflow() {
     }, []);
 
     const addState = useCallback((name) => {
-        setStates((prev) => {
-            return [
-                ...prev,
-                {
-                    id: `temp-${uuidv4()}`,
-                    position: { x: 0, y: 0 },
-                    data: { label: name },
-                    style: {
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        background: "#ffffff",
-                        border: "1px solid #000000",
-                        fontWeight: 500,
-                        fontSize: "6px",
-                        padding: 0,
-                        width: 75,
-                        height: 20,
-                    },
+        setStates((prevStates) => {
+            let newX = 50;
+            let newY = 200;
+
+            const xOffset = 150;
+            const yOffset = 100;
+
+            if (prevStates.length > 0) {
+                const rightmostState = prevStates.reduce((prev, current) => {
+                    return prev.position.x > current.position.x ? prev : current;
+                });
+
+                newX = rightmostState.position.x + xOffset;
+
+                const canvasWidth = 800;
+                if (newX > canvasWidth) {
+                    newX = 50;
+                    newY = rightmostState.position.y + yOffset;
+                }
+            }
+
+            const newState = {
+                id: `temp-${uuidv4()}`,
+                position: { x: newX, y: newY },
+                data: { label: name },
+                style: {
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    background: "#ffffff",
+                    border: "1px solid #000000",
+                    fontWeight: 500,
+                    fontSize: "6px",
+                    padding: 0,
+                    width: 75,
+                    height: 20,
                 },
-            ];
+            };
+
+            return [...prevStates, newState];
         });
     }, []);
 
@@ -195,42 +237,6 @@ export default function useWorkflow() {
         }
     }, []);
 
-    const organizeCoordinates = useCallback(() => {
-        let currentY = 0;
-        const yIncrement = 100;
-        const xPositionSource = 300;
-        const xPositionState = 300;
-        const newCoordinates = {};
-
-        transitions.forEach((transition) => {
-            if (!newCoordinates[transition.source]) {
-                newCoordinates[transition.source] = { x: xPositionSource, y: currentY };
-                currentY += yIncrement;
-            }
-            if (!newCoordinates[transition.target]) {
-                newCoordinates[transition.target] = { x: xPositionSource, y: currentY };
-                currentY += yIncrement;
-            }
-        });
-
-        states.forEach((state) => {
-            if (!newCoordinates[state.id]) {
-                newCoordinates[state.id] = { x: xPositionState, y: currentY };
-                currentY += yIncrement;
-            }
-        });
-
-        const newStates = states.map((state) =>
-            newCoordinates[state.id] ? { ...state, position: newCoordinates[state.id] } : state,
-        );
-
-        setStates(newStates);
-
-        // newStates.forEach((state) => {
-        //     pushCallback(() => updateCoordinate(state.id, state.position));
-        // });
-    }, [states, transitions]);
-
     const deleteState = useCallback((id) => {
         setStates((prev) => {
             return prev.filter((state) => state.id !== id);
@@ -241,6 +247,128 @@ export default function useWorkflow() {
         });
     }, []);
 
+    const discardChanges = useCallback(() => {
+        setStates(originalStates);
+        setTransitions(originalTransitions);
+    }, [originalStates, originalTransitions]);
+
+    const saveChanges = useCallback(async () => {
+        console.log(originalStates);
+        console.log(states);
+        if (_.isEqual(originalStates, states) && _.isEqual(originalTransitions, transitions)) {
+            console.log("No changes made");
+            return;
+        }
+
+        try {
+            const ogStates = states
+                .filter((state) => !state.id.startsWith("temp"))
+                .map((state) => {
+                    const originalState = originalStates.find((originalState) => originalState.id === state.id);
+                    if (!_.isEqual(state, originalState)) {
+                        return sendRequest({
+                            url: `/states/${state.id}`,
+                            method: "PUT",
+                            body: {
+                                name: state.data.label,
+                                coordinates: {
+                                    x: state.position.x,
+                                    y: state.position.y,
+                                },
+                                statusId: state.data.statusId,
+                            },
+                        });
+                    }
+                });
+
+            const newStatePromises = states
+                .filter((state) => state.id.startsWith("temp"))
+                .map(async (state) => {
+                    try {
+                        const response = await sendRequest({
+                            url: "/status",
+                            method: "POST",
+                            body: {
+                                name: state.data.label,
+                            },
+                        });
+
+                        sendRequest({
+                            url: `/boards/${activeWorkflow.boardId}/status/${response.id}`,
+                            method: "PUT",
+                        });
+
+                        return sendRequest({
+                            url: "/states",
+                            method: "POST",
+                            body: {
+                                name: state.data.label,
+                                coordinates: {
+                                    x: state.position.x,
+                                    y: state.position.y,
+                                },
+                                statusId: response.id,
+                            },
+                        });
+                    } catch (error) {
+                        console.log(error);
+                    }
+                });
+
+            const stateResponses = await Promise.all(newStatePromises);
+
+            const newTransitionPromises = transitions
+                .filter((transition) => transition.id.startsWith("temp"))
+                .map(async (transition) => {
+                    try {
+                        return sendRequest({
+                            url: "/transitions",
+                            method: "POST",
+                            body: {
+                                fromStateId: transition.source.startsWith("temp")
+                                    ? stateResponses.find(
+                                          (s) =>
+                                              states.find((state) => state.id === transition.source).data.label ===
+                                              s.name,
+                                      ).id
+                                    : transition.source,
+                                toStateId: transition.target.startsWith("temp")
+                                    ? stateResponses.find(
+                                          (s) =>
+                                              states.find((state) => state.id === transition.target).data.label ===
+                                              s.name,
+                                      ).id
+                                    : transition.target,
+                                label: transition.data.label,
+                                rules: [],
+                                type: null,
+                            },
+                        });
+                    } catch (error) {
+                        console.log(error);
+                    }
+                });
+
+            const transitionResponses = await Promise.all(newTransitionPromises);
+            await Promise.all(ogStates);
+            await sendRequest({
+                url: `/workflows/${activeWorkflow.id}`,
+                method: "PUT",
+                body: {
+                    name: activeWorkflow.name,
+                    active: activeWorkflow.active,
+                    stateIds: [...activeWorkflow.stateIds, ...stateResponses.map((state) => state.id)],
+                    transitionIds: [
+                        ...activeWorkflow.transitionIds,
+                        ...transitionResponses.map((transition) => transition.id),
+                    ],
+                },
+            });
+        } catch (err) {
+            console.log(err);
+        }
+    }, [states, originalStates, transitions, originalTransitions, activeWorkflow]);
+
     return {
         states,
         workflows,
@@ -249,10 +377,11 @@ export default function useWorkflow() {
         fetchWorkflow,
         fetchAllWorkflows,
         updateCoordinate,
+        addState,
         deleteState,
         createTransition,
         deleteTransition,
-        organizeCoordinates,
-        addState,
+        discardChanges,
+        saveChanges,
     };
 }

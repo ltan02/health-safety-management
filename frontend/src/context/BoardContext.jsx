@@ -20,8 +20,7 @@ export const BoardProvider = ({ children }) => {
         const columnPromises = columnIds.map(id => sendRequest({ url: `/columns/${id}`, method: "GET" }));
         const columns = await Promise.all(columnPromises);
 
-        const statusIds = [...new Set(columns.flatMap(column => column.statusIds))];
-        const statusPromises = statusIds.map(id => sendRequest({ url: `/status/${id}`, method: "GET" }));
+        const statusPromises = boardResponse.statusIds.map(id => sendRequest({ url: `/status/${id}`, method: "GET" }));
         const statuses = await Promise.all(statusPromises);
         setStatuses(statuses);
 

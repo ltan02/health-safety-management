@@ -33,7 +33,7 @@ public class BoardController {
 
     @PostMapping
     public ResponseEntity<Board> createBoard(@RequestBody Board req) {
-        Board board = new Board(null, req.getName(), req.isActive(), req.getAdminColumnIds(), req.getEmployeeColumnIds(), req.getStatusIds(), req.getWorkflowId());
+        Board board = new Board(null, req.getName(), req.isActive(), req.getAdminColumnIds(), req.getEmployeeColumnIds(), req.getStatusIds(), req.getWorkflowIds());
         try {
             Board newBoard = boardService.createOrUpdateBoard(board);
             return ResponseEntity.ok(newBoard);
@@ -81,13 +81,42 @@ public class BoardController {
             }
 
             if (req.getName() != null) existingBoard.setName(req.getName());
-            existingBoard.setActive(req.isActive());
             if (req.getAdminColumnIds() != null) existingBoard.setAdminColumnIds(req.getAdminColumnIds());
             if (req.getEmployeeColumnIds() != null) existingBoard.setEmployeeColumnIds(req.getEmployeeColumnIds());
-            if (req.getWorkflowId() != null) existingBoard.setWorkflowId(req.getWorkflowId());
+            if (req.getStatusIds() != null) existingBoard.setStatusIds(req.getStatusIds());
+            if (req.getWorkflowIds() != null) existingBoard.setWorkflowIds(req.getWorkflowIds());
 
             Board updatedBoard = boardService.createOrUpdateBoard(existingBoard);
             return ResponseEntity.ok(updatedBoard);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PutMapping("/{boardId}/status/{statusId}")
+    public ResponseEntity<Board> addStatus(@PathVariable String boardId, @PathVariable String statusId) {
+        try {
+            Board existingBoard = boardService.getBoardById(boardId);
+            if (existingBoard == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            Status status = statusService.getStatusById(statusId);
+            if (status == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            if (existingBoard.getStatusIds().contains(statusId)) {
+                return ResponseEntity.ok(existingBoard);
+            }
+
+            List<String> statusIds = existingBoard.getStatusIds();
+            statusIds.add(statusId);
+            existingBoard.setStatusIds(statusIds);
+
+            boardService.createOrUpdateBoard(existingBoard);
+
+            return ResponseEntity.ok(existingBoard);
         } catch (InterruptedException | ExecutionException e) {
             return ResponseEntity.internalServerError().build();
         }
