@@ -4,7 +4,7 @@ import { FIELD_TYPES } from './form_data';
 import { FIELD_ELEMENT } from './form_elements';
 
 function PreviewForm({ fields, sortedRows }) {
-  const [fieldData, setFieldData] = useState({});
+  const [fieldsData, setFieldsData] = useState({});
 
 
   const handleChange = (event, field) => {
@@ -18,12 +18,12 @@ function PreviewForm({ fields, sortedRows }) {
           newValue.splice(index, 1);
         })
       }
-      setFieldData(prevData => ({
+      setFieldsData(prevData => ({
         ...prevData,
         [name]: newValue,
       }));
     } else {
-      setFieldData(prevData => ({
+      setFieldsData(prevData => ({
         ...prevData,
         [name]: value,
       }));
@@ -68,7 +68,7 @@ function PreviewForm({ fields, sortedRows }) {
                   <Grid item xs={12} sm={6} key={fieldData.id}>
                     <FieldComponent
                       {...fieldData.props}
-                      value={fieldData.type === FIELD_TYPES.SELECTION_MULTI ? fieldData[fieldData.props.name] ?? [] : fieldData[fieldData.props.name] ?? ''}
+                      value={fieldData.type === FIELD_TYPES.SELECTION_MULTI ? fieldsData[fieldData.props.name] ?? [] : fieldsData[fieldData.props.name] ?? ''}
                       onChange={(e) => handleChange(e, fieldData)}
                       style={{ padding: '10px 0px' }}
                     />
@@ -91,7 +91,7 @@ function PreviewForm({ fields, sortedRows }) {
             variant="contained"
             color="secondary"
             sx={{ mt: 3, display: 'block', ml: 'auto', mr: 'auto' }}
-            onClick={() => setFieldData({})}
+            onClick={() => setFieldsData({})}
           >
             Cancel
           </Button>
