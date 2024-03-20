@@ -1,6 +1,7 @@
 package com.teamadc.backend.service;
 
 import com.teamadc.backend.model.Form;
+import com.teamadc.backend.dto.request.FieldCoordinateRequest;
 import com.teamadc.backend.model.Coordinate;
 import com.teamadc.backend.model.Field;
 import com.teamadc.backend.model.FieldProp;
@@ -86,6 +87,24 @@ public class FormService {
                 .filter(f -> f.getId().equals(fieldId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Field not found with id: " + fieldId));
+    }
+
+    public Form updateCoordinates(String formId, List<FieldCoordinateRequest> fields) throws InterruptedException, ExecutionException {
+        Form form = formRepository.findById(formId);
+        List<Field> formFields = form.getFields();
+        for (FieldCoordinateRequest field : fields) {
+            Field fieldToUpdate = formFields.stream()
+                    .filter(f -> f.getId().equals(field.getId()))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("Field not found with id: " + field.getId()));
+            fieldToUpdate.setCoordinate(field.getCoordinate());
+            formFields.removeIf(f -> f.getId().equals(field.getId()));
+            formFields.add(fieldToUpdate);
+            fieldRepository.save(fieldToUpdate);
+        }
+
+        form.setFields(formFields);
+        return formRepository.save(form);
     }
     
 

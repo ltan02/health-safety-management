@@ -62,6 +62,10 @@ public abstract class AbstractFirestoreRepository<T> {
         }
     }
 
+    public T saveAndFlush(T entity) throws InterruptedException, ExecutionException {
+        return this.save(entity);
+    }
+
     public T findById(String id) throws InterruptedException, ExecutionException {
         DocumentSnapshot document = firestore.collection(this.getCollectionName().toLowerCase()).document(id).get().get();
         if (document.exists()) {

@@ -4,7 +4,7 @@ import useAxios from "./useAxios";
 export default function useForm() {
   const [forms, setForms] = useState({});
 
-  const { sendRequest } = useAxios();
+  const { sendRequest, loading } = useAxios();
 
   const fetchForms = async () => {
     const response = await sendRequest({
@@ -17,29 +17,20 @@ export default function useForm() {
     setForms(newForm);
   };
 
-  const updateFieldCoordinate = async (formId, fieldId, coordinate) => {
+  const updateAllFieldCoordinates = async (formId, fields) => {
     try {
-      if (!coordinate || !formId || !formId) {
+      if (!fields || !formId) {
         console.error("Invalid input");
         return;
       }
 
-      console.log(
-        "Name: ",
-        forms[formId].fields.find((field) => field.id === fieldId).id
-      );
-      console.log(
-        "New Coordinate: ",
-        forms[formId].fields.find((field) => field.id === fieldId).coordinate
-      );
       const response = await sendRequest({
-        url: `/forms/${formId}/coordinate/${fieldId}`,
+        url: `/forms/${formId}/coordinate`,
         method: "PUT",
-        body: {
-          x: coordinate.x,
-          y: coordinate.y,
-        },
+        body: fields,
       });
+
+      console.log("Fields: ", response);
 
       return response;
     } catch (error) {
@@ -94,16 +85,6 @@ export default function useForm() {
   };
 
   const sortedRows = (groupedByRows) => {
-    console.log(
-      Object.keys(groupedByRows)
-        .sort((a, b) => a - b)
-        .map((y) => ({
-          row: y,
-          fields: groupedByRows[y].sort(
-            (a, b) => a.coordinate.x - b.coordinate.x
-          ),
-        }))
-    );
     return Object.keys(groupedByRows)
       .sort((a, b) => a - b)
       .map((y) => ({
@@ -130,24 +111,18 @@ export default function useForm() {
       { x: 0, y: 0 }
     );
     console.log(lastCoordinate);
-    // if (lastCoordinate.x === 0) {
-    //   lastCoordinate.x = 1;
-    // } else {
-    //   lastCoordinate.y += 1;
-    //   lastCoordinate.x = 0;
-    // }
-
     return lastCoordinate;
   };
 
   return {
     fetchForms,
-    updateFieldCoordinate,
+    updateAllFieldCoordinates,
     forms,
     addField,
     groupedByRows,
     sortedRows,
     getLastCoordinate,
-    deleteField
+    deleteField,
+    loading
   };
 }

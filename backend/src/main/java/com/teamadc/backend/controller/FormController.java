@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import com.teamadc.backend.model.Form;
+import com.teamadc.backend.dto.request.FieldCoordinateRequest;
 import com.teamadc.backend.model.Coordinate;
 import com.teamadc.backend.model.Field;
 import com.teamadc.backend.service.FormService;
@@ -55,6 +56,16 @@ public class FormController {
         try {
             Field newField = formService.updateCoordinate(formId, fieldId, request);
             return ResponseEntity.ok(newField);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PutMapping("/{formId}/coordinate")
+    public ResponseEntity<Form> updateCoordinates(@PathVariable String formId, @RequestBody List<FieldCoordinateRequest> request) {
+        try {
+            Form newForm = formService.updateCoordinates(formId, request);
+            return ResponseEntity.ok(newForm);
         } catch (InterruptedException | ExecutionException e) {
             return ResponseEntity.internalServerError().build();
         }

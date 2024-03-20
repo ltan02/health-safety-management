@@ -12,7 +12,7 @@ function FormCustomizationModal({ open, handleClose, fields, updateFieldCoordina
             <Paper elevation={3} sx={{ width: "80vw" }}>
                 <FormTab labels={["Preview", "Customize", "Add", "Remove"]}>
                     <PreviewForm fields={fields} sortedRows={sortedRows} />
-                    <EditFieldForm fields={fields} updateFieldCoordinate={updateFieldCoordinate} sortedRows={sortedRows} deleteField={deleteField} />
+                    <EditFieldForm fields={fields} updateFieldCoordinate={updateFieldCoordinate} sortedRows={sortedRows} deleteField={deleteField} handleClose={handleClose} />
                     <AddFieldForm handleAddNewField={handleAddNewField} getLastCoordinate={getLastCoordinate} />
                     {/* <PreviewForm /> */}
                 </FormTab>

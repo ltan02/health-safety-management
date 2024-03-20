@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Container, Typography, Button, Grid, Modal, Box } from "@mui/material";
-import DoneIcon from "@mui/icons-material/Done";
 import FieldComponentWrapper from "./FieldComponentWrapper";
 import {
   DndContext,
   PointerSensor,
   useSensor,
   useSensors,
-  DragOverlay,
   closestCorners,
 } from "@dnd-kit/core";
 import {
@@ -16,7 +14,13 @@ import {
   rectSortingStrategy,
 } from "@dnd-kit/sortable";
 
-function EditFieldForm({ updateFieldCoordinate, fields, sortedRows, deleteField }) {
+function EditFieldForm({
+  updateFieldCoordinate,
+  fields,
+  sortedRows,
+  deleteField,
+  handleClose,
+}) {
   const [fieldsData, setFieldsData] = useState([]);
   const [activeId, setActiveId] = useState(null);
   const [isEdited, setIsEdited] = useState(false);
@@ -27,6 +31,11 @@ function EditFieldForm({ updateFieldCoordinate, fields, sortedRows, deleteField 
   useEffect(() => {
     setFieldsData(fields);
   }, []);
+
+  useEffect(() => {
+    console.log("updated")
+    setFieldsData(fields);
+  }, [fields]);
 
   const handleDragEnd = async (event) => {
     const { active, over } = event;
@@ -40,36 +49,21 @@ function EditFieldForm({ updateFieldCoordinate, fields, sortedRows, deleteField 
         newFormData[oldIndex].coordinate,
       ];
 
-      //handleReplaceCoordinate(newFormData[oldIndex].id, newFormData[oldIndex].coordinate, newFormData[newIndex].id, newFormData[newIndex].coordinate);
-
-      // console.log(newFormData[oldIndex].type);
-      // console.log(newFormData[oldIndex].coordinate);
-      // console.log(newFormData[newIndex].type);
-      // console.log(newFormData[newIndex].coordinate);
-      // Move item in the array for visual reordering
       newFormData = arrayMove(newFormData, oldIndex, newIndex);
-
       setFieldsData(newFormData);
       setIsEdited(true);
     }
     setActiveId(null);
   };
 
-  const handleUpdateCoordinate = async () => {
+  const handleFieldUpdateCoordinate = async () => {
     setIsEdited(false);
-    return Promise.all(
-      fieldsData.map(async (field) => {
-        return await updateFieldCoordinate(field.id, field.coordinate);
-      })
-    );
+    updateFieldCoordinate(fieldsData);
   };
-
 
   const onHandleDelete = () => {
     const newFormData = fieldsData.filter((item) => item.id !== activeField.id);
     setFieldsData(newFormData);
-    console.log(newFormData)
-    console.log(activeField.id)
     setOpen(false);
     deleteField(activeField.id);
   };
@@ -77,10 +71,26 @@ function EditFieldForm({ updateFieldCoordinate, fields, sortedRows, deleteField 
   const handleOpenDeleteModal = (fieldData) => {
     setOpen(true);
     setActiveField(fieldData);
-  }
+  };
 
   return (
-    <Container style={{ height: "700px", width: "700px", overflow: "auto" }}>
+    <Container style={{ height: "80vh", width: "80vh", overflow: "auto" }}>
+       {isEdited && (
+        <Container sx={{ position: "fixed", top: 10, right:10 }}>
+          <Box sx={{ display: "flex", justifyContent: "end" }}>
+            <Button onClick={handleClose} variant="contained" color="secondary">
+              Cancel
+            </Button>
+            <Button
+              onClick={handleFieldUpdateCoordinate}
+              variant="contained"
+              color="primary"
+            >
+              Save
+            </Button>
+          </Box>
+        </Container>
+      )}
       <Typography variant="h6" align="center" sx={{ my: 5 }}>
         Incident Report Form
       </Typography>
@@ -129,70 +139,61 @@ function EditFieldForm({ updateFieldCoordinate, fields, sortedRows, deleteField 
           </Button>
         </Grid>
       </form>
-      {isEdited && (
-        <Button
-          onClick={handleUpdateCoordinate}
-          sx={{ position: "fixed", bottom: 16, right: 16 }}
-          variant="contained"
-          color="primary"
-        >
-          Save
-        </Button>
-      )}
       {open && (
-  <Modal
-    open={open}
-    onClose={() => setOpen(false)}
-    aria-labelledby="delete-confirmation-modal"
-    aria-describedby="delete-confirmation-modal-description"
-    closeAfterTransition
-    BackdropProps={{
-      timeout: 500,
-    }}
-  >
-    <Box
-      sx={{
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: 400,
-        bgcolor: 'background.paper',
-        border: '2px solid #000',
-        boxShadow: 24,
-        p: 4,
-      }}
-    >
-      <Typography id="delete-confirmation-modal" variant="h6" component="h2" align="center" gutterBottom>
-        Are you sure you want to delete this field?
-      </Typography>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-around',
-          mt: 3,
-        }}
-      >
-        <Button
-          variant="outlined"
-          color="secondary"
-          onClick={() => setOpen(false)}
+        <Modal
+          open={open}
+          onClose={() => setOpen(false)}
+          aria-labelledby="delete-confirmation-modal"
+          aria-describedby="delete-confirmation-modal-description"
+          closeAfterTransition
         >
-          Cancel
-        </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={onHandleDelete}
-        >
-          Confirm
-        </Button>
-      </Box>
-    </Box>
-  </Modal>
-)
-
-      }
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: 400,
+              bgcolor: "background.paper",
+              border: "2px solid #000",
+              boxShadow: 24,
+              p: 4,
+            }}
+          >
+            <Typography
+              id="delete-confirmation-modal"
+              variant="h6"
+              component="h2"
+              align="center"
+              gutterBottom
+            >
+              Are you sure you want to delete this field?
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-around",
+                mt: 3,
+              }}
+            >
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={() => setOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={onHandleDelete}
+              >
+                Confirm
+              </Button>
+            </Box>
+          </Box>
+        </Modal>
+      )}
     </Container>
   );
 }
