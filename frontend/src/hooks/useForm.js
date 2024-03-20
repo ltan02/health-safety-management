@@ -1,5 +1,6 @@
 import { useState } from "react";
 import useAxios from "./useAxios";
+import { FIELD_TYPES } from "../pages/admin/form/initial_form";
 
 export default function useForm() {
   const [forms, setForms] = useState({});
@@ -29,8 +30,6 @@ export default function useForm() {
         method: "PUT",
         body: fields,
       });
-
-      console.log("Fields: ", response);
 
       return response;
     } catch (error) {
@@ -62,7 +61,6 @@ export default function useForm() {
         console.error("Invalid input");
         return;
       }
-
       const response = await sendRequest({
         url: `/forms/${formId}/field/${fieldId}`,
         method: "DELETE",
@@ -74,7 +72,7 @@ export default function useForm() {
   };
 
   const groupedByRows = (fields) => {
-    return fields.reduce((acc, field) => {
+    const newFields = fields.reduce((acc, field) => {
       const { y } = field.coordinate;
       if (!acc[y]) {
         acc[y] = [];
@@ -82,6 +80,36 @@ export default function useForm() {
       acc[y].push(field);
       return acc;
     }, {});
+
+    Object.keys(newFields).map((key) => {
+      if (newFields[key].length < 2) {
+        let coordinate = {
+          x: 0,
+          y: Number(key),
+        };
+        if (newFields[key][0].coordinate.x === 0) {
+          coordinate = {
+            x: 1,
+            y: Number(key),
+          };
+        } else {
+          coordinate = {
+            x: 0,
+            y: key,
+          };
+        }
+        const emptyField = {
+          id: "empty" + key,
+          name: "Empty",
+          type: FIELD_TYPES.EMPTY,
+          props: {},
+          coordinate: coordinate,
+        };
+        newFields[key].push(emptyField);
+      }
+    });  
+
+    return newFields;
   };
 
   const sortedRows = (groupedByRows) => {
@@ -110,7 +138,6 @@ export default function useForm() {
       },
       { x: 0, y: 0 }
     );
-    console.log(lastCoordinate);
     return lastCoordinate;
   };
 

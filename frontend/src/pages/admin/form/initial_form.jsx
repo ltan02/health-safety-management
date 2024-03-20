@@ -24,6 +24,7 @@ export const FIELD_TYPES = {
   SELECTION_MULTI: "selection-multi",
   SELECTION_SINGLE: "selection-single",
   FILE_ATTACHMENT: "file",
+  EMPTY: "empty",
   //   DESCRIPTION: "description",
   // HEADING_1: "heading-1",
   // HEADING_2: "heading-2",
@@ -256,6 +257,8 @@ export const FIELD_ELEMENT = {
       />
     </FormControl>
   ),
+  [FIELD_TYPES.EMPTY]: () => <></>,
+  
 };
 
 export const FIELD_ADD_FORM = {

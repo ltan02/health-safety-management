@@ -33,7 +33,6 @@ function EditFieldForm({
   }, []);
 
   useEffect(() => {
-    console.log("updated")
     setFieldsData(fields);
   }, [fields]);
 
@@ -44,10 +43,18 @@ function EditFieldForm({
       const newIndex = fieldsData.findIndex((item) => item.id === over.id);
 
       let newFormData = [...fieldsData];
-      [newFormData[oldIndex].coordinate, newFormData[newIndex].coordinate] = [
-        newFormData[newIndex].coordinate,
-        newFormData[oldIndex].coordinate,
-      ];
+
+      if (newIndex === -1) { // if empty space
+        const newField = sortedRows().find(row => 
+          row.fields.find(field => field.id === over.id)
+        ).fields.find(field => field.id === over.id);
+        newFormData[oldIndex].coordinate = newField.coordinate;
+      } else {
+        [newFormData[oldIndex].coordinate, newFormData[newIndex].coordinate] = [
+          newFormData[newIndex].coordinate,
+          newFormData[oldIndex].coordinate,
+        ];
+      }
 
       newFormData = arrayMove(newFormData, oldIndex, newIndex);
       setFieldsData(newFormData);
@@ -98,7 +105,8 @@ function EditFieldForm({
         <DndContext
           sensors={sensors}
           collisionDetection={closestCorners}
-          onDragEnd={handleDragEnd}
+          // onDragEnd={handleDragEnd}
+          onDragOver={handleDragEnd}
           onDragStart={(event) => setActiveId(event.active.id)}
         >
           <SortableContext

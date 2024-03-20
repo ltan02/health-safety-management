@@ -52,12 +52,6 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate }) {
       }
     }
 
-    console.log("Field Type: ", select);
-    console.log("Field Title: ", fieldTitle);
-    console.log("Field Description: ", fieldDescription);
-    console.log("Required: ", required);
-    console.log("Options: ", options);
-
     const lastCoordinate = getLastCoordinate();
     if (lastCoordinate.x === 0) {
       lastCoordinate.x = 1;
