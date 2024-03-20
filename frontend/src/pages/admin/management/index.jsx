@@ -2,106 +2,56 @@ import React, { useCallback, useEffect } from "react";
 import ReactFlow, { useNodesState, useEdgesState, addEdge, MiniMap, Controls } from "reactflow";
 import "reactflow/dist/style.css";
 import useWorkflow from "../../../hooks/useWorkflow";
-import AddTransitionModal from "./AddTransitionModal";
-import AddStateModal from "./AddStateModal";
-import { Container, Button, Typography, Grid, CircularProgress, Box, Divider, IconButton } from "@mui/material";
+import AddTransitionModal from "../../../components/workflows/AddTransitionModal";
+import { Container, Button, Typography, CircularProgress, Box, Divider, IconButton } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import MoveDownIcon from "@mui/icons-material/MoveDown";
 import ElectricBoltIcon from "@mui/icons-material/ElectricBolt";
 import InfoIcon from "@mui/icons-material/Info";
 import WorkflowModal from "../../../components/workflows/WorkflowModal";
 import AddStatusModal from "../../../components/workflows/AddStatusModal";
+import CustomEdge from "../../../components/workflows/CustomEdge";
+
+const edgeTypes = {
+    customEdge: CustomEdge,
+};
 
 function AdminManagement() {
-    const [transitionModalOpen, setTransitionModalOpen] = React.useState(false);
-    const [stateModalOpen, setStateModalOpen] = React.useState(false);
-    const [selectedStatus, setSelectedStatus] = React.useState(null);
     const [workflowModalOpen, setWorkflowModalOpen] = React.useState(false);
     const [addStatusModalOpen, setAddStatusModalOpen] = React.useState(false);
+    const [statusName, setStatusName] = React.useState("");
+    const [addTransitionModalOpen, setAddTransitionModalOpen] = React.useState(false);
+    const [transitionName, setTransitionName] = React.useState("");
+    const [fromStatusNames, setFromStatusNames] = React.useState(null);
+    const [toStatusNames, setToStatusNames] = React.useState(null);
+
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
-    const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-    const {
-        states,
-        transitions,
-        loading,
-        statuses,
-        fetchWorkflow,
-        updateCoordinate,
-        createState,
-        deleteState,
-        createTransition,
-        deleteTransition,
-        discardCallbacks,
-        pushCallback,
-        applyCallbacks,
-        organizeCoordinates,
-    } = useWorkflow();
+    const [edges, setEdges] = useEdgesState([]);
+    const { states, transitions, loading, fetchWorkflow, updateCoordinate, addState, deleteState, createTransition } =
+        useWorkflow();
 
     const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
     const handleDragEnd = useCallback(
         (_, node) => {
-            pushCallback(() => updateCoordinate(node.id, node.position));
+            updateCoordinate(node.id, node.position);
         },
-        [pushCallback, updateCoordinate],
+        [updateCoordinate],
     );
 
     const handleEdgesUpdated = useCallback(
         (params) => {
             onConnect(params);
-            pushCallback(() => createTransition(params.source, params.target, params?.label));
+            createTransition(params.source, params.target, params?.label);
         },
-        [onConnect, pushCallback, createTransition],
-    );
-
-    const handleStateModalOpen = (status) => {
-        setStateModalOpen(true);
-        setSelectedStatus({
-            id: status,
-            name: statuses[status].name,
-            color: statuses[status].color,
-        });
-    };
-
-    const handleStateUpdated = useCallback((name) => {
-        const newState = {
-            id: `temp-${Date.now()}`,
-            data: { label: name },
-            position: { x: 0, y: 0 },
-            style: {
-                backgroundColor: selectedStatus.color,
-                fontWeight: "bold",
-                border: `solid 2px ${selectedStatus.color}`,
-            },
-        };
-        setNodes([...nodes, newState]);
-        pushCallback(() => createState(name, selectedStatus.id, newState.position));
-    }, []);
-
-    const onEdgeDelete = useCallback(
-        (id) => {
-            pushCallback(() => deleteTransition(id));
-        },
-        [deleteTransition, pushCallback],
+        [onConnect, createTransition],
     );
 
     const onStateDelete = useCallback(
         (id) => {
-            pushCallback(() => deleteState(id));
+            deleteState(id);
         },
-        [deleteState, pushCallback],
-    );
-
-    const handleEdgesChange = useCallback(
-        (changes) => {
-            onEdgesChange(changes);
-            changes.forEach((change) => {
-                if (change.type === "remove") {
-                    onEdgeDelete(change.id);
-                }
-            });
-        },
-        [onEdgesChange, onEdgeDelete],
+        [deleteState],
     );
 
     const handleStatesChange = useCallback(
@@ -113,25 +63,47 @@ function AdminManagement() {
                 }
             });
         },
-        [onEdgesChange, onEdgeDelete],
+        [onNodesChange, onStateDelete],
     );
-    const handleDiscardChanges = () => {
-        discardCallbacks();
-        fetchWorkflow();
+
+    const handleStatusNameChange = (event) => {
+        setStatusName(event.target.value);
     };
 
-    const handleSaveChanges = () => {
-        applyCallbacks();
+    const handleAddStatus = () => {
+        addState(statusName);
+        setAddStatusModalOpen(false);
+        setStatusName("");
+    };
+
+    const handleAddTransition = () => {
+        createTransition(fromStatusNames, toStatusNames, transitionName);
+        setAddTransitionModalOpen(false);
+        setFromStatusNames(null);
+        setToStatusNames(null);
+        setTransitionName("");
+    };
+
+    const handleTransitionNameChange = (event) => {
+        setTransitionName(event.target.value);
+    };
+
+    const handleFromStatusChange = (event) => {
+        setFromStatusNames(event.target.value);
+    };
+
+    const handleToStatusChange = (event) => {
+        setToStatusNames(event.target.value);
     };
 
     useEffect(() => {
         setNodes(states);
         setEdges(transitions);
-    }, [states, transitions]);
+    }, [setEdges, setNodes, states, transitions]);
 
     useEffect(() => {
         fetchWorkflow();
-    }, []);
+    }, [fetchWorkflow]);
 
     return (
         <Container
@@ -198,7 +170,7 @@ function AdminManagement() {
                             </Typography>
                         </Button>
                         <Button
-                            onClick={() => {}}
+                            onClick={() => setAddTransitionModalOpen(true)}
                             variant="text"
                             style={{
                                 flexDirection: "column",
@@ -233,7 +205,7 @@ function AdminManagement() {
                                 Transition
                             </Typography>
                         </Button>
-                        <Button
+                        {/* <Button
                             onClick={() => {}}
                             variant="text"
                             style={{
@@ -268,7 +240,7 @@ function AdminManagement() {
                             >
                                 Rules
                             </Typography>
-                        </Button>
+                        </Button> */}
                     </div>
                     <div>
                         <Button
@@ -320,13 +292,41 @@ function AdminManagement() {
                         <WorkflowModal open={workflowModalOpen} handleClose={() => setWorkflowModalOpen(false)} />
                     )}
                     {addStatusModalOpen && (
-                        <AddStatusModal open={addStatusModalOpen} handleClose={() => setAddStatusModalOpen(false)} />
+                        <AddStatusModal
+                            open={addStatusModalOpen}
+                            handleClose={() => {
+                                setAddStatusModalOpen(false);
+                                setStatusName("");
+                            }}
+                            statusName={statusName}
+                            handleStatusNameChange={handleStatusNameChange}
+                            handleAddStatus={handleAddStatus}
+                        />
+                    )}
+                    {addTransitionModalOpen && (
+                        <AddTransitionModal
+                            open={addTransitionModalOpen}
+                            handleClose={() => {
+                                setAddTransitionModalOpen(false);
+                                setFromStatusNames(null);
+                                setToStatusNames(null);
+                                setTransitionName("");
+                            }}
+                            statuses={states}
+                            transitionName={transitionName}
+                            handleTransitionNameChange={handleTransitionNameChange}
+                            handleAddTransition={handleAddTransition}
+                            fromStatusNames={fromStatusNames}
+                            handleFromStatusChange={handleFromStatusChange}
+                            toStatusNames={toStatusNames}
+                            handleToStatusChange={handleToStatusChange}
+                        />
                     )}
                     <ReactFlow
                         nodes={nodes}
                         edges={edges}
+                        edgeTypes={edgeTypes}
                         onNodesChange={handleStatesChange}
-                        onEdgesChange={handleEdgesChange}
                         onNodeDragStop={handleDragEnd}
                         onConnect={handleEdgesUpdated}
                         fitView
@@ -355,19 +355,6 @@ function AdminManagement() {
                     <CircularProgress />
                 </Box>
             )}
-            <AddTransitionModal
-                open={transitionModalOpen}
-                handleClose={() => setTransitionModalOpen(false)}
-                states={states}
-                handleFieldSubmit={handleEdgesUpdated}
-                transitions={transitions}
-            />
-            <AddStateModal
-                open={stateModalOpen}
-                handleClose={() => setStateModalOpen(false)}
-                handleFieldSubmit={handleStateUpdated}
-                selectedStatus={selectedStatus}
-            />
         </Container>
     );
 }

@@ -1,4 +1,4 @@
-import { Modal, Box, Typography, Button } from "@mui/material";
+import { Modal, Box, Typography, Button, TextField } from "@mui/material";
 
 const style = {
     position: "absolute",
@@ -11,10 +11,12 @@ const style = {
     p: 4,
     borderRadius: 1,
     outline: "none",
-    height: "50%",
+    height: "40%",
+    display: "flex",
+    flexDirection: "column",
 };
 
-function AddStatusModal({ open, handleClose }) {
+function AddStatusModal({ open, handleClose, statusName, handleStatusNameChange, handleAddStatus }) {
     return (
         <Modal
             open={open}
@@ -36,8 +38,21 @@ function AddStatusModal({ open, handleClose }) {
                     Review&quot;, or &quot;Resolved&quot; can provide immediate insight into the incident&apos;s
                     handling stage.
                 </Typography>
+                <TextField
+                    id="outlined-number"
+                    label="Create status"
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                    sx={{ marginTop: 5 }}
+                    value={statusName}
+                    onChange={handleStatusNameChange}
+                />
+                <Typography id="add-status-modal-title" variant="body2" sx={{ fontSize: "12px" }}>
+                    Try a name that&apos;s easy to understand e.g. To do
+                </Typography>
                 <div style={{ display: "flex", justifyContent: "end" }}>
-                    <Button onClick={handleClose} variant="outlined" sx={{ mt: 2 }}>
+                    <Button onClick={handleAddStatus} variant="outlined" sx={{ mt: 2, mr: 2 }} disabled={statusName === ""}>
                         Add
                     </Button>
                     <Button onClick={handleClose} variant="outlined" sx={{ mt: 2 }}>
