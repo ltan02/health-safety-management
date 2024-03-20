@@ -28,6 +28,10 @@ public class Field {
         this.coordinate = coordinate;
     }
 
+    public Field(Coordinate coordinate) {
+        this.coordinate = coordinate;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this) {
