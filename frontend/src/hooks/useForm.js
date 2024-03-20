@@ -1,6 +1,6 @@
 import { useState } from "react";
 import useAxios from "./useAxios";
-import { FIELD_TYPES } from "../pages/admin/form/initial_form";
+import { FIELD_TYPES } from "../pages/admin/form/form_data";
 
 export default function useForm() {
   const [forms, setForms] = useState({});

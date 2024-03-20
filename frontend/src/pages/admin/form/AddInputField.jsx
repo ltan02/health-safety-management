@@ -1,15 +1,12 @@
-import React from "react";
 import {
   FormControl,
   TextField,
-  Typography,
   Select,
   MenuItem,
 } from "@mui/material";
-import { VARIANT_TYPES } from "./initial_form";
+import { VARIANT_TYPES } from "./form_data";
 
 function AddInputField({
-  type,
   onTitleChange,
   onDescriptionChange,
   onPlaceHolderChange,

@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Container, Typography, Button, Grid } from '@mui/material';
-import { FIELD_ELEMENT, FIELD_TYPES } from './initial_form';
+import { FIELD_TYPES } from './form_data';
+import { FIELD_ELEMENT } from './form_elements';
 
 function PreviewForm({ fields, sortedRows }) {
   const [fieldData, setFieldData] = useState({});
@@ -90,7 +91,7 @@ function PreviewForm({ fields, sortedRows }) {
             variant="contained"
             color="secondary"
             sx={{ mt: 3, display: 'block', ml: 'auto', mr: 'auto' }}
-            onClick={() => setFieldData({})} // Assuming you want to clear the form or take some action on cancel
+            onClick={() => setFieldData({})}
           >
             Cancel
           </Button>

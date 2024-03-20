@@ -12,11 +12,12 @@ import {
   FormControl,
 } from "@mui/material";
 import {
-  FIELD_ADD_FORM,
   FIELD_DATA,
   FIELD_TYPES,
   VARIANT_TYPES,
-} from "./initial_form";
+} from "./form_data";
+
+import {  FIELD_ADD_FORM } from "./add_elements";
 
 function AddFieldForm({ handleAddNewField, getLastCoordinate }) {
   const [fieldType, setFieldType] = useState([]);

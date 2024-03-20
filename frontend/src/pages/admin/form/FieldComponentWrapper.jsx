@@ -3,7 +3,8 @@ import { Container, IconButton, Chip } from "@mui/material";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { FIELD_ELEMENT, FIELD_TYPES } from "./initial_form";
+import { FIELD_TYPES } from "./form_data";
+import { FIELD_ELEMENT } from "./form_elements";
 import { useSortable } from "@dnd-kit/sortable";
 
 const FieldComponentWrapper = ({ fieldData, onEdit, onDelete }) => {
