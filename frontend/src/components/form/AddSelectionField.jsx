@@ -13,11 +13,6 @@ import {
 import { VARIANT_TYPES } from "./form_data";
 import useAxios from "../../hooks/useAxios";
 
-const STATE = {
-  MANUAL: "Manual",
-  AUTOMATIC: "Automatic",
-};
-
 function AddSelectionField({
   onTitleChange,
   onDescriptionChange,
@@ -26,16 +21,13 @@ function AddSelectionField({
 }) {
   const { sendRequest } = useAxios();
   const [options, setOptions] = useState([{ value: "", label: "" }]);
-  const [employees, setEmployees] = useState([{ value: "", label: ""}]);
   const [value, setValue] = useState(0);
   const handleChange = (event, newValue) => {
     setValue(newValue);
-    console.log(newValue);
     if (newValue === 0) {
       setOptions([{ value: "", label: "" }]);
-      onOptionChange(options);
     } else {
-      onOptionChange(employees);
+      fetchEmployees()
     }
   };
 
@@ -44,7 +36,6 @@ function AddSelectionField({
       return;
     }
     setOptions(options.concat({ value: "", label: "" }));
-    onOptionChange(options);
   };
 
   const handleOptionChange = (index, newValue) => {
@@ -75,12 +66,13 @@ function AddSelectionField({
     const employees = response.map((employee) => {
       return { value: employee.id, label: employee.firstName };
     });
-    setEmployees(employees);
+    setOptions(employees);
   };
 
   useEffect(() => {
-    fetchEmployees()
-  }, []);
+    const filteredOptions = options.filter((option) => option.value !== "");
+    onOptionChange(filteredOptions);
+  }, [options]);
 
   return (
     <FormControl fullWidth margin="normal">
