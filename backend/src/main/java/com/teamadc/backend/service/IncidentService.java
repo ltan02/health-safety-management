@@ -38,6 +38,11 @@ public class IncidentService {
         return incidents.stream().filter(incident -> incident.getReporter().equals(uid) || incident.getEmployeesInvolved().contains(uid)).toList();
     }
 
+    public List<Incident> getIncidentsByStatusId(String uid, String statusId) throws InterruptedException, ExecutionException {
+        List<Incident> incidents = this.getIncidents(uid);
+        return incidents.stream().filter(incident -> incident.getStatusId().equals(statusId)).toList();
+    }
+
     public Incident addComment(String incidentId, Comment comment) throws InterruptedException, ExecutionException {
         Incident incident = incidentRepository.findById(incidentId);
 
@@ -62,5 +67,21 @@ public class IncidentService {
         incidentRepository.save(incident);
 
         return incident;
+    }
+
+    public Incident assignReviewer(String incidentId, String reviewerId) throws InterruptedException, ExecutionException {
+        Incident incident = incidentRepository.findById(incidentId);
+        incident.setReviewer(reviewerId);
+        return incidentRepository.save(incident);
+    }
+
+    public Incident removeReviewer(String incidentId) throws InterruptedException, ExecutionException {
+        Incident incident = incidentRepository.findById(incidentId);
+        incident.setReviewer(null);
+        return incidentRepository.save(incident);
+    }
+    
+    public List<Incident> getIncidentsByReviewer(String reviewerId) throws InterruptedException, ExecutionException {
+        return incidentRepository.findAll().stream().filter(incident -> incident.getReviewer().equals(reviewerId)).toList();
     }
 }

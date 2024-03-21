@@ -3,8 +3,8 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 
-export default function WorkflowTab({ labels, children }) {
-  const [value, setValue] = useState(0); // Use index-based value for simplicity
+export default function PreviewFormTab({ labels, children }) {
+  const [value, setValue] = useState(0);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);

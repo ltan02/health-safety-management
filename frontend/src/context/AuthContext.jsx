@@ -14,9 +14,13 @@ export function AuthProvider({ children }) {
             try {
                 return JSON.parse(storedUser);
             } catch (e) {
+                sessionStorage.removeItem("user");
+                sessionStorage.removeItem("token");
                 return null;
             }
         }
+        sessionStorage.removeItem("user");
+        sessionStorage.removeItem("token");
         return null;
     });
     const { error, sendRequest } = useAxios();
@@ -54,20 +58,16 @@ export function AuthProvider({ children }) {
     }, [user]);
 
     const signIn = async (email, password) => {
-        try {
-            const firebaseResponse = await auth.signInWithEmailAndPassword(email, password);
-            const token = await firebaseResponse.user.getIdToken();
-            sessionStorage.setItem("token", token);
+        const firebaseResponse = await auth.signInWithEmailAndPassword(email, password);
+        const token = await firebaseResponse.user.getIdToken();
+        sessionStorage.setItem("token", token);
 
-            const backendResponse = await sendRequest({
-                url: `/users/${firebaseResponse.user.uid}`,
-            });
+        const backendResponse = await sendRequest({
+            url: `/users/${firebaseResponse.user.uid}`,
+        });
 
-            sessionStorage.setItem("user", JSON.stringify(backendResponse));
-            setUser(backendResponse);
-        } catch (e) {
-            console.error("SignIn error: ", e);
-        }
+        sessionStorage.setItem("user", JSON.stringify(backendResponse));
+        setUser(backendResponse);
     };
 
     const signUp = async (email, password, firstName, lastName, role) => {

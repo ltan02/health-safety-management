@@ -1,9 +1,14 @@
 package com.teamadc.backend.controller;
 
+import com.teamadc.backend.dto.response.StatusResponse;
+import com.teamadc.backend.model.Incident;
 import com.teamadc.backend.model.Status;
+import com.teamadc.backend.service.IncidentService;
 import com.teamadc.backend.service.StatusService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,10 +18,12 @@ import java.util.concurrent.ExecutionException;
 @RequestMapping("/status")
 public class StatusController {
     private final StatusService statusService;
+    private final IncidentService incidentService;
 
     @Autowired
-    public StatusController(StatusService statusService) {
+    public StatusController(StatusService statusService, IncidentService incidentService) {
         this.statusService = statusService;
+        this.incidentService = incidentService;
     }
 
     @PostMapping
@@ -31,20 +38,40 @@ public class StatusController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Status>> getStatusById() {
+    public ResponseEntity<List<StatusResponse>> getStatuses() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = (String) authentication.getPrincipal();
+
         try {
             List<Status> statuses = statusService.getStatuses();
-            return ResponseEntity.ok(statuses);
+
+            List<StatusResponse> statusResponses = statuses.stream().map(status -> {
+                try {
+                    List<Incident> incidents = incidentService.getIncidentsByStatusId(uid, status.getId());
+                    return new StatusResponse(status.getId(), status.getName(), incidents.size());
+                } catch (InterruptedException | ExecutionException e) {
+                    return null;
+                }
+            }).toList();
+
+            return ResponseEntity.ok(statusResponses);
         } catch (InterruptedException | ExecutionException e) {
             return ResponseEntity.internalServerError().build();
         }
     }
 
     @GetMapping("/{statusId}")
-    public ResponseEntity<Status> getStatusById(@PathVariable String statusId) {
+    public ResponseEntity<StatusResponse> getStatusById(@PathVariable String statusId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = (String) authentication.getPrincipal();
+
         try {
             Status status = statusService.getStatusById(statusId);
-            return ResponseEntity.ok(status);
+
+            List<Incident> incidents = incidentService.getIncidentsByStatusId(uid, statusId);
+            StatusResponse statusResponse = new StatusResponse(status.getId(), status.getName(), incidents.size());
+
+            return ResponseEntity.ok(statusResponse);
         } catch (InterruptedException | ExecutionException e) {
             return ResponseEntity.internalServerError().build();
         }

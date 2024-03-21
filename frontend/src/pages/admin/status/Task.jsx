@@ -31,8 +31,8 @@ function Task({ id, task }) {
                     padding: 1,
                 }}
             >
-                <Chip label={`${task.name}`} variant="outlined" />
-                <Typography variant="p">0 Issues</Typography>
+                <Chip sx={{ fontSize: "13px" }} label={`${task.name}`} variant="outlined" />
+                <Typography variant="p" sx={{ fontSize: "13px" }}>{`${task.count} ${task.count === 1 ? "report" : "reports"}`}</Typography>
             </Box>
         </Card>
     );

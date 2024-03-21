@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 
 @RestController
-@RequestMapping("/state")
+@RequestMapping("/states")
 public class StateController {
     private final StateService stateService;
 
@@ -27,7 +27,7 @@ public class StateController {
 
     @PostMapping
     public ResponseEntity<State> createState(@RequestBody State req) {
-        State state = new State(req.getName());
+        State state = new State(null, req.getName(), req.getCoordinates(), req.getStatusId());
         try {
             State newState = stateService.createOrUpdateState(state);
             return ResponseEntity.ok(newState);
@@ -86,10 +86,16 @@ public class StateController {
     @PutMapping("/{stateId}")
     public ResponseEntity<State> updateCoordinate(@PathVariable String stateId, @RequestBody State req) {
         try {
-            State state = stateService.getStateById(stateId);
-            state.setCoordinate(req.getCoordinate());
+            State existingState = stateService.getStateById(stateId);
+            if (existingState == null) {
+                return ResponseEntity.notFound().build();
+            }
 
-            State newState = stateService.createOrUpdateState(state);
+            existingState.setCoordinates(req.getCoordinates());
+            existingState.setName(req.getName());
+            existingState.setStatusId(req.getStatusId());
+
+            State newState = stateService.createOrUpdateState(existingState);
             return ResponseEntity.ok(newState);
         } catch (InterruptedException | ExecutionException e) {
             return ResponseEntity.internalServerError().build();
