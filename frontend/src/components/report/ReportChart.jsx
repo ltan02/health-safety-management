@@ -2,31 +2,27 @@
 import { PieChart, BarChart, LineChart, ScatterChart } from "@mui/x-charts";
 import { Typography, Container, TextField, Grid, Select, MenuItem } from "@mui/material";
 import { categoryReports, dateReports, locationReports, statusReports} from "../../pages/report/initialData.js";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import useAxios from "../../hooks/useAxios.js";
 
 function ReportChart({type}) {
-    const [field, setField] = useState('Category');
+    const { sendRequest, loading } = useAxios();
     const [report, setReport] = useState(categoryReports);
+    const [field, setField] = useState("category");
     const handleFieldChange = (event) => {
         setField(event.target.value);
-        switch(event.target.value) {
-            case 'Category': 
-                setReport(categoryReports);
-                break;
-            case 'Date':
-                setReport(dateReports);
-                break;
-            case 'Location':
-                setReport(locationReports);
-                break;
-            case 'Status':
-                setReport(statusReports);
-                break;
-            default:
-                setReport(categoryReports);
-                break;
-        }
     };
+
+
+    useEffect(() => {
+        const response = Promise.all([sendRequest({
+            url: `/reports/${field}`,
+        })]);
+        response.then((e) => {
+            console.log(e[0]);
+            setReport(e[0]);
+        }).catch(console.error);
+    }, [field]);
 
     const BarChartCard = (
         <>
@@ -120,10 +116,10 @@ function ReportChart({type}) {
                     value={field}
                     onChange={handleFieldChange}
                 >
-                    <MenuItem value={'Category'}>Category</MenuItem>
-                    <MenuItem value={'Date'}>Date</MenuItem>
-                    <MenuItem value={'Location'}>Location</MenuItem>
-                    <MenuItem value={'Status'}>Status</MenuItem>
+                    <MenuItem value={'category'}>Category</MenuItem>
+                    <MenuItem value={'date'}>Date</MenuItem>
+                    <MenuItem value={'status'}>Status</MenuItem>
+                    <MenuItem value={'reporter'}>Reporter</MenuItem>
                 </Select>
                 <Typography gutterBottom variant="h7"> Select Date Range </Typography>
                 <Grid>
