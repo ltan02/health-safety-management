@@ -93,6 +93,30 @@ public class BoardController {
         }
     }
 
+    @DeleteMapping("/{boardId}/status/{statusId}")
+    public ResponseEntity<Board> removeStatus(@PathVariable String boardId, @PathVariable String statusId) {
+        try {
+            Board existingBoard = boardService.getBoardById(boardId);
+            if (existingBoard == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            if (!existingBoard.getStatusIds().contains(statusId)) {
+                return ResponseEntity.ok(existingBoard);
+            }
+
+            List<String> statusIds = existingBoard.getStatusIds();
+            statusIds.remove(statusId);
+            existingBoard.setStatusIds(statusIds);
+
+            boardService.createOrUpdateBoard(existingBoard);
+
+            return ResponseEntity.ok(existingBoard);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     @PutMapping("/{boardId}/status/{statusId}")
     public ResponseEntity<Board> addStatus(@PathVariable String boardId, @PathVariable String statusId) {
         try {

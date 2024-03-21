@@ -143,7 +143,6 @@ export default function useWorkflow() {
     }, []);
 
     const createTransition = useCallback((source, target, label = null) => {
-        console.log("HERE");
         setTransitions((prev) => {
             const existingTransitions = prev.filter((t) => t.source === source.id && t.target === target.id);
             const newIndex = existingTransitions.length;
@@ -253,121 +252,184 @@ export default function useWorkflow() {
     }, [originalStates, originalTransitions]);
 
     const saveChanges = useCallback(async () => {
-        console.log(originalStates);
-        console.log(states);
         if (_.isEqual(originalStates, states) && _.isEqual(originalTransitions, transitions)) {
             console.log("No changes made");
             return;
         }
 
         try {
-            const ogStates = states
-                .filter((state) => !state.id.startsWith("temp"))
-                .map((state) => {
-                    const originalState = originalStates.find((originalState) => originalState.id === state.id);
-                    if (!_.isEqual(state, originalState)) {
-                        return sendRequest({
-                            url: `/states/${state.id}`,
-                            method: "PUT",
-                            body: {
-                                name: state.data.label,
-                                coordinates: {
-                                    x: state.position.x,
-                                    y: state.position.y,
-                                },
-                                statusId: state.data.statusId,
+            const statesToAdd = states.filter((state) => state.id.startsWith("temp"));
+            const statesToUpdate = states.filter(
+                (state) =>
+                    !state.id.startsWith("temp") &&
+                    !_.isEqual(
+                        state,
+                        originalStates.find((originalState) => originalState.id === state.id),
+                    ),
+            );
+            const statesToDelete = originalStates.filter(
+                (originalState) => !states.find((state) => state.id === originalState.id),
+            );
+
+            const addStatePromises = statesToAdd.map(async (state) => {
+                try {
+                    const response = await sendRequest({
+                        url: "/status",
+                        method: "POST",
+                        body: {
+                            name: state.data.label,
+                        },
+                    });
+
+                    sendRequest({
+                        url: `/boards/${activeWorkflow.boardId}/status/${response.id}`,
+                        method: "PUT",
+                    });
+
+                    return sendRequest({
+                        url: "/states",
+                        method: "POST",
+                        body: {
+                            name: state.data.label,
+                            coordinates: {
+                                x: state.position.x,
+                                y: state.position.y,
                             },
-                        });
-                    }
+                            statusId: response.id,
+                        },
+                    });
+                } catch (error) {
+                    console.log(error);
+                }
+            });
+
+            statesToUpdate.map((state) => {
+                return sendRequest({
+                    url: `/states/${state.id}`,
+                    method: "PUT",
+                    body: {
+                        name: state.data.label,
+                        coordinates: {
+                            x: state.position.x,
+                            y: state.position.y,
+                        },
+                        statusId: state.data.statusId,
+                    },
+                });
+            });
+
+            statesToDelete.map((state) => {
+                const deleteStatePromise = sendRequest({
+                    url: `/states/${state.id}`,
+                    method: "DELETE",
                 });
 
-            const newStatePromises = states
-                .filter((state) => state.id.startsWith("temp"))
-                .map(async (state) => {
-                    try {
-                        const response = await sendRequest({
-                            url: "/status",
-                            method: "POST",
-                            body: {
-                                name: state.data.label,
-                            },
-                        });
-
-                        sendRequest({
-                            url: `/boards/${activeWorkflow.boardId}/status/${response.id}`,
-                            method: "PUT",
-                        });
-
-                        return sendRequest({
-                            url: "/states",
-                            method: "POST",
-                            body: {
-                                name: state.data.label,
-                                coordinates: {
-                                    x: state.position.x,
-                                    y: state.position.y,
-                                },
-                                statusId: response.id,
-                            },
-                        });
-                    } catch (error) {
-                        console.log(error);
-                    }
+                const deleteStatusPromise = sendRequest({
+                    url: `/status/${state.statusId}`,
+                    method: "DELETE",
                 });
 
-            const stateResponses = await Promise.all(newStatePromises);
-
-            const newTransitionPromises = transitions
-                .filter((transition) => transition.id.startsWith("temp"))
-                .map(async (transition) => {
-                    try {
-                        return sendRequest({
-                            url: "/transitions",
-                            method: "POST",
-                            body: {
-                                fromStateId: transition.source.startsWith("temp")
-                                    ? stateResponses.find(
-                                          (s) =>
-                                              states.find((state) => state.id === transition.source).data.label ===
-                                              s.name,
-                                      ).id
-                                    : transition.source,
-                                toStateId: transition.target.startsWith("temp")
-                                    ? stateResponses.find(
-                                          (s) =>
-                                              states.find((state) => state.id === transition.target).data.label ===
-                                              s.name,
-                                      ).id
-                                    : transition.target,
-                                label: transition.data.label,
-                                rules: [],
-                                type: null,
-                            },
-                        });
-                    } catch (error) {
-                        console.log(error);
-                    }
+                const removeStatusFromBoardPromise = sendRequest({
+                    url: `/boards/${activeWorkflow.boardId}/status/${state.statusId}`,
+                    method: "DELETE",
                 });
 
-            const transitionResponses = await Promise.all(newTransitionPromises);
-            await Promise.all(ogStates);
+                return Promise.all([deleteStatePromise, deleteStatusPromise, removeStatusFromBoardPromise]);
+            });
+
+            const newStates = await Promise.all(addStatePromises);
+
+            const transitionsToAdd = transitions.filter((transition) => transition.id.startsWith("temp"));
+            const transitionsToDelete = originalTransitions.filter(
+                (originalTransition) => !transitions.find((state) => state.id === originalTransition.id),
+            );
+
+            const newTransitionPromises = transitionsToAdd.map((transition) => {
+                return sendRequest({
+                    url: "/transitions",
+                    method: "POST",
+                    body: {
+                        fromStateId: transition.source.startsWith("temp")
+                            ? newStates.find(
+                                  (s) => states.find((state) => state.id === transition.source).data.label === s.name,
+                              ).id
+                            : transition.source,
+                        toStateId: transition.target.startsWith("temp")
+                            ? newStates.find(
+                                  (s) => states.find((state) => state.id === transition.target).data.label === s.name,
+                              ).id
+                            : transition.target,
+                        label: transition.data.label,
+                        rules: [],
+                        type: null,
+                    },
+                });
+            });
+
+            transitionsToDelete.map((transition) => {
+                return sendRequest({
+                    url: `/transitions/${transition.id}`,
+                    method: "DELETE",
+                });
+            });
+
+            const newTransitions = await Promise.all(newTransitionPromises);
+
+            const newTransitionsLocal = transitions.map((transition) => {
+                return {
+                    ...transition,
+                    id: transition.id.startsWith("temp")
+                        ? newTransitions.find((s) => s.label === transition.data.label).id
+                        : transition.id,
+                    source: transition.source.startsWith("temp")
+                        ? newStates.find(
+                              (s) => states.find((state) => state.id === transition.source).data.label === s.name,
+                          ).id
+                        : transition.source,
+                    target: transition.target.startsWith("temp")
+                        ? newStates.find(
+                              (s) => states.find((state) => state.id === transition.target).data.label === s.name,
+                          ).id
+                        : transition.target,
+                };
+            });
+
+            const newStatesLocal = states.map((state) => {
+                return {
+                    ...state,
+                    id: state.id.startsWith("temp") ? newStates.find((s) => s.name === state.data.label).id : state.id,
+                };
+            });
+
             await sendRequest({
                 url: `/workflows/${activeWorkflow.id}`,
                 method: "PUT",
                 body: {
                     name: activeWorkflow.name,
                     active: activeWorkflow.active,
-                    stateIds: [...activeWorkflow.stateIds, ...stateResponses.map((state) => state.id)],
-                    transitionIds: [
-                        ...activeWorkflow.transitionIds,
-                        ...transitionResponses.map((transition) => transition.id),
-                    ],
+                    stateIds: newStatesLocal.map((state) => state.id),
+                    transitionIds: newTransitionsLocal.map((transition) => transition.id),
+                    boardId: activeWorkflow.boardId,
                 },
             });
+
+            setOriginalStates(newStatesLocal);
+            setOriginalTransitions(newTransitionsLocal);
+            setStates(newStatesLocal);
+            setTransitions(newTransitionsLocal);
         } catch (err) {
             console.log(err);
         }
-    }, [states, originalStates, transitions, originalTransitions, activeWorkflow]);
+    }, [
+        originalStates,
+        states,
+        originalTransitions,
+        transitions,
+        activeWorkflow.id,
+        activeWorkflow.name,
+        activeWorkflow.active,
+        activeWorkflow.boardId,
+    ]);
 
     return {
         states,

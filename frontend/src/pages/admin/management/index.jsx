@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from "react";
-import ReactFlow, { useNodesState, useEdgesState, addEdge, MiniMap, Controls } from "reactflow";
+import ReactFlow, { useNodesState, useEdgesState, MiniMap, Controls } from "reactflow";
 import "reactflow/dist/style.css";
 import useWorkflow from "../../../hooks/useWorkflow";
 import AddTransitionModal from "../../../components/workflows/AddTransitionModal";
@@ -42,7 +42,11 @@ function AdminManagement() {
         saveChanges,
     } = useWorkflow();
 
-    const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
+    const onConnect = useCallback((params) => {
+        setFromStatusNames(states.find((state) => params.source === state.id));
+        setToStatusNames(states.find((state) => params.target === state.id));
+        setAddTransitionModalOpen(true);
+    }, []);
 
     const handleDragEnd = useCallback(
         (_, node) => {
