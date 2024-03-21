@@ -30,8 +30,13 @@ function AddSelectionField({
   const [value, setValue] = useState(0);
   const handleChange = (event, newValue) => {
     setValue(newValue);
-    setOptions(employees);
-    onOptionChange(employees);
+    console.log(newValue);
+    if (newValue === 0) {
+      setOptions([{ value: "", label: "" }]);
+      onOptionChange(options);
+    } else {
+      onOptionChange(employees);
+    }
   };
 
   const handleAddOption = () => {
@@ -56,7 +61,7 @@ function AddSelectionField({
 
   const handleAddAutoOption = (event) => {
     const newValue = event.target.value;
-    
+    // add categories here ??
     if (newValue === "employees") {
       onOptionChange(options);
     }
