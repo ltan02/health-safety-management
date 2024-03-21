@@ -25,9 +25,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 @RestController
 @RequestMapping("/workflows")
 public class WorkflowController {
-    @Autowired
     private final WorkflowService workflowService;
 
+    @Autowired
     public WorkflowController(WorkflowService workflowService) {
         this.workflowService = workflowService;
     }
@@ -51,7 +51,7 @@ public class WorkflowController {
                 return ResponseEntity.notFound().build();
             }
 
-            Workflow newWorkflow = new Workflow(workflowId, req.getName(), req.getActive(), req.getStateIds(), req.getTransitionIds(), req.getBoardId());
+            Workflow newWorkflow = new Workflow(workflowId, req.getName(), req.getActive(), req.getStateIds(), req.getTransitionIds(), req.getBoardId(), req.getLastUpdated());
 
             Workflow updatedWorkflow = workflowService.createOrUpdateWorkflow(newWorkflow);
             return ResponseEntity.ok(updatedWorkflow);
@@ -97,66 +97,4 @@ public class WorkflowController {
             return ResponseEntity.internalServerError().build();
         }
     }
-
-
-//    @PostMapping("/{workflowId}/state")
-//    public ResponseEntity<Workflow> addState(@PathVariable String workflowId, @RequestBody State request) {
-//        try {
-//            workflowService.addState(workflowId, request);
-//            return ResponseEntity.ok().build();
-//        } catch (InterruptedException | ExecutionException e) {
-//            return ResponseEntity.internalServerError().build();
-//        }
-//    }
-//
-//    @PutMapping("/{workflowId}/status/{stateId}")
-//    public ResponseEntity<Workflow> updateStatus(@PathVariable String workflowId, @PathVariable String stateId, @RequestBody State request) {
-//        try {
-//            workflowService.updateStatus(workflowId, stateId, request);
-//            return ResponseEntity.ok().build();
-//        } catch (InterruptedException | ExecutionException e) {
-//            return ResponseEntity.internalServerError().build();
-//        }
-//    }
-//
-//    @PostMapping("/{workflowId}/transition")
-//    public ResponseEntity<Workflow> addTransition(@PathVariable String workflowId, @RequestBody Transition request) {
-//        try {
-//            workflowService.addTransition(workflowId, request);
-//            return ResponseEntity.ok().build();
-//        } catch (InterruptedException | ExecutionException e) {
-//            return ResponseEntity.internalServerError().build();
-//        }
-//    }
-//
-//
-//    @DeleteMapping("/{workflowId}/state/{stateId}")
-//    public ResponseEntity<Workflow> deleteState(@PathVariable String workflowId, @PathVariable String stateId) {
-//        try {
-//            workflowService.deleteState(workflowId, stateId);
-//            return ResponseEntity.ok().build();
-//        } catch (InterruptedException | ExecutionException e) {
-//            return ResponseEntity.internalServerError().build();
-//        }
-//    }
-//
-//    @DeleteMapping("/{workflowId}/transition/{flowId}")
-//    public ResponseEntity<Workflow> deleteTransition(@PathVariable String workflowId, @PathVariable String flowId) {
-//        try {
-//            workflowService.deleteTransition(workflowId, flowId);
-//            return ResponseEntity.ok().build();
-//        } catch (InterruptedException | ExecutionException e) {
-//            return ResponseEntity.internalServerError().build();
-//        }
-//    }
-//
-//    @PutMapping("/{workflowId}/coordinate/{stateId}")
-//    public ResponseEntity<Workflow> updateCoordinate(@PathVariable String workflowId, @PathVariable String stateId, @RequestBody Coordinate request) {
-//        try {
-//            workflowService.updateCoordinate(workflowId, stateId, request);
-//            return ResponseEntity.ok().build();
-//        } catch (InterruptedException | ExecutionException e) {
-//            return ResponseEntity.internalServerError().build();
-//        }
-//    }
 }
