@@ -84,7 +84,7 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate }) {
   };
 
   return (
-    <Container style={{ height: "700px", width: "500px", overflow: "auto" }}>
+    <Container style={{ height: "80vh", width: "80vh", overflow: "auto" }}>
       <Typography variant="h6" align="center" sx={{ my: 5 }}>
         Select Field Type
       </Typography>
