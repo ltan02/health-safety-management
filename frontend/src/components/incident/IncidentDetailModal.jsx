@@ -33,7 +33,7 @@ const modalStyle = {
   bgcolor: "background.paper",
   boxShadow: 24,
   p: 4,
-  border: "2rem solid",
+  border: "2px solid",
   borderColor: "#7D7D7D",
 };
 
@@ -149,7 +149,8 @@ export default function IncidentDetailModal({
             sx={{
               display: "flex",
               flexDirection: "column",
-              width: "50%",
+              width: "55%",
+              marginRight: 2
             }}
           >
             <Typography
@@ -225,7 +226,7 @@ export default function IncidentDetailModal({
             sx={{
               display: "flex",
               flexDirection: "column",
-              width: "50%",
+              width: "45%",
               alignItems: "flex-start",
               rowGap: 2,
             }}
@@ -292,7 +293,7 @@ export default function IncidentDetailModal({
                   </Grid>
                   <Grid item xs={6}>
                     {incident && (
-                      <Typography>{incident.incidentDate}</Typography>
+                      <Typography sx={{ fontSize: "14px" }}>{incident.incidentDate}</Typography>
                     )}
                   </Grid>
                   <Grid item xs={6}>
@@ -302,7 +303,7 @@ export default function IncidentDetailModal({
                   </Grid>
                   <Grid item xs={6}>
                     {incident && (
-                      <Typography>{incident.incidentCategory}</Typography>
+                      <Typography sx={{ fontSize: "14px" }}>{incident.incidentCategory}</Typography>
                     )}
                   </Grid>
                   <Grid item xs={6}>
@@ -316,7 +317,7 @@ export default function IncidentDetailModal({
                         <Grid item>
                           <Profile user={incident.reporter} />
                         </Grid>
-                        <Grid item>
+                        <Grid item sx={{ fontSize: "14px" }}>
                           {incident.reporter.firstName}{" "}
                           {incident.reporter.lastName}
                         </Grid>
@@ -346,7 +347,7 @@ export default function IncidentDetailModal({
                               <Grid item>
                                 <Profile user={employee} />
                               </Grid>
-                              <Grid item>
+                              <Grid item sx={{ fontSize: "14px" }}>
                                 {employee.firstName} {employee.lastName}
                               </Grid>
                             </Grid>
@@ -363,7 +364,7 @@ export default function IncidentDetailModal({
                       <Grid item>
                         <Profile user={incident.reviewer} />
                       </Grid>
-                      <Grid item>
+                      <Grid item sx={{ fontSize: "14px" }}>
                         {incident.reviewer?.firstName ?? "Unassigned"}
                         {incident.reviewer?.lastName ?? ""}
                         {isPrivileged(user.role) && (
