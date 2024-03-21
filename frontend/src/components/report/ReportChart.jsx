@@ -1,28 +1,24 @@
 
 import { PieChart, BarChart, LineChart, ScatterChart } from "@mui/x-charts";
 import { Typography, Container, TextField, Grid, Select, MenuItem } from "@mui/material";
-import { categoryReports, dateReports, locationReports, statusReports} from "../../pages/report/initialData.js";
 import { useEffect, useState } from "react";
 import useAxios from "../../hooks/useAxios.js";
+import { categoryReports } from "../../pages/report/initialData.js";
 
 function ReportChart({type}) {
     const { sendRequest, loading } = useAxios();
     const [report, setReport] = useState(categoryReports);
     const [field, setField] = useState("category");
+    const [startDate, setStartDate] = useState();
+    const [endDate, setEndDate] = useState();
     const handleFieldChange = (event) => {
         setField(event.target.value);
+        getReportAPI(event.target.value);
     };
 
-
     useEffect(() => {
-        const response = Promise.all([sendRequest({
-            url: `/reports/${field}`,
-        })]);
-        response.then((e) => {
-            console.log(e[0]);
-            setReport(e[0]);
-        }).catch(console.error);
-    }, [field]);
+        getReportAPI(field);
+    }, [startDate, endDate]);
 
     const BarChartCard = (
         <>
@@ -124,15 +120,35 @@ function ReportChart({type}) {
                 <Typography gutterBottom variant="h7"> Select Date Range </Typography>
                 <Grid>
                     <Typography gutterBottom variant="h8"> Start: </Typography>
-                    <TextField type="datetime-local"/>
+                    <TextField type="datetime-local" 
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                    />
                 </Grid>
                 <Grid>
                     <Typography gutterBottom variant="h8"> End: </Typography>
-                    <TextField type="datetime-local"/>
+                    <TextField type="datetime-local"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                    />
                 </Grid>
             </Container>
         </div>
     );
+
+    function getReportAPI(value) {
+        const url = startDate && endDate ? `/reports/${value}/${startDate}/${endDate}` : `/reports/${value}`;
+    
+        const response = Promise.all([sendRequest({ url })]);
+        response.then((e) => {
+            if(e[0].length === 0) {
+                setReport([{id: 0, label: "No Data", value: 0}])
+            } else {
+                setReport(e[0]);
+            }
+        }).catch(console.error);
+    }
+    
 }
 
 export default ReportChart;
