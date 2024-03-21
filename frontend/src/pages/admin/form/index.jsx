@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
-  Button,
-  Modal,
-  Box,
-  TextField,
-  Select,
-  MenuItem,
   Container,
-  Grid,
   IconButton,
   Typography,
   Table,
@@ -20,7 +13,7 @@ import {
 } from "@mui/material";
 
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import FormCustomizationModal from "./FormCustomizationModal";
+import FormCustomizationModal from "../../../components/form/FormCustomizationModal";
 import useForm from "../../../hooks/useForm";
 
 function AdminForm() {

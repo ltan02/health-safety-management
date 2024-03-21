@@ -74,7 +74,6 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate }) {
         },
         "coordinate": lastCoordinate
     }
-    // console.log(lastCoordinate);
     handleAddNewField(newField);
   };
 

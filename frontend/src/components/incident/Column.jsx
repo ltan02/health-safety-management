@@ -5,6 +5,7 @@ import { Container, Typography, Box, Chip, IconButton } from "@mui/material";
 import Task from "./Task";
 import AddIcon from "@mui/icons-material/Add";
 import AddTaskModal from "./AddTaskModal";
+import PreviewForm from "../form/PreviewForm";
 
 function Column({ id, title, tasks, handleAddTask, employees, onRefresh }) {
     const { setNodeRef } = useDroppable({ id });
