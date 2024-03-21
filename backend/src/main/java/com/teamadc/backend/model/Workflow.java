@@ -17,16 +17,18 @@ public class Workflow {
     private List<String> stateIds;
     private List<String> transitionIds;
     private String boardId;
+    private String lastUpdated;
 
     public Workflow() {}
 
-    public Workflow(String id, String name, boolean active, List<String> stateIds, List<String> transitionIds, String boardId) {
+    public Workflow(String id, String name, boolean active, List<String> stateIds, List<String> transitionIds, String boardId, String lastUpdated) {
         this.id = id;
         this.name = name;
         this.active = active;
         this.stateIds = stateIds;
         this.transitionIds = transitionIds;
         this.boardId = boardId;
+        this.lastUpdated = lastUpdated;
     }
 
     public Workflow(String name, boolean active, List<String> stateIds, List<String> transitionIds) {
