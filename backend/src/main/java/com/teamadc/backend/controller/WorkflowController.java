@@ -97,4 +97,14 @@ public class WorkflowController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    @DeleteMapping("/{workflowId}")
+    public ResponseEntity<Void> deleteWorkflow(@PathVariable String workflowId) {
+        try {
+            workflowService.deleteWorkflow(workflowId);
+            return ResponseEntity.ok().build();
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 }
