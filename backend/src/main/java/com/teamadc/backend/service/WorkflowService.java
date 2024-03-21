@@ -29,20 +29,10 @@ public class WorkflowService {
     }
 
     public Workflow createOrUpdateWorkflow(Workflow workflow) throws InterruptedException, ExecutionException {
-        workflow.setTransitions(List.of());
-        workflow.setStates(List.of());
         return workflowRepository.save(workflow);
     }
 
     public Workflow updateWorkflow(Workflow workflow) throws InterruptedException, ExecutionException {
-        List<State> states = workflow.getStates();
-        List<Transition> transitions = workflow.getTransitions();
-        for (State state : states) {
-            stateRepository.save(state);
-        }
-        for (Transition transition : transitions) {
-            transitionRepository.save(transition);
-        }
         return workflowRepository.save(workflow);
     }
 
@@ -58,62 +48,62 @@ public class WorkflowService {
         return workflowRepository.findAll();
     }
 
-    public void addState(String workflowId, State state ) throws InterruptedException, ExecutionException {
-        Workflow workflow = workflowRepository.findById(workflowId);
-        List<State> states = workflow.getStates();
-        stateRepository.save(state);
-        states.add(state);
-        workflow.setStates(states);
-        workflowRepository.save(workflow);
-    }
-
-    public void deleteState(String workflowId, String stateId) throws InterruptedException, ExecutionException {
-        Workflow workflow = workflowRepository.findById(workflowId);
-        List<State> states = workflow.getStates();
-        stateRepository.deleteById(stateId);
-        states.removeIf(state -> state.getId().equals(stateId));
-        workflow.setStates(states);
-        workflowRepository.save(workflow);
-    }
-
-    public void updateStatus(String workflowId, String stateId, State state) throws InterruptedException, ExecutionException {
-        Workflow workflow = workflowRepository.findById(workflowId);
-        List<State> states = workflow.getStates();
-        stateRepository.save(state);
-        states.removeIf(s -> s.getId().equals(stateId));
-        states.add(state);
-        workflow.setStates(states);
-        workflowRepository.save(workflow);
-    }
-
-    public void addTransition(String workflowId, Transition transition) throws InterruptedException, ExecutionException {
-        Workflow workflow = workflowRepository.findById(workflowId);
-        List<Transition> flows = workflow.getTransitions();
-        transitionRepository.save(transition);
-        flows.add(transition);
-        workflow.setTransitions(flows);
-        workflowRepository.save(workflow);
-    }
-
-    public void deleteTransition(String workflowId, String flowId) throws InterruptedException, ExecutionException {
-        Workflow workflow = workflowRepository.findById(workflowId);
-        List<Transition> flows = workflow.getTransitions();
-        transitionRepository.deleteById(flowId);
-        flows.removeIf(f -> f.getId().equals(flowId));
-        workflow.setTransitions(flows);
-        workflowRepository.save(workflow);
-    }
-
-    public void updateCoordinate(String workflowId, String stateId, Coordinate coordinate) throws InterruptedException, ExecutionException {
-        Workflow workflow = workflowRepository.findById(workflowId);
-        List<State> states = workflow.getStates();
-        State state = states.stream().filter(s -> s.getId().equals(stateId)).findFirst().orElseThrow();
-        state.setCoordinate(coordinate);
-        states.removeIf(s -> s.getId().equals(stateId));
-        stateRepository.save(state);
-        states.add(state);
-        workflow.setStates(states);
-        workflowRepository.save(workflow);
-    }
+//    public void addState(String workflowId, State state ) throws InterruptedException, ExecutionException {
+//        Workflow workflow = workflowRepository.findById(workflowId);
+//        List<State> states = workflow.getStates();
+//        stateRepository.save(state);
+//        states.add(state);
+//        workflow.setStates(states);
+//        workflowRepository.save(workflow);
+//    }
+//
+//    public void deleteState(String workflowId, String stateId) throws InterruptedException, ExecutionException {
+//        Workflow workflow = workflowRepository.findById(workflowId);
+//        List<State> states = workflow.getStates();
+//        stateRepository.deleteById(stateId);
+//        states.removeIf(state -> state.getId().equals(stateId));
+//        workflow.setStates(states);
+//        workflowRepository.save(workflow);
+//    }
+//
+//    public void updateStatus(String workflowId, String stateId, State state) throws InterruptedException, ExecutionException {
+//        Workflow workflow = workflowRepository.findById(workflowId);
+//        List<State> states = workflow.getStates();
+//        stateRepository.save(state);
+//        states.removeIf(s -> s.getId().equals(stateId));
+//        states.add(state);
+//        workflow.setStates(states);
+//        workflowRepository.save(workflow);
+//    }
+//
+//    public void addTransition(String workflowId, Transition transition) throws InterruptedException, ExecutionException {
+//        Workflow workflow = workflowRepository.findById(workflowId);
+//        List<Transition> flows = workflow.getTransitions();
+//        transitionRepository.save(transition);
+//        flows.add(transition);
+//        workflow.setTransitions(flows);
+//        workflowRepository.save(workflow);
+//    }
+//
+//    public void deleteTransition(String workflowId, String flowId) throws InterruptedException, ExecutionException {
+//        Workflow workflow = workflowRepository.findById(workflowId);
+//        List<Transition> flows = workflow.getTransitions();
+//        transitionRepository.deleteById(flowId);
+//        flows.removeIf(f -> f.getId().equals(flowId));
+//        workflow.setTransitions(flows);
+//        workflowRepository.save(workflow);
+//    }
+//
+//    public void updateCoordinate(String workflowId, String stateId, Coordinate coordinate) throws InterruptedException, ExecutionException {
+//        Workflow workflow = workflowRepository.findById(workflowId);
+//        List<State> states = workflow.getStates();
+//        State state = states.stream().filter(s -> s.getId().equals(stateId)).findFirst().orElseThrow();
+//        state.setCoordinate(coordinate);
+//        states.removeIf(s -> s.getId().equals(stateId));
+//        stateRepository.save(state);
+//        states.add(state);
+//        workflow.setStates(states);
+//        workflowRepository.save(workflow);
+//    }
     
 }

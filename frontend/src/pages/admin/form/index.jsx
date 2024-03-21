@@ -19,9 +19,7 @@ import {
   Paper,
 } from "@mui/material";
 
-import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import { styled } from "@mui/material/styles";
 import FormCustomizationModal from "./FormCustomizationModal";
 import useForm from "../../../hooks/useForm";
 
@@ -29,41 +27,47 @@ function AdminForm() {
   const {
     fetchForms,
     forms,
-    updateFieldCoordinate,
+    updateAllFieldCoordinates,
     addField,
     sortedRows,
     groupedByRows,
     getLastCoordinate,
     deleteField,
+    loading,
   } = useForm();
   const [fields, setFields] = useState({});
   const [selectingForm, setSelectingForm] = useState({});
 
   const [open, setOpen] = useState(false);
 
-  const handleOpen = (fields) => {
-    setFields(fields);
+  const handleOpen = (form) => {
+    setSelectingForm(form);
     setOpen(true);
+    setFields(form.fields);
   };
 
   const handleClose = () => {
     setOpen(false);
+    setFields({});
   };
 
-  const handleUpdateCoordinate = (fieldId, coordinate) => {
-    updateFieldCoordinate(selectingForm.id, fieldId, coordinate);
+  const handleUpdateCoordinate = async (fieldsData) => {
+    await updateAllFieldCoordinates(selectingForm.id, fieldsData);
+    await fetchForms();
   };
 
-  const handleAddNewField = (fieldData) => {
-    addField(selectingForm.id, fieldData);
+  const handleAddNewField = async (fieldData) => {
+    await addField(selectingForm.id, fieldData);
+    await fetchForms();
   };
 
   const handleSort = () => {
     return sortedRows(groupedByRows(fields));
   };
   
-  const handleDeleteField = (fieldId) => { 
-    deleteField(selectingForm.id, fieldId);
+  const handleDeleteField = async (fieldId) => { 
+    await deleteField(selectingForm.id, fieldId);
+    await fetchForms();
   }
 
   useEffect(() => {
@@ -71,10 +75,16 @@ function AdminForm() {
   }, []);
 
   useEffect(() => {
-    if (selectingForm.id) {
-      handleOpen(selectingForm.fields);
-    }
+    setFields(selectingForm.fields);
   }, [selectingForm]);
+
+  useEffect(() => {
+    if (selectingForm.id) {
+      setSelectingForm(
+        Object.values(forms).find((form) => form.id === selectingForm.id)
+      )
+    }
+  }, [forms]);
 
   return (
     <Container maxWidth="md" sx={{ mt: 4 }}>
@@ -133,7 +143,9 @@ function AdminForm() {
                 <TableCell align="right">
                   <IconButton
                     size="small"
-                    onClick={() => setSelectingForm(forms[formId])}
+                    onClick={() => {
+                      handleOpen(forms[formId]);
+                    }}
                   >
                     <AddCircleOutlineIcon />
                   </IconButton>

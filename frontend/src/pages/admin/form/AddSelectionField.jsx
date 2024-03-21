@@ -11,7 +11,7 @@ import {
   Chip,
   Grid,
 } from "@mui/material";
-import { VARIANT_TYPES } from "./initial_form";
+import { VARIANT_TYPES } from "./form_data";
 
 function AddSelectionField({
   onTitleChange,

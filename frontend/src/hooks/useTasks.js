@@ -58,7 +58,6 @@ export default function useTasks() {
                 newTasks[column.id] = [];
             }
         });
-        console.log(newTasks)
         setTasks(newTasks);
     }, [adminColumns, employeeColumns]);
 

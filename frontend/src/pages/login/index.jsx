@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
 import { Container, Card, CardContent, Typography, TextField, Button } from "@mui/material";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import InputAdornment from "@mui/material/InputAdornment";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import IconButton from "@mui/material/IconButton";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Alert from "@mui/material/Alert";
 import { useAuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import pwcLogo from "../../assets/pwcLogo.svg";
@@ -9,6 +17,16 @@ function Login() {
     const { user, signIn } = useAuthContext();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const [showMissingEmail, setShowMissingEmail] = useState(false);
+    const [showMissingPassword, setShowMissingPassword] = useState(false);
+    const [showInvalidDetails, setShowInvalidDetails] = useState(false);
+
+    const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+    const handleMouseDownPassword = (event) => {
+        event.preventDefault();
+    };
 
     useEffect(() => {
         if (user !== null) {
@@ -17,7 +35,20 @@ function Login() {
     }, [navigate, user]);
 
     const handleSubmit = () => {
-        signIn(email, password);
+        setShowMissingEmail(false);
+        setShowMissingPassword(false);
+        setShowInvalidDetails(false);
+
+        if (email === "") {
+            setShowMissingEmail(true);
+        } else if (password === "") {
+            setShowMissingPassword(true);
+        } else {
+            signIn(email, password).catch((e) => {
+                console.error("Login error: ", e);
+                setShowInvalidDetails(true);
+            });
+        }
     };
 
     useEffect(() => {
@@ -61,16 +92,45 @@ function Login() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                         />
-                        <TextField
-                            label="Password"
-                            type="password"
-                            fullWidth
-                            required
-                            margin="normal"
-                            variant="outlined"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
+                        <FormControl fullWidth sx={{ marginTop: 1 }} variant="outlined">
+                            <InputLabel htmlFor="outlined-adornment-password">Password*</InputLabel>
+                            <OutlinedInput
+                                id="outlined-adornment-password"
+                                type={showPassword ? "text" : "password"}
+                                endAdornment={
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            aria-label="toggle password visibility"
+                                            onClick={handleClickShowPassword}
+                                            onMouseDown={handleMouseDownPassword}
+                                            edge="end"
+                                        >
+                                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                }
+                                label="Password"
+                                value={password}
+                                onChange={(event) => setPassword(event.target.value)}
+                            />
+                        </FormControl>
+
+                        {showMissingEmail && (
+                            <Alert severity="error" sx={{ marginTop: 1 }}>
+                                Email field must not be left blank
+                            </Alert>
+                        )}
+                        {showMissingPassword && (
+                            <Alert severity="error" sx={{ marginTop: 1 }}>
+                                Password field must not be left blank
+                            </Alert>
+                        )}
+                        {showInvalidDetails && (
+                            <Alert severity="error" sx={{ marginTop: 1 }}>
+                                Your email or password are incorrect. Please try again!
+                            </Alert>
+                        )}
+
                         <Button
                             onClick={handleSubmit}
                             color="primary"

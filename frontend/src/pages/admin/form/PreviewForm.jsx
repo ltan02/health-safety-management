@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Container, Typography, Button, Grid } from '@mui/material';
-import { FIELD_ELEMENT, FIELD_TYPES } from './initial_form';
+import { FIELD_TYPES } from './form_data';
+import { FIELD_ELEMENT } from './form_elements';
 
 function PreviewForm({ fields, sortedRows }) {
-  const [fieldData, setFieldData] = useState({});
+  const [fieldsData, setFieldsData] = useState({});
 
 
   const handleChange = (event, field) => {
@@ -17,12 +18,12 @@ function PreviewForm({ fields, sortedRows }) {
           newValue.splice(index, 1);
         })
       }
-      setFieldData(prevData => ({
+      setFieldsData(prevData => ({
         ...prevData,
         [name]: newValue,
       }));
     } else {
-      setFieldData(prevData => ({
+      setFieldsData(prevData => ({
         ...prevData,
         [name]: value,
       }));
@@ -49,13 +50,7 @@ function PreviewForm({ fields, sortedRows }) {
   };
 
   return (
-    <Container
-      style={{
-        height: '700px',
-        width: '700px',
-        overflow: 'auto',
-      }}
-    >
+    <Container style={{ height: "80vh", width: "80vh", overflow: "auto" }}>
       <Typography variant="h6" align="center" sx={{ my: 5 }}>
         {fields.name}
       </Typography>
@@ -73,7 +68,7 @@ function PreviewForm({ fields, sortedRows }) {
                   <Grid item xs={12} sm={6} key={fieldData.id}>
                     <FieldComponent
                       {...fieldData.props}
-                      value={fieldData.type === FIELD_TYPES.SELECTION_MULTI ? fieldData[fieldData.props.name] ?? [] : fieldData[fieldData.props.name] ?? ''}
+                      value={fieldData.type === FIELD_TYPES.SELECTION_MULTI ? fieldsData[fieldData.props.name] ?? [] : fieldsData[fieldData.props.name] ?? ''}
                       onChange={(e) => handleChange(e, fieldData)}
                       style={{ padding: '10px 0px' }}
                     />
@@ -96,7 +91,7 @@ function PreviewForm({ fields, sortedRows }) {
             variant="contained"
             color="secondary"
             sx={{ mt: 3, display: 'block', ml: 'auto', mr: 'auto' }}
-            onClick={() => setFieldData({})} // Assuming you want to clear the form or take some action on cancel
+            onClick={() => setFieldsData({})}
           >
             Cancel
           </Button>
