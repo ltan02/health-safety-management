@@ -64,7 +64,7 @@ function AddSelectionField({
       method: "GET",
     });
     const employees = response.map((employee) => {
-      return { value: employee.id, label: employee.firstName };
+      return { value: employee.id, label: employee.firstName +" " + employee.lastName };
     });
     setOptions(employees);
   };

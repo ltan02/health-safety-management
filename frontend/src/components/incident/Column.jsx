@@ -7,7 +7,7 @@ import AddIcon from "@mui/icons-material/Add";
 import AddTaskModal from "./AddTaskModal";
 import PreviewForm from "../form/PreviewForm";
 
-function Column({ id, title, tasks, handleAddTask, employees, onRefresh }) {
+function Column({ id, title, tasks, handleAddTask, employees, onRefresh, field, sortedRows }) {
     const { setNodeRef } = useDroppable({ id });
     const [openModal, setOpenModal] = useState(false);
 
@@ -55,6 +55,8 @@ function Column({ id, title, tasks, handleAddTask, employees, onRefresh }) {
                 columnId={id}
                 handleAddTask={handleAddTask}
                 allEmployees={employees}
+                field={field}
+                sortedRows={sortedRows}
             />
         </Container>
     );

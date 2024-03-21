@@ -3,7 +3,7 @@ import { Container, Typography, Button, Grid } from '@mui/material';
 import { FIELD_TYPES } from './form_data';
 import { FIELD_ELEMENT } from './form_elements';
 
-function PreviewForm({ fields, sortedRows }) {
+function PreviewForm({ fields, sortedRows, handleSubmit, onClose }) {
   const [fieldsData, setFieldsData] = useState({});
 
 
@@ -45,8 +45,19 @@ function PreviewForm({ fields, sortedRows }) {
     return duplicates;
   }
 
-  const handleSubmit = (event) => {
+  const pushSubmitButton = (event) => {
     event.preventDefault();
+    if (handleSubmit) {
+      handleSubmit(fieldsData);
+    }
+    pushCloseButton();
+  };
+
+  const pushCloseButton = () => {
+    setFieldsData({})
+    if (onClose) {
+      onClose();
+    }
   };
 
   return (
@@ -54,7 +65,7 @@ function PreviewForm({ fields, sortedRows }) {
       <Typography variant="h6" align="center" sx={{ my: 5 }}>
         {fields.name}
       </Typography>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={pushSubmitButton}>
         <Grid container spacing={2} alignItems="top">
           {sortedRows().map((row, rowIndex) => (
             <Grid container spacing={2} key={rowIndex} alignItems="center">
@@ -91,7 +102,8 @@ function PreviewForm({ fields, sortedRows }) {
             variant="contained"
             color="secondary"
             sx={{ mt: 3, display: 'block', ml: 'auto', mr: 'auto' }}
-            onClick={() => setFieldsData({})}
+            onClick={pushCloseButton
+          }
           >
             Cancel
           </Button>
