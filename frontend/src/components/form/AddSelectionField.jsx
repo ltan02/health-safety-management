@@ -69,6 +69,17 @@ function AddSelectionField({
     setOptions(employees);
   };
 
+  const fetchCategories = async () => {
+    // const response = await sendRequest({
+    //   url: "/users",
+    //   method: "GET",
+    // });
+    // const employees = response.map((employee) => {
+    //   return { value: employee.id, label: employee.firstName };
+    // });
+    // setOptions(employees);
+  };
+
   useEffect(() => {
     const filteredOptions = options.filter((option) => option.value !== "");
     onOptionChange(filteredOptions);
