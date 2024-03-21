@@ -9,6 +9,7 @@ import os
 import json
 from vertexai.generative_models import ChatSession, GenerativeModel
 import uvicorn
+from fastapi.middleware.cors import CORSMiddleware
 
 
 load_dotenv()
@@ -25,6 +26,13 @@ aiplatform.init(project="pwc-project-b3778", location="us-central1", credentials
 model = TextGenerationModel.from_pretrained("text-bison@001")
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class IncidentModel(BaseModel):
     incident: str
