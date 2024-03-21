@@ -49,8 +49,6 @@ function AddTransitionModal({
     toStatusNames,
     handleToStatusChange,
 }) {
-
-    console.log(statuses);
     return (
         <Modal
             open={open}
@@ -68,16 +66,20 @@ function AddTransitionModal({
                 </Typography>
                 <div style={{ marginTop: "20px", display: "flex", alignItems: "center" }}>
                     <FormControl sx={{ width: 300 }}>
-                        <InputLabel id="demo-multiple-checkbox-label">From status</InputLabel>
+                        <InputLabel id="from-status-checkbox-label">From status</InputLabel>
                         <Select
-                            labelId="demo-multiple-chip-label"
-                            id="demo-multiple-chip"
-                            value={fromStatusNames?.data?.label ?? ""}
+                            labelId="from-status-chip-label"
+                            id="from-status-chip"
+                            value={fromStatusNames ?? ""}
                             onChange={handleFromStatusChange}
-                            input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+                            input={<OutlinedInput id="from-status-select-multiple-chip" label="Chip" />}
                             renderValue={(selected) => (
                                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                                    <Chip key={selected} label={selected} sx={{ fontSize: "12px" }} />
+                                    <Chip
+                                        key={selected}
+                                        label={selected?.data?.label ?? ""}
+                                        sx={{ fontSize: "12px" }}
+                                    />
                                 </Box>
                             )}
                             MenuProps={MenuProps}
@@ -92,16 +94,16 @@ function AddTransitionModal({
                     </FormControl>
                     <EastIcon sx={{ marginX: 4 }} />
                     <FormControl sx={{ width: 300 }}>
-                        <InputLabel id="demo-multiple-checkbox-label">To status</InputLabel>
+                        <InputLabel id="to-status-checkbox-label">To status</InputLabel>
                         <Select
-                            labelId="demo-multiple-chip-label"
-                            id="demo-multiple-chip"
-                            value={toStatusNames?.data?.label ?? ""}
+                            labelId="to-status-chip-label"
+                            id="to-status-chip"
+                            value={toStatusNames ?? ""}
                             onChange={handleToStatusChange}
-                            input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+                            input={<OutlinedInput id="to-status-select-multiple-chip" label="Chip" />}
                             renderValue={(selected) => (
                                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                                    <Chip key={selected} label={selected} sx={{ fontSize: "12px" }} />
+                                    <Chip key={selected} label={selected?.data?.label} sx={{ fontSize: "12px" }} />
                                 </Box>
                             )}
                             MenuProps={MenuProps}

@@ -242,7 +242,7 @@ export default function useWorkflow() {
         });
 
         setTransitions((prev) => {
-            return prev.filter((transition) => transition.source !== id && transition.target !== id);
+            return prev.filter((transition) => transition.source !== id || transition.target !== id);
         });
     }, []);
 

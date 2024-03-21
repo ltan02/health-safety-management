@@ -26,6 +26,7 @@ function AdminManagement() {
     const [fromStatusNames, setFromStatusNames] = React.useState(null);
     const [toStatusNames, setToStatusNames] = React.useState(null);
     const [discardChangesModalOpen, setDiscardChangesModalOpen] = React.useState(false);
+    const [selectedNode, setSelectedNode] = React.useState(null);
 
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges] = useEdgesState([]);
@@ -46,7 +47,7 @@ function AdminManagement() {
         setFromStatusNames(states.find((state) => params.source === state.id));
         setToStatusNames(states.find((state) => params.target === state.id));
         setAddTransitionModalOpen(true);
-    }, []);
+    }, [states]);
 
     const handleDragEnd = useCallback(
         (_, node) => {
@@ -55,31 +56,31 @@ function AdminManagement() {
         [updateCoordinate],
     );
 
+    const onStateDelete = useCallback(
+      (id) => {
+          deleteState(id);
+      },
+      [deleteState],
+  );
+
+    const handleStatesChange = useCallback(
+      (changes) => {
+        onNodesChange(changes);
+        changes.forEach((change) => {
+          if (change.type === "remove") {
+            onStateDelete(change.id);
+          }
+        });
+      },
+      [onNodesChange, onStateDelete]
+    );
+
     const handleEdgesUpdated = useCallback(
         (params) => {
             onConnect(params);
             createTransition(params.source, params.target, params?.label);
         },
         [onConnect, createTransition],
-    );
-
-    const onStateDelete = useCallback(
-        (id) => {
-            deleteState(id);
-        },
-        [deleteState],
-    );
-
-    const handleStatesChange = useCallback(
-        (changes) => {
-            onNodesChange(changes);
-            changes.forEach((change) => {
-                if (change.type === "remove") {
-                    onStateDelete(change.id);
-                }
-            });
-        },
-        [onNodesChange, onStateDelete],
     );
 
     const handleStatusNameChange = (event) => {
@@ -359,6 +360,7 @@ function AdminManagement() {
                         onConnect={handleEdgesUpdated}
                         fitView
                         style={{ width: "100%", height: "100%" }}
+                        onSelectionChange={(elements) => setSelectedNode(elements?.nodes?.[0] || null)}
                     >
                         <MiniMap />
                         <Controls />

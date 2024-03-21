@@ -154,8 +154,6 @@ export const BoardProvider = ({ children }) => {
                     .statuses.push(...newBoard.adminColumns.find((column) => column.id === columnId).statuses);
                 newBoard.adminColumns = newBoard.adminColumns.filter((column) => column.id !== columnId);
 
-                console.log(JSON.stringify(newBoard, null, 2));
-
                 const adminColumns = newBoard.adminColumns;
                 adminColumns.sort((a, b) => a.order - b.order);
                 setAdminColumns(adminColumns);
