@@ -130,23 +130,6 @@ function EditFieldForm({
             </Grid>
           </SortableContext>
         </DndContext>
-        <Grid container spacing={2} alignItems="top">
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            sx={{ mt: 3, display: "block", ml: "auto", mr: "auto" }}
-          >
-            Submit
-          </Button>
-          <Button
-            variant="contained"
-            color="secondary"
-            sx={{ mt: 3, display: "block", ml: "auto", mr: "auto" }}
-          >
-            Cancel
-          </Button>
-        </Grid>
       </form>
       <DeleteFieldModal open={open} setOpen={setOpen} onHandleDelete={onHandleDelete} />
     </Container>
