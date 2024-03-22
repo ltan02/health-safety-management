@@ -137,16 +137,26 @@ function ReportChart({type}) {
     );
 
     function getReportAPI(value) {
-        const url = startDate && endDate ? `/reports/${value}/${startDate}/${endDate}` : `/reports/${value}`;
-    
+        let url = `/reports/${value}`;
+
+        const params = [];
+        if (startDate) params.push(`start=${startDate}`);
+        if (endDate) params.push(`end=${endDate}`);
+        if (params.length > 0) {
+            url += '?' + params.join('&');
+        }
+
+        // Send the request and handle the response
         const response = Promise.all([sendRequest({ url })]);
         response.then((e) => {
-            if(e[0].length === 0) {
-                setReport([{id: 0, label: "No Data", value: 0}])
+            if (e[0].length === 0) {
+                setReport([{ id: 0, label: "No Data", value: 0 }]);
             } else {
                 setReport(e[0]);
             }
-        }).catch(console.error);
+        }).catch((e) => {
+            console.error(e[0]);
+        });
     }
     
 }

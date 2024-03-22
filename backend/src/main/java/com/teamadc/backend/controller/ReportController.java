@@ -7,10 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.Date;
 
 @RestController
 @RequestMapping("/reports")
@@ -24,22 +23,9 @@ public class ReportController {
     }
 
     @GetMapping("/{type}")
-    public ResponseEntity<List<Report>> getReport(@PathVariable String type) {
+    public ResponseEntity<List<Report>> getReportByDate(@PathVariable String type, @RequestParam Optional<String> start, @RequestParam Optional<String> end) {
         try {
-            List<Report> reports = reportService.getReports(type);
-            return ResponseEntity.ok(reports);
-        } catch (InterruptedException | ExecutionException e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @GetMapping("/{type}/{start}/{end}")
-    public ResponseEntity<List<Report>> getReportByDate(@PathVariable String type, @PathVariable String start, @PathVariable String end) {
-        try {
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
-            Date startDate = formatter.parse(start);
-            Date endDate = formatter.parse(end);
-            List<Report> reports = reportService.getReports(type, startDate, endDate);
+            List<Report> reports = reportService.getReports(type, start, end);
             return ResponseEntity.ok(reports);
         } catch (InterruptedException | ExecutionException e ) {
             return ResponseEntity.internalServerError().build();
