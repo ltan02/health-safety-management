@@ -1,5 +1,4 @@
 import RedirectButton from "../components/sidebar/RedirectButton";
-import RoleSwitchModal from "../components/sidebar/RoleSwitchModal";
 
 export const Roles = {
     Admin: "ADMIN",
@@ -25,7 +24,6 @@ export const PRIVILEGED_SIDEBAR_CONTENTS = {
         ["Incident Reports"]: <RedirectButton to="/incidents">Incident Reports</RedirectButton>,
     },
     [PAGE_TYPE.REPORT]: {
-        ["Role"]: <RoleSwitchModal>Role</RoleSwitchModal>,
         ["Overview"]: <RedirectButton to="/report">Overview</RedirectButton>,
         ["Dashboard"]: <RedirectButton to="/report/dashboard">Dashboard</RedirectButton>
     },
