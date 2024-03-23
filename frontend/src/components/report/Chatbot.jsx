@@ -4,26 +4,48 @@ import { Box, TextField, Button, List, ListItem, ListItemText, Paper, Typography
 const Chatbot = () => {
   const [messages, setMessages] = useState([{ text: "Hi! How can I help you today?", sender: "bot" }]);
   const [newMessage, setNewMessage] = useState("");
+  const [botResp, setBotResp] = useState({});
   const bottomRef = useRef(null);
+
+  const baseUrl = import.meta.env.VITE_AI_URL;
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
+
+  useEffect(() => {
+    if (botResp.response) {
+      const botResponse = { text: botResp.response, sender: "bot" };
+      setMessages((prevMessages) => [...prevMessages, botResponse]);
+    }
+  }, [botResp]);
+
   const scrollToBottom = () => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleSendMessage = () => {
+
+  const handleSendMessage = async() => {
     if (!newMessage.trim()) return;
     const newMessages = [...messages, { text: newMessage, sender: "user" }];
     setMessages(newMessages);
     setNewMessage("");
 
-    setTimeout(() => {
-      const botResponse = { text: `You said: ${newMessage}`, sender: "bot" };
-      setMessages((prevMessages) => [...prevMessages, botResponse]);
-    }, 1000);
+    const response = await fetch(baseUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        prompt: newMessage
+      })
+    });
+
+    const jsonResponse = await response.json(); // Parse the JSON response
+    console.log(jsonResponse);
+    const botMessage = jsonResponse.response || ""; // Extract the 'response' property
+    setBotResp({ response: botMessage }); // Set the extracted text response in the state
   };
 
   return (
