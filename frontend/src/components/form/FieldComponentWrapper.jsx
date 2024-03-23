@@ -60,18 +60,17 @@ const FieldComponentWrapper = ({ fieldData, onEdit, onDelete }) => {
           >
             <IconButton
               size="small"
-              style={{ margin: "2px" }}
               {...listeners}
               {...attributes}
+              style={{ margin: "2px" }}
             >
               <DragIndicatorIcon />
             </IconButton>
-            {/* <IconButton size="small" style={{ margin: '2px' }} onClick={() => onEdit(fieldData)}>
+            <IconButton size="small" onClick={() => onEdit(fieldData)}>
           <EditIcon />
-        </IconButton> */}
+        </IconButton>
             <IconButton
               size="small"
-              style={{ margin: "2px" }}
               onClick={() => onDelete(fieldData)}
             >
               <DeleteIcon />

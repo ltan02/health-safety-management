@@ -14,19 +14,23 @@ import {
   rectSortingStrategy,
 } from "@dnd-kit/sortable";
 import DeleteFieldModal from "./DeleteFieldModal";
+import EditFieldModal from "./EditFieldModal";
 
 function EditFieldForm({
   updateFieldCoordinate,
   fields,
   sortedRows,
   deleteField,
+  updateField,
   handleClose,
 }) {
   const [fieldsData, setFieldsData] = useState([]);
   const [activeId, setActiveId] = useState(null);
   const [isEdited, setIsEdited] = useState(false);
+  const [editingField, setEditingField] = useState(null);
   const [activeField, setActiveField] = useState(null);
   const [open, setOpen] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
   const sensors = useSensors(useSensor(PointerSensor));
 
   useEffect(() => {
@@ -81,6 +85,27 @@ function EditFieldForm({
     setActiveField(fieldData);
   };
 
+  const handleOpenEdit = (fieldData) => {
+    if (fieldData) {
+      setEditingField(fieldData);
+      setOpenEdit(true);
+    } 
+  }
+  
+  const handleEditField = (fieldData) => {
+    const newFieldData = { ...fieldData };
+    const newEditingField = { ...editingField };
+    Object.keys(fieldData).map((key) => {
+      if (!fieldData[key]) {
+        newFieldData[key] = newEditingField.props[key];
+      }
+    });
+
+    newEditingField.props = newFieldData;
+
+    updateField(newEditingField);
+  }
+
   return (
     <Container style={{ height: "80vh", width: "80vh", overflow: "auto" }}>
        {isEdited && (
@@ -122,6 +147,7 @@ function EditFieldForm({
                       <FieldComponentWrapper
                         fieldData={fieldData}
                         onDelete={() => handleOpenDeleteModal(fieldData)}
+                        onEdit={handleOpenEdit}
                       />
                     </Grid>
                   ))}
@@ -132,6 +158,10 @@ function EditFieldForm({
         </DndContext>
       </form>
       <DeleteFieldModal open={open} setOpen={setOpen} onHandleDelete={onHandleDelete} />
+      {
+        editingField && <EditFieldModal open={openEdit} setOpen={setOpenEdit} onHandleEdit={handleEditField} fieldData={editingField} />
+      }
+      
     </Container>
   );
 }

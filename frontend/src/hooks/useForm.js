@@ -71,6 +71,24 @@ export default function useForm() {
     }
   };
 
+  const updateField = async (formId, field) => {
+    try {
+      if (!formId || !field || !field.props) {
+        console.error("Invalid input");
+        return;
+      }
+
+      const response = await sendRequest({
+        url: `/forms/${formId}/field/${field.id}`,
+        method: "PUT",
+        body: field,
+      });
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   const groupedByRows = (fields) => {
     const newFields = fields.reduce((acc, field) => {
       const { y } = field.coordinate;
@@ -146,6 +164,7 @@ export default function useForm() {
     updateAllFieldCoordinates,
     forms,
     addField,
+    updateField,
     groupedByRows,
     sortedRows,
     getLastCoordinate,

@@ -11,6 +11,10 @@ function AddInputField({
   onDescriptionChange,
   onPlaceHolderChange,
   onRequiredChange,
+  initialTitle,
+  initialDescription,
+  initialPlaceHolder,
+  initialRequired,
 }) {
   return (
     <FormControl fullWidth margin="normal">
@@ -22,6 +26,7 @@ function AddInputField({
         margin="dense"
         fullWidth
         label="Title"
+        defaultValue={initialTitle}
       />
       <TextField
         onChange={onDescriptionChange}
@@ -30,6 +35,7 @@ function AddInputField({
         margin="dense"
         fullWidth
         label="Description (optional)"
+        defaultValue={initialDescription}
       />
       <TextField
         onChange={onPlaceHolderChange}
@@ -38,6 +44,7 @@ function AddInputField({
         margin="dense"
         fullWidth
         label="Placeholder (optional)"
+        defaultValue={initialPlaceHolder}
       />
       <Select
         fullWidth

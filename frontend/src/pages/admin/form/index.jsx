@@ -26,7 +26,7 @@ function AdminForm() {
     groupedByRows,
     getLastCoordinate,
     deleteField,
-    loading,
+    updateField,
   } = useForm();
   const [fields, setFields] = useState({});
   const [selectingForm, setSelectingForm] = useState({});
@@ -60,6 +60,11 @@ function AdminForm() {
   
   const handleDeleteField = async (fieldId) => { 
     await deleteField(selectingForm.id, fieldId);
+    await fetchForms();
+  }
+
+  const handleUpdateField = async (fieldData) => {
+    await updateField(selectingForm.id, fieldData);
     await fetchForms();
   }
 
@@ -157,6 +162,7 @@ function AdminForm() {
         sortedRows={handleSort}
         getLastCoordinate={() => getLastCoordinate(fields)}
         deleteField={handleDeleteField}
+        updateField={handleUpdateField}
       />
     </Container>
   );

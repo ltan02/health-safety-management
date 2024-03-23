@@ -18,9 +18,13 @@ function AddSelectionField({
   onDescriptionChange,
   onOptionChange,
   onRequiredChange,
+  initialTitle,
+  initialDescription,
+  initialOptions =[{ value: "", label: "" }],
+  initialRequired,
 }) {
   const { sendRequest } = useAxios();
-  const [options, setOptions] = useState([{ value: "", label: "" }]);
+  const [options, setOptions] = useState(initialOptions);
   const [value, setValue] = useState(0);
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -95,6 +99,7 @@ function AddSelectionField({
         margin="dense"
         fullWidth
         label="Title"
+        defaultValue={initialTitle}
       />
       <TextField
         onChange={onDescriptionChange}
@@ -103,13 +108,14 @@ function AddSelectionField({
         margin="dense"
         fullWidth
         label="Description"
+        defaultValue={initialDescription}
       />
       <Select
         fullWidth
         variant={VARIANT_TYPES.STANDARD}
         onChange={onRequiredChange}
         label="Required"
-        defaultValue={false}
+        defaultValue={initialRequired}
       >
         <MenuItem value={true}>Required</MenuItem>
         <MenuItem value={false}>Optional</MenuItem>
