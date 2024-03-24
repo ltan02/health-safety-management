@@ -89,7 +89,7 @@ export default function useForm() {
     }
   }
 
-  const groupedByRows = (fields) => {
+  const groupedByRows = (fields, cols) => {
     const newFields = fields.reduce((acc, field) => {
       const { y } = field.coordinate;
       if (!acc[y]) {
@@ -99,8 +99,14 @@ export default function useForm() {
       return acc;
     }, {});
 
+    for(let i = 0; i < cols; i++) {
+      if (!newFields[i]) {
+        newFields[i] = [];
+      }
+    }
+
     Object.keys(newFields).map((key) => {
-      if (newFields[key].length < 2) {
+      if (newFields[key].length < cols) {
         let coordinate = {
           x: 0,
           y: Number(key),

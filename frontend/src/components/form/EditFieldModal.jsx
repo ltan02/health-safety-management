@@ -15,7 +15,6 @@ import { useState } from "react";
 import { FIELD_TYPES, VARIANT_TYPES } from "./form_data";
 import { FIELD_ADD_FORM } from "./add_elements";
 function EditFieldModal({ open, setOpen, onHandleEdit, fieldData }) {
-
   const [title, setTitle] = useState(
     fieldData.props.label ? fieldData.props.label : ""
   );
@@ -86,6 +85,9 @@ function EditFieldModal({ open, setOpen, onHandleEdit, fieldData }) {
           p: 4,
         }}
       >
+        <Typography variant="h5" fontWeight={500} align="center">
+          Edit Field
+        </Typography>
         {FIELD_ADD_FORM[select] ? (
           <>
             {FIELD_ADD_FORM[select]({
@@ -102,7 +104,7 @@ function EditFieldModal({ open, setOpen, onHandleEdit, fieldData }) {
             })}
           </>
         ) : (
-          <Typography variant="h6" align="center" sx={{ my: 5 }}>
+          <Typography variant="h6" align="center" fontWeight={600} sx={{ my: 5 }}>
             Select Field Type
           </Typography>
         )}
@@ -146,21 +148,16 @@ function EditFieldModal({ open, setOpen, onHandleEdit, fieldData }) {
                 helperText={`This is a preview of a ${select} field.`}
               />
             )}
-
-            <Grid container justifyContent={"space-between"}>
-              <Button variant="contained" color="primary" onClick={handleEdit}>
-                Save
-              </Button>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={handleClose}
-              >
-                Cancel
-              </Button>
-            </Grid>
           </FormControl>
         </Box>
+        <Grid container justifyContent={"space-between"}>
+          <Button variant="contained" color="primary" onClick={handleEdit}>
+            Save
+          </Button>
+          <Button variant="contained" color="secondary" onClick={handleClose}>
+            Cancel
+          </Button>
+        </Grid>
       </Container>
     </Modal>
   );

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Container, Typography, Button, Grid } from "@mui/material";
+import { Container, Typography, Button, Grid, Divider } from "@mui/material";
 import { FIELD_TYPES } from "./form_data";
 import { FIELD_ELEMENT } from "./form_elements";
 
@@ -68,15 +68,21 @@ function PreviewForm({ fields, sortedRows, handleSubmit, onClose }) {
     return requiredFields.every((fields) =>
       fields.every((field) => fieldsData[field.props.name])
     );
-  }
+  };
 
   return (
     <Container style={{ height: "80vh", width: "80vh", overflow: "auto" }}>
-      <Typography variant="h6" align="center" sx={{ my: 5 }}>
+      <Typography
+        variant="h4"
+        align="left"
+        fontWeight={500}
+        sx={{ marginTop: 5 }}
+      >
         Incident Report Form
       </Typography>
+      <Divider sx={{ my: 2 }} color="primary" />
       <form onSubmit={pushSubmitButton}>
-        <Grid container spacing={2} alignItems="top">
+        <Grid container alignItems="top">
           {sortedRows().map((row, rowIndex) => (
             <Grid container spacing={2} key={rowIndex} alignItems="center">
               {row.fields.map((fieldData) => {
@@ -86,17 +92,23 @@ function PreviewForm({ fields, sortedRows, handleSubmit, onClose }) {
                   return null;
                 }
                 return (
-                  <Grid item xs={12} sm={6} key={fieldData.id}>
-                    <FieldComponent
-                      {...fieldData.props}
-                      value={
-                        fieldData.type === FIELD_TYPES.SELECTION_MULTI
-                          ? fieldsData[fieldData.props.name] ?? []
-                          : fieldsData[fieldData.props.name] ?? ""
-                      }
-                      onChange={(e) => handleChange(e, fieldData)}
-                      style={{ padding: "10px 10px" }}
-                    />
+                  <Grid item md={12} key={fieldData.id} sx={{ my: 2 }} style={{ paddingLeft: 0}}>
+                    <Container
+                      sx={{
+                        display: "flex",
+                        justifyContent: "start",
+                      }}
+                    >
+                      <FieldComponent
+                        {...fieldData.props}
+                        value={
+                          fieldData.type === FIELD_TYPES.SELECTION_MULTI
+                            ? fieldsData[fieldData.props.name] ?? []
+                            : fieldsData[fieldData.props.name] ?? ""
+                        }
+                        onChange={(e) => handleChange(e, fieldData)}
+                      />
+                    </Container>
                   </Grid>
                 );
               })}

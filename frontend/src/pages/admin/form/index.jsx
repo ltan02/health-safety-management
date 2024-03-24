@@ -10,6 +10,7 @@ import {
   TableHead,
   TableRow,
   Paper,
+  CircularProgress,
 } from "@mui/material";
 
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
@@ -27,6 +28,7 @@ function AdminForm() {
     getLastCoordinate,
     deleteField,
     updateField,
+    loading,
   } = useForm();
   const [fields, setFields] = useState({});
   const [selectingForm, setSelectingForm] = useState({});
@@ -55,7 +57,7 @@ function AdminForm() {
   };
 
   const handleSort = () => {
-    return sortedRows(groupedByRows(fields));
+    return sortedRows(groupedByRows(fields, 1));
   };
   
   const handleDeleteField = async (fieldId) => { 

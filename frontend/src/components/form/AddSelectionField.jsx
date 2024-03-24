@@ -20,7 +20,7 @@ function AddSelectionField({
   onRequiredChange,
   initialTitle,
   initialDescription,
-  initialOptions =[{ value: "", label: "" }],
+  initialOptions = [{ value: "", label: "" }],
   initialRequired,
 }) {
   const { sendRequest } = useAxios();
@@ -31,7 +31,7 @@ function AddSelectionField({
     if (newValue === 0) {
       setOptions([{ value: "", label: "" }]);
     } else {
-      fetchEmployees()
+      fetchEmployees();
     }
   };
 
@@ -68,7 +68,10 @@ function AddSelectionField({
       method: "GET",
     });
     const employees = response.map((employee) => {
-      return { value: employee.id, label: employee.firstName +" " + employee.lastName };
+      return {
+        value: employee.id,
+        label: employee.firstName + " " + employee.lastName,
+      };
     });
     setOptions(employees);
   };
@@ -136,29 +139,31 @@ function AddSelectionField({
           <Typography variant={VARIANT_TYPES.LABEL} sx={{ mt: 2 }}>
             Please enter the options for the selection field
           </Typography>
-          {options.map((option, index) => (
-            <Grid container spacing={1} alignItems="center" key={index}>
-              <Grid item xs>
-                <TextField
-                  variant="outlined"
-                  margin="dense"
-                  fullWidth
-                  label={`Option ${index + 1}`}
-                  value={option.value}
-                  onChange={(e) => handleOptionChange(index, e.target.value)}
-                />
+          <div style={{ overflowY: "auto", maxHeight: "200px" }}>
+            {options.map((option, index) => (
+              <Grid container spacing={1} alignItems="center" key={index}>
+                <Grid item xs>
+                  <TextField
+                    variant="outlined"
+                    margin="dense"
+                    fullWidth
+                    label={`Option ${index + 1}`}
+                    value={option.value}
+                    onChange={(e) => handleOptionChange(index, e.target.value)}
+                  />
+                </Grid>
+                <Grid item>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => handleRemoveOption(index)}
+                  >
+                    Remove
+                  </Button>
+                </Grid>
               </Grid>
-              <Grid item>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  onClick={() => handleRemoveOption(index)}
-                >
-                  Remove
-                </Button>
-              </Grid>
-            </Grid>
-          ))}
+            ))}
+          </div>
           <Button variant="contained" color="primary" onClick={handleAddOption}>
             Add Option
           </Button>
@@ -170,18 +175,16 @@ function AddSelectionField({
             Please select the options for the selection field
           </Typography>
           <FormControl fullWidth>
-          <Select
-            fullWidth
-            variant={VARIANT_TYPES.STANDARD}
-            onChange={handleAddAutoOption}
-            label="Automatic"
-            defaultValue={"employees"}
-          >
-            <MenuItem value={"employees"}>
-              Employees
-            </MenuItem>
-            <MenuItem value={"categories"}>Categories</MenuItem>
-          </Select>
+            <Select
+              fullWidth
+              variant={VARIANT_TYPES.STANDARD}
+              onChange={handleAddAutoOption}
+              label="Automatic"
+              defaultValue={"employees"}
+            >
+              <MenuItem value={"employees"}>Employees</MenuItem>
+              <MenuItem value={"categories"}>Categories</MenuItem>
+            </Select>
           </FormControl>
         </div>
       )}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Container, Typography, Button, Grid, Modal, Box } from "@mui/material";
+import { Container, Typography, Button, Grid, Divider, Box } from "@mui/material";
 import FieldComponentWrapper from "./FieldComponentWrapper";
 import {
   DndContext,
@@ -86,6 +86,7 @@ function EditFieldForm({
   };
 
   const handleOpenEdit = (fieldData) => {
+
     if (fieldData) {
       setEditingField(fieldData);
       setOpenEdit(true);
@@ -124,9 +125,10 @@ function EditFieldForm({
           </Box>
         </Container>
       )}
-      <Typography variant="h6" align="center" sx={{ my: 5 }}>
+      <Typography variant="h4" align="left" fontWeight={500} sx={{ marginTop: 5 }}>
         Incident Report Form
       </Typography>
+      <Divider sx={{ my: 2 }} color="primary" />
       <form onSubmit={(e) => e.preventDefault()}>
         <DndContext
           sensors={sensors}
@@ -139,11 +141,11 @@ function EditFieldForm({
             items={fieldsData.map((item) => item.id)}
             strategy={rectSortingStrategy}
           >
-            <Grid container spacing={2} alignItems="center">
+            <Grid container spacing={2} alignItems="top">
               {sortedRows().map((row, rowIndex) => (
                 <Grid container key={rowIndex} alignItems="center">
                   {row.fields.map((fieldData) => (
-                    <Grid item xs={12} sm={6} key={fieldData.id}>
+                    <Grid item md={12} key={fieldData.id} sx={{ my: 2}}>
                       <FieldComponentWrapper
                         fieldData={fieldData}
                         onDelete={() => handleOpenDeleteModal(fieldData)}
