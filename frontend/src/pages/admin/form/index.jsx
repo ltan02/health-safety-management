@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
-  Button,
-  Modal,
-  Box,
-  TextField,
-  Select,
-  MenuItem,
   Container,
-  Grid,
   IconButton,
   Typography,
   Table,
@@ -17,10 +10,11 @@ import {
   TableHead,
   TableRow,
   Paper,
+  CircularProgress,
 } from "@mui/material";
 
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import FormCustomizationModal from "./FormCustomizationModal";
+import FormCustomizationModal from "../../../components/form/FormCustomizationModal";
 import useForm from "../../../hooks/useForm";
 
 function AdminForm() {
@@ -33,6 +27,7 @@ function AdminForm() {
     groupedByRows,
     getLastCoordinate,
     deleteField,
+    updateField,
     loading,
   } = useForm();
   const [fields, setFields] = useState({});
@@ -62,11 +57,16 @@ function AdminForm() {
   };
 
   const handleSort = () => {
-    return sortedRows(groupedByRows(fields));
+    return sortedRows(groupedByRows(fields, 1));
   };
   
   const handleDeleteField = async (fieldId) => { 
     await deleteField(selectingForm.id, fieldId);
+    await fetchForms();
+  }
+
+  const handleUpdateField = async (fieldData) => {
+    await updateField(selectingForm.id, fieldData);
     await fetchForms();
   }
 
@@ -164,6 +164,7 @@ function AdminForm() {
         sortedRows={handleSort}
         getLastCoordinate={() => getLastCoordinate(fields)}
         deleteField={handleDeleteField}
+        updateField={handleUpdateField}
       />
     </Container>
   );

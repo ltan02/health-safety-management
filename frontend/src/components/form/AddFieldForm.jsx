@@ -74,13 +74,12 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate }) {
         },
         "coordinate": lastCoordinate
     }
-    // console.log(lastCoordinate);
     handleAddNewField(newField);
   };
 
   return (
     <Container style={{ height: "80vh", width: "80vh", overflow: "auto" }}>
-      <Typography variant="h6" align="center" sx={{ my: 5 }}>
+      <Typography variant="h6" align="center" fontWeight={600} sx={{ my: 5 }}>
         Select Field Type
       </Typography>
       <Select
@@ -112,7 +111,7 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate }) {
             })}
           </>
         ) : (
-          <Typography variant="h6" align="center" sx={{ my: 5 }}>
+          <Typography variant="h6" align="center" fontWeight={600} sx={{ my: 5 }}>
             Select Field Type
           </Typography>
         )}

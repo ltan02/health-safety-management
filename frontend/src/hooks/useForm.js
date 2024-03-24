@@ -1,6 +1,6 @@
 import { useState } from "react";
 import useAxios from "./useAxios";
-import { FIELD_TYPES } from "../pages/admin/form/form_data";
+import { FIELD_TYPES } from "../components/form/form_data";
 
 export default function useForm() {
   const [forms, setForms] = useState({});
@@ -71,7 +71,25 @@ export default function useForm() {
     }
   };
 
-  const groupedByRows = (fields) => {
+  const updateField = async (formId, field) => {
+    try {
+      if (!formId || !field || !field.props) {
+        console.error("Invalid input");
+        return;
+      }
+
+      const response = await sendRequest({
+        url: `/forms/${formId}/field/${field.id}`,
+        method: "PUT",
+        body: field,
+      });
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const groupedByRows = (fields, cols) => {
     const newFields = fields.reduce((acc, field) => {
       const { y } = field.coordinate;
       if (!acc[y]) {
@@ -81,8 +99,14 @@ export default function useForm() {
       return acc;
     }, {});
 
+    for(let i = 0; i < cols; i++) {
+      if (!newFields[i]) {
+        newFields[i] = [];
+      }
+    }
+
     Object.keys(newFields).map((key) => {
-      if (newFields[key].length < 2) {
+      if (newFields[key].length < cols) {
         let coordinate = {
           x: 0,
           y: Number(key),
@@ -146,6 +170,7 @@ export default function useForm() {
     updateAllFieldCoordinates,
     forms,
     addField,
+    updateField,
     groupedByRows,
     sortedRows,
     getLastCoordinate,

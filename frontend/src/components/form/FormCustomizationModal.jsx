@@ -5,14 +5,14 @@ import PreviewForm from "./PreviewForm";
 import AddFieldForm from "./AddFieldForm";
 import EditFieldForm from "./EditFieldForm";
 
-function FormCustomizationModal({ open, handleClose, fields, updateFieldCoordinate, handleAddNewField, sortedRows, getLastCoordinate, deleteField}) {
+function FormCustomizationModal({ open, handleClose, fields, updateFieldCoordinate, handleAddNewField, sortedRows, getLastCoordinate, deleteField, updateField}) {
   return (
     <Modal open={open} onClose={handleClose}>
         <Box sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: "auto", maxWidth: "90vw", bgcolor: "background.paper", boxShadow: 24, p: 4, borderRadius: 2 }}>
-            <Paper elevation={3} sx={{ width: "80vw" }}>
+            <Paper elevation={0} >
                 <FormTab labels={["Preview Form", "Customize Fields", "Add Fields"]}>
-                    <PreviewForm fields={fields} sortedRows={sortedRows} />
-                    <EditFieldForm fields={fields} updateFieldCoordinate={updateFieldCoordinate} sortedRows={sortedRows} deleteField={deleteField} handleClose={handleClose} />
+                    <PreviewForm fields={fields} sortedRows={sortedRows} onClose={handleClose} />
+                    <EditFieldForm fields={fields} updateFieldCoordinate={updateFieldCoordinate} sortedRows={sortedRows} deleteField={deleteField} handleClose={handleClose} updateField={updateField} />
                     <AddFieldForm handleAddNewField={handleAddNewField} getLastCoordinate={getLastCoordinate} />
                 </FormTab>
             </Paper>

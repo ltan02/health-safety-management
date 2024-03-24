@@ -91,6 +91,16 @@ public class FormController {
         }
     }
 
+    @PutMapping("/{formId}/field/{fieldId}")
+    public ResponseEntity<Form> updateField(@PathVariable String formId, @PathVariable String fieldId, @RequestBody Field request) {
+        try {
+            Form newField = formService.updateField(formId, fieldId, request);
+            return ResponseEntity.ok(newField);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     @DeleteMapping("/{formId}")
     public ResponseEntity<Form> deleteForm(@PathVariable String formId) {
         try {

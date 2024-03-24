@@ -1,6 +1,41 @@
-import React from 'react';
-import { FormControl, TextField, Typography, Select, MenuItem, OutlinedInput, Chip } from '@mui/material';
-import { FIELD_TYPES, VARIANT_TYPES } from './form_data';
+import React from "react";
+import {
+  FormControl,
+  TextField,
+  Typography,
+  Select,
+  MenuItem,
+  Chip,
+  Box,
+  Tooltip,
+} from "@mui/material";
+
+import styled from "@emotion/styled";
+
+import { useDropzone } from 'react-dropzone';
+import { FIELD_TYPES, VARIANT_TYPES } from "./form_data";
+
+const FileDropzone = (props) => {
+  const {getRootProps, getInputProps} = useDropzone({
+    onDrop: (acceptedFiles) => {
+      //handle file upload
+    },
+  });
+
+  return (
+    <Box {...getRootProps()} style={{ border: '1px solid orange', textAlign: 'center', opacity: 0.5, borderRadius: 5 }}>
+      <input {...getInputProps()} />
+      <Typography sx={{
+        color: 'orange',
+        fontSize: '1rem',
+        padding: '20px',
+        cursor: 'pointer',
+      }} variant={VARIANT_TYPES.BODY}>+</Typography>
+    </Box>
+  );
+};
+
+
 export const FIELD_ELEMENT = {
   [FIELD_TYPES.TEXT_FIELD]: ({
     label,
@@ -11,15 +46,18 @@ export const FIELD_ELEMENT = {
     onChange,
     ...props
   }) => (
-    <FormControl fullWidth {...props}>
-      <Typography variant={VARIANT_TYPES.LABEL}>{label}</Typography>
-      <Typography variant={VARIANT_TYPES.BODY}> {description} {required ? "(Required)" : "(Optional)"}</Typography>
+    <FormControl fullWidth {...props} style={{minHeight: 100}}>
+      <Typography fontWeight={600} variant={VARIANT_TYPES.LABEL}>
+        {label}
+        {required ? "*" : ""}
+      </Typography>
+      <Typography variant={VARIANT_TYPES.BODY}> {description} </Typography>
       <TextField
         onChange={onChange}
         name={name}
         required={required}
         placeholder={placeholder}
-        variant={VARIANT_TYPES.OUTLINED}
+        variant={VARIANT_TYPES.STANDARD}
         disabled={props.disabled}
       />
     </FormControl>
@@ -34,9 +72,12 @@ export const FIELD_ELEMENT = {
     rows = 3,
     ...props
   }) => (
-    <FormControl fullWidth {...props}>
-      <Typography variant={VARIANT_TYPES.LABEL}>{label}</Typography>
-      <Typography variant={VARIANT_TYPES.BODY}>{description}{required ? "(Required)" : "(Optional)"}</Typography>
+    <FormControl fullWidth {...props} >
+      <Typography fontWeight={600} variant={VARIANT_TYPES.LABEL}>
+        {label}
+        {required ? "*" : ""}
+      </Typography>
+      <Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>
       <TextField
         onChange={onChange}
         name={name}
@@ -44,7 +85,7 @@ export const FIELD_ELEMENT = {
         placeholder={placeholder}
         multiline
         rows={rows}
-        variant={VARIANT_TYPES.OUTLINED}
+        variant={VARIANT_TYPES.STANDARD}
         disabled={props.disabled}
       />
     </FormControl>
@@ -58,15 +99,18 @@ export const FIELD_ELEMENT = {
     ...props
   }) => (
     <FormControl fullWidth {...props}>
-      <Typography variant={VARIANT_TYPES.LABEL}>{label}</Typography>
-      <Typography variant={VARIANT_TYPES.BODY}>{description}{required ? "(Required)" : "(Optional)"}</Typography>
+      <Typography fontWeight={600} variant={VARIANT_TYPES.LABEL}>
+        {label}
+        {required ? "*" : ""}
+      </Typography>
+      <Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>
       <TextField
         {...props}
         type="number"
         name={name}
         required={required}
         onChange={onChange}
-        variant={VARIANT_TYPES.OUTLINED}
+        variant={VARIANT_TYPES.STANDARD}
         disabled={props.disabled}
       />
     </FormControl>
@@ -80,16 +124,23 @@ export const FIELD_ELEMENT = {
     ...props
   }) => (
     <FormControl fullWidth {...props}>
-      <Typography variant={VARIANT_TYPES.LABEL}>{label}</Typography>
-      <Typography variant={VARIANT_TYPES.BODY}>{description}{required ? "(Required)" : "(Optional)"}</Typography>
+      <Typography fontWeight={600} variant={VARIANT_TYPES.LABEL}>
+        {label}
+        {required ? "*" : ""}
+      </Typography>
+      <Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>
       <TextField
         {...props}
         type="datetime-local"
         onChange={onChange}
         required={required}
         value={value}
-        variant={VARIANT_TYPES.OUTLINED}
+        variant={VARIANT_TYPES.STANDARD}
         disabled={props.disabled}
+        style={{
+          paddingLeft: 0,
+          marginTop: 35,
+        }}
       />
     </FormControl>
   ),
@@ -103,9 +154,14 @@ export const FIELD_ELEMENT = {
     required,
     ...props
   }) => (
-    <FormControl fullWidth {...props} variant="outlined" margin="normal">
-      <Typography variant={VARIANT_TYPES.LABEL} gutterBottom>{label}</Typography>
-      <Typography variant={VARIANT_TYPES.BODY} gutterBottom>{description}{required ? "(Required)" : "(Optional)"}</Typography>
+    <FormControl fullWidth {...props} variant={VARIANT_TYPES.STANDARD} margin="normal">
+      <Typography  fontWeight={600} variant={VARIANT_TYPES.LABEL} gutterBottom>
+        {label}
+        {required ? "*" : ""}
+      </Typography>
+      <Typography variant={VARIANT_TYPES.BODY} gutterBottom>
+        {description}
+      </Typography>
       <Select
         labelId="multi-select-label"
         name={name}
@@ -113,11 +169,17 @@ export const FIELD_ELEMENT = {
         value={value}
         onChange={onChange}
         required={required}
-        input={<OutlinedInput label={label} />}
+        // input={<OutlinedInput label={label} />}
         renderValue={(selected) => (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
             {selected.map((value) => (
-              <Chip key={value} label={options.find(option => option.value === value)?.label || value} />
+              <Chip
+                key={value}
+                label={
+                  options.find((option) => option.value === value)?.label ||
+                  value
+                }
+              />
             ))}
           </div>
         )}
@@ -149,9 +211,12 @@ export const FIELD_ELEMENT = {
     required,
     ...props
   }) => (
-    <FormControl fullWidth {...props}>
-      <Typography variant={VARIANT_TYPES.LABEL}>{label}</Typography>
-      <Typography variant={VARIANT_TYPES.BODY}>{description}{required ? "(Required)" : "(Optional)"}</Typography>
+    <FormControl fullWidth {...props} variant={VARIANT_TYPES.STANDARD} margin="normal">
+      <Typography fontWeight={600} variant={VARIANT_TYPES.LABEL}>
+        {label}
+        {required ? "*" : ""}
+      </Typography>
+      <Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>
       <Select
         labelId="single-select-label"
         value={value}
@@ -170,16 +235,15 @@ export const FIELD_ELEMENT = {
   ),
   [FIELD_TYPES.FILE_ATTACHMENT]: ({ label, description, ...props }) => (
     <FormControl fullWidth {...props}>
-      <Typography variant={VARIANT_TYPES.LABEL}>{label}</Typography>
+      <Typography variant={VARIANT_TYPES.LABEL} fontWeight={600}>
+        {label}
+      </Typography>
       <Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>
-      <TextField
+      <FileDropzone
         {...props}
-        type="file"
-        variant={VARIANT_TYPES.OUTLINED}
         disabled={props.disabled}
       />
     </FormControl>
   ),
   [FIELD_TYPES.EMPTY]: () => <></>,
-  
 };

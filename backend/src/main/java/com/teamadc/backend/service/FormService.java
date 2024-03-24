@@ -68,6 +68,22 @@ public class FormService {
         return formRepository.save(form);
     }
 
+    public Form updateField(String formId, String fieldId, Field field) throws InterruptedException, ExecutionException {
+        Form form = formRepository.findById(formId);
+        List<Field> fields = form.getFields();
+        Field fieldToUpdate = fields.stream()
+                                    .filter(f -> f.getId().equals(fieldId))
+                                    .findFirst()
+                                    .orElseThrow(() -> new IllegalStateException("Field not found with id: " + fieldId));
+        fieldToUpdate.setProps(field.getProps());
+        fields.removeIf(f -> f.getId().equals(fieldId));
+        fields.add(fieldToUpdate);
+        
+        fieldRepository.save(fieldToUpdate);
+        form.setFields(fields);
+        return formRepository.save(form);
+    }
+
     public Field updateCoordinate(String formId, String fieldId, Coordinate coordinate) throws InterruptedException, ExecutionException {
         Form form = formRepository.findById(formId);
         List<Field> fields = form.getFields();

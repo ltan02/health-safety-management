@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Container, Typography, Button, Grid, Modal, Box } from "@mui/material";
+import { Container, Typography, Button, Grid, Divider, Box } from "@mui/material";
 import FieldComponentWrapper from "./FieldComponentWrapper";
 import {
   DndContext,
@@ -14,19 +14,23 @@ import {
   rectSortingStrategy,
 } from "@dnd-kit/sortable";
 import DeleteFieldModal from "./DeleteFieldModal";
+import EditFieldModal from "./EditFieldModal";
 
 function EditFieldForm({
   updateFieldCoordinate,
   fields,
   sortedRows,
   deleteField,
+  updateField,
   handleClose,
 }) {
   const [fieldsData, setFieldsData] = useState([]);
   const [activeId, setActiveId] = useState(null);
   const [isEdited, setIsEdited] = useState(false);
+  const [editingField, setEditingField] = useState(null);
   const [activeField, setActiveField] = useState(null);
   const [open, setOpen] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
   const sensors = useSensors(useSensor(PointerSensor));
 
   useEffect(() => {
@@ -45,10 +49,10 @@ function EditFieldForm({
 
       let newFormData = [...fieldsData];
 
-      if (newIndex === -1) { // if empty space
-        const newField = sortedRows().find(row => 
-          row.fields.find(field => field.id === over.id)
-        ).fields.find(field => field.id === over.id);
+      if (newIndex === -1) {
+        const newField = sortedRows()
+          .find((row) => row.fields.find((field) => field.id === over.id))
+          .fields.find((field) => field.id === over.id);
         newFormData[oldIndex].coordinate = newField.coordinate;
       } else {
         [newFormData[oldIndex].coordinate, newFormData[newIndex].coordinate] = [
@@ -81,10 +85,32 @@ function EditFieldForm({
     setActiveField(fieldData);
   };
 
+  const handleOpenEdit = (fieldData) => {
+
+    if (fieldData) {
+      setEditingField(fieldData);
+      setOpenEdit(true);
+    }
+  };
+
+  const handleEditField = (fieldData) => {
+    const newFieldData = { ...fieldData };
+    const newEditingField = { ...editingField };
+    Object.keys(fieldData).map((key) => {
+      if (!fieldData[key]) {
+        newFieldData[key] = newEditingField.props[key];
+      }
+    });
+
+    newEditingField.props = newFieldData;
+
+    updateField(newEditingField);
+  };
+
   return (
     <Container style={{ height: "80vh", width: "80vh", overflow: "auto" }}>
-       {isEdited && (
-        <Container sx={{ position: "fixed", top: 10, right:10 }}>
+      {isEdited && (
+        <Container sx={{ position: "fixed", top: 10, right: 10 }}>
           <Box sx={{ display: "flex", justifyContent: "end" }}>
             <Button onClick={handleClose} variant="contained" color="secondary">
               Cancel
@@ -99,9 +125,10 @@ function EditFieldForm({
           </Box>
         </Container>
       )}
-      <Typography variant="h6" align="center" sx={{ my: 5 }}>
+      <Typography variant="h4" align="left" fontWeight={500} sx={{ marginTop: 5 }}>
         Incident Report Form
       </Typography>
+      <Divider sx={{ my: 2 }} color="primary" />
       <form onSubmit={(e) => e.preventDefault()}>
         <DndContext
           sensors={sensors}
@@ -116,12 +143,13 @@ function EditFieldForm({
           >
             <Grid container spacing={2} alignItems="top">
               {sortedRows().map((row, rowIndex) => (
-                <Grid container spacing={2} key={rowIndex} alignItems="center">
+                <Grid container key={rowIndex} alignItems="center">
                   {row.fields.map((fieldData) => (
-                    <Grid item xs={12} sm={6} key={fieldData.id}>
+                    <Grid item md={12} key={fieldData.id} sx={{ my: 2}}>
                       <FieldComponentWrapper
                         fieldData={fieldData}
                         onDelete={() => handleOpenDeleteModal(fieldData)}
+                        onEdit={handleOpenEdit}
                       />
                     </Grid>
                   ))}
@@ -130,25 +158,20 @@ function EditFieldForm({
             </Grid>
           </SortableContext>
         </DndContext>
-        <Grid container spacing={2} alignItems="top">
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            sx={{ mt: 3, display: "block", ml: "auto", mr: "auto" }}
-          >
-            Submit
-          </Button>
-          <Button
-            variant="contained"
-            color="secondary"
-            sx={{ mt: 3, display: "block", ml: "auto", mr: "auto" }}
-          >
-            Cancel
-          </Button>
-        </Grid>
       </form>
-      <DeleteFieldModal open={open} setOpen={setOpen} onHandleDelete={onHandleDelete} />
+      <DeleteFieldModal
+        open={open}
+        setOpen={setOpen}
+        onHandleDelete={onHandleDelete}
+      />
+      {editingField && (
+        <EditFieldModal
+          open={openEdit}
+          setOpen={setOpenEdit}
+          onHandleEdit={handleEditField}
+          fieldData={editingField}
+        />
+      )}
     </Container>
   );
 }

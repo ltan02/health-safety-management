@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, IconButton, Chip } from "@mui/material";
+import { Container, IconButton, Chip, Tooltip } from "@mui/material";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -28,6 +28,8 @@ const FieldComponentWrapper = ({ fieldData, onEdit, onDelete }) => {
     position: "relative",
     cursor: "grab",
   };
+
+  const isDisabled = fieldData.name === "Employees Involved";
 
   return (
     <Container
@@ -58,24 +60,28 @@ const FieldComponentWrapper = ({ fieldData, onEdit, onDelete }) => {
               flexDirection: "column",
             }}
           >
-            <IconButton
-              size="small"
-              style={{ margin: "2px" }}
-              {...listeners}
-              {...attributes}
-            >
-              <DragIndicatorIcon />
-            </IconButton>
-            {/* <IconButton size="small" style={{ margin: '2px' }} onClick={() => onEdit(fieldData)}>
-          <EditIcon />
-        </IconButton> */}
-            <IconButton
-              size="small"
-              style={{ margin: "2px" }}
-              onClick={() => onDelete(fieldData)}
-            >
-              <DeleteIcon />
-            </IconButton>
+            <Tooltip title="Drag" arrow disabled={isDragging}>
+              <span>
+                <IconButton
+                  size="small"
+                  {...listeners}
+                  {...attributes}
+                  style={{ margin: "2px" }}
+                >
+                  <DragIndicatorIcon />
+                </IconButton>
+              </span>
+            </Tooltip>
+            <Tooltip title="Edit" arrow>
+              <IconButton size="small" onClick={() => onEdit(fieldData)}>
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Delete" arrow>
+              <IconButton size="small" onClick={() => onDelete(fieldData)}>
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
           </div>
         </>
       )}

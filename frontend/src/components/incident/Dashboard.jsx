@@ -19,11 +19,14 @@ import { isPrivileged } from "../../utils/permissions";
 import useAxios from "../../hooks/useAxios";
 import { useBoard } from "../../context/BoardContext";
 import IncidentDetailModal from "./IncidentDetailModal";
+import useForm from "../../hooks/useForm";
 
 
 function Dashboard() {
   const { tasks, filterTasks, setTasks, fetchTasks } =
     useTasks();
+    
+  const {forms, fetchForms, groupedByRows, sortedRows} = useForm();
   const { activeId, handleDragStart, handleDragOver, handleDragEnd } =
     useDragBehavior(tasks, setTasks);
   const { user } = useAuthContext();
@@ -31,6 +34,7 @@ function Dashboard() {
   const { adminColumns, employeeColumns, statuses } = useBoard();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
+  const [fields, setFields] = useState({});
 
 
   const [employees, setEmployees] = useState([]);
@@ -48,16 +52,16 @@ function Dashboard() {
 
   const handleAddTask = async (task) => {
     const directMapping = {
-      timeOfIncident: "incidentDate",
+      time_of_incident: "incidentDate",
       category: "incidentCategory",
-      employeesInvolved: "employeesInvolved",
+      employees_involved: "employeesInvolved",
     };
 
     const incident = {
       reporter: user.id,
-      incidentDate: task.timeOfIncident,
+      incidentDate: task.time_of_incident,
       incidentCategory: task.category,
-      employeesInvolved: task.employeesInvolved,
+      employeesInvolved: task.employees_involved,
       customFields: [],
       statusId: statuses.find((status) => status.name === "Pending Review")?.id,
     };
@@ -73,7 +77,6 @@ function Dashboard() {
         });
       }
     }
-
     await sendRequest({ url: "/incidents", method: "POST", body: incident });
     fetchTasks();
   };
@@ -87,14 +90,23 @@ function Dashboard() {
     setSelectedTask(task);
   }
 
+  const handleSort = () => {
+    return sortedRows(groupedByRows(fields));
+  };
+
   useEffect(() => {
     const fetchEmployees = async () => {
       const res = await sendRequest({ url: "/users" });
       setEmployees(res);
     };
-
+    fetchForms();
     fetchEmployees();
   }, []);
+
+  useEffect(() => {
+    // TODO: remove this when the form is selected from the form list
+    setFields(forms["GZ4tf8bErd3rZ9YizFOu"]?.fields);
+  }, [forms]);
 
   return (
     <Container maxWidth="false" disableGutters>
@@ -139,6 +151,8 @@ function Dashboard() {
                 handleAddTask={handleAddTask}
                 employees={employees}
                 onRefresh={refreshDashboard}
+                field={fields}
+                sortedRows={handleSort}
               />
             </Box>
           ))}
