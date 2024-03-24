@@ -49,10 +49,10 @@ function EditFieldForm({
 
       let newFormData = [...fieldsData];
 
-      if (newIndex === -1) { // if empty space
-        const newField = sortedRows().find(row => 
-          row.fields.find(field => field.id === over.id)
-        ).fields.find(field => field.id === over.id);
+      if (newIndex === -1) {
+        const newField = sortedRows()
+          .find((row) => row.fields.find((field) => field.id === over.id))
+          .fields.find((field) => field.id === over.id);
         newFormData[oldIndex].coordinate = newField.coordinate;
       } else {
         [newFormData[oldIndex].coordinate, newFormData[newIndex].coordinate] = [
@@ -89,9 +89,9 @@ function EditFieldForm({
     if (fieldData) {
       setEditingField(fieldData);
       setOpenEdit(true);
-    } 
-  }
-  
+    }
+  };
+
   const handleEditField = (fieldData) => {
     const newFieldData = { ...fieldData };
     const newEditingField = { ...editingField };
@@ -104,12 +104,12 @@ function EditFieldForm({
     newEditingField.props = newFieldData;
 
     updateField(newEditingField);
-  }
+  };
 
   return (
     <Container style={{ height: "80vh", width: "80vh", overflow: "auto" }}>
-       {isEdited && (
-        <Container sx={{ position: "fixed", top: 10, right:10 }}>
+      {isEdited && (
+        <Container sx={{ position: "fixed", top: 10, right: 10 }}>
           <Box sx={{ display: "flex", justifyContent: "end" }}>
             <Button onClick={handleClose} variant="contained" color="secondary">
               Cancel
@@ -139,9 +139,9 @@ function EditFieldForm({
             items={fieldsData.map((item) => item.id)}
             strategy={rectSortingStrategy}
           >
-            <Grid container spacing={2} alignItems="top">
+            <Grid container spacing={2} alignItems="center">
               {sortedRows().map((row, rowIndex) => (
-                <Grid container spacing={2} key={rowIndex} alignItems="center">
+                <Grid container key={rowIndex} alignItems="center">
                   {row.fields.map((fieldData) => (
                     <Grid item xs={12} sm={6} key={fieldData.id}>
                       <FieldComponentWrapper
@@ -157,11 +157,19 @@ function EditFieldForm({
           </SortableContext>
         </DndContext>
       </form>
-      <DeleteFieldModal open={open} setOpen={setOpen} onHandleDelete={onHandleDelete} />
-      {
-        editingField && <EditFieldModal open={openEdit} setOpen={setOpenEdit} onHandleEdit={handleEditField} fieldData={editingField} />
-      }
-      
+      <DeleteFieldModal
+        open={open}
+        setOpen={setOpen}
+        onHandleDelete={onHandleDelete}
+      />
+      {editingField && (
+        <EditFieldModal
+          open={openEdit}
+          setOpen={setOpenEdit}
+          onHandleEdit={handleEditField}
+          fieldData={editingField}
+        />
+      )}
     </Container>
   );
 }

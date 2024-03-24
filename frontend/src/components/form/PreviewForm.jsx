@@ -73,7 +73,7 @@ function PreviewForm({ fields, sortedRows, handleSubmit, onClose }) {
   return (
     <Container style={{ height: "80vh", width: "80vh", overflow: "auto" }}>
       <Typography variant="h6" align="center" sx={{ my: 5 }}>
-        {fields.name}
+        Incident Report Form
       </Typography>
       <form onSubmit={pushSubmitButton}>
         <Grid container spacing={2} alignItems="top">
@@ -95,7 +95,7 @@ function PreviewForm({ fields, sortedRows, handleSubmit, onClose }) {
                           : fieldsData[fieldData.props.name] ?? ""
                       }
                       onChange={(e) => handleChange(e, fieldData)}
-                      style={{ padding: "10px 0px" }}
+                      style={{ padding: "10px 10px" }}
                     />
                   </Grid>
                 );
