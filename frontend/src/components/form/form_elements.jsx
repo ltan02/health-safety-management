@@ -13,7 +13,7 @@ export const FIELD_ELEMENT = {
   }) => (
     <FormControl fullWidth {...props}>
       <Typography variant={VARIANT_TYPES.LABEL}>{label}{required ? "*": ""}</Typography>
-      <Typography variant={VARIANT_TYPES.BODY}> {description} {required ? "(Required)" : "(Optional)"}</Typography>
+      <Typography variant={VARIANT_TYPES.BODY}> {description} </Typography>
       <TextField
         onChange={onChange}
         name={name}
@@ -36,7 +36,7 @@ export const FIELD_ELEMENT = {
   }) => (
     <FormControl fullWidth {...props}>
       <Typography variant={VARIANT_TYPES.LABEL}>{label}{required ? "*": ""}</Typography>
-      <Typography variant={VARIANT_TYPES.BODY}>{description}{required ? "(Required)" : "(Optional)"}</Typography>
+      <Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>
       <TextField
         onChange={onChange}
         name={name}
@@ -59,7 +59,7 @@ export const FIELD_ELEMENT = {
   }) => (
     <FormControl fullWidth {...props}>
       <Typography variant={VARIANT_TYPES.LABEL}>{label}{required ? "*": ""}</Typography>
-      <Typography variant={VARIANT_TYPES.BODY}>{description}{required ? "(Required)" : "(Optional)"}</Typography>
+      <Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>
       <TextField
         {...props}
         type="number"
@@ -81,7 +81,7 @@ export const FIELD_ELEMENT = {
   }) => (
     <FormControl fullWidth {...props}>
       <Typography variant={VARIANT_TYPES.LABEL}>{label}{required ? "*": ""}</Typography>
-      <Typography variant={VARIANT_TYPES.BODY}>{description}{required ? "(Required)" : "(Optional)"}</Typography>
+      <Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>
       <TextField
         {...props}
         type="datetime-local"
@@ -105,7 +105,7 @@ export const FIELD_ELEMENT = {
   }) => (
     <FormControl fullWidth {...props} variant="outlined" margin="normal">
       <Typography variant={VARIANT_TYPES.LABEL} gutterBottom>{label}{required ? "*": ""}</Typography>
-      <Typography variant={VARIANT_TYPES.BODY} gutterBottom>{description}{required ? "(Required)" : "(Optional)"}</Typography>
+      <Typography variant={VARIANT_TYPES.BODY} gutterBottom>{description}</Typography>
       <Select
         labelId="multi-select-label"
         name={name}
@@ -151,7 +151,7 @@ export const FIELD_ELEMENT = {
   }) => (
     <FormControl fullWidth {...props}>
       <Typography variant={VARIANT_TYPES.LABEL}>{label}{required ? "*": ""}</Typography>
-      <Typography variant={VARIANT_TYPES.BODY}>{description}{required ? "(Required)" : "(Optional)"}</Typography>
+      <Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>
       <Select
         labelId="single-select-label"
         value={value}
