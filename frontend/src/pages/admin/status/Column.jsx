@@ -89,7 +89,7 @@ function Column({ id, title, tasks, handleRenameColumn, isOverlayActive, handleD
                             <EditIcon />
                         </IconButton>
                     )}
-                    <Chip label={tasks.length} size="small" />
+                    <Chip label={tasks.length} size="small" sx={{bgcolor:"#EB8C00", color: "white"}}/>
                 </Box>
             </Box>
             {tasks && tasks.length > 0 && (

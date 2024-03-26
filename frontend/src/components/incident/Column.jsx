@@ -36,7 +36,7 @@ function Column({ id, title, tasks, handleAddTask, employees, onRefresh, field, 
                 }}
             >
                 <Typography variant="h6" fontWeight={600} sx={{ flexGrow: 1 }}>
-                    {title} <Chip label={tasks.length} size="small" />
+                    {title} <Chip label={tasks.length} size="small" sx={{bgcolor:"#EB8C00", color: "white"}}/>
                 </Typography>
                 <IconButton onClick={toggleModal} color="primary">
                     <AddIcon />
