@@ -34,6 +34,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 class IncidentModel(BaseModel):
     incident: str
 
@@ -71,18 +72,25 @@ texts = []
 for doc in docs:
     texts.append(str(doc.to_dict()))
 
-prompt = "You are a querying bot for PwC that answers user questions based on the following incidents - " + str(
-        texts) \
-             + ". Once read, reply with  - 'Data loaded'. Answer only incidents-related questions, for other " \
-               "questions, say - 'Query not related to incidents, try again.'"
 
-del texts
+print(len(texts))
+
+prompt = "You are a querying bot for PwC that answers user questions based on incident data. The data is as following" + str(texts) + " Once the data is loaded, reply with - 'Data Loaded'. Answer only incidents-related questions, for other questions, say - 'Query not related to incidents, try again.'"
 
 t = []
 r = chat_session.send_message(prompt, stream=True)
-for c in r:
-    t.append(c.text)
+
+for chunk in r:
+    t.append(chunk.text)
 print("".join(t))
+#
+# for i in range(0, len(texts), 10):
+#     t = []
+#     r = chat_session.send_message("incidents - " + str(texts[i:10]), stream=True)
+#     for chunk in r:
+#         t.append(chunk.text)
+#     print("".join(t))
+
 
 
 @app.post("/chat/")
@@ -95,6 +103,7 @@ async def get_chat_response(chat_prompt: ChatPrompt) -> dict:
         return {"response": "".join(text_response)}
     except Exception as e:
         return {"response": "Please try again with a different query."}
+
 
 
 if __name__ == "__main__":
