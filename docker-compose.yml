@@ -1,6 +1,18 @@
 version: '3.8'
 
 services:
+  ai:
+    build:
+      context: ./ai
+      dockerfile: Dockerfile
+    ports:
+      - '8000:8000'
+    volumes:
+      - $HOME/.config/gcloud/application_default_credentials.json:/gcp/creds.json:ro
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/gcp/creds.json
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
   backend:
     build:
       context: ./backend
