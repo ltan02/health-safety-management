@@ -18,6 +18,6 @@ COPY --from=builder /opt/app/.venv /opt/app/.venv
 
 ENV PATH="/opt/app/.venv/bin:$PATH"
 
-EXPOSE 8080
+EXPOSE 8000
 
 ENTRYPOINT ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
