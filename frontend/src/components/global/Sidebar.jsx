@@ -40,35 +40,12 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
   }, [location]);
 
   const renderList = (items) => (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: "2rem",
-      }}
-    >
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "2rem",
-        }}
-      >
-        <AccountCircleIcon
-          style={{
-            fontSize: 84,
-            padding: "0px",
-          }}
-        />
-        <Typography variant="h6">{user?.email ?? "Anonymous User"}</Typography>
-      </Box>
+    <Box>
       <List
         sx={{
           display: "flex",
           flexDirection: "column",
-          // gap: "2rem",
+          alignContent: "center",
           width: drawerWidth,
         }}
       >
@@ -80,12 +57,15 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
   );
 
   return (
-    <Box>
+    <Box >
       <Box sx={{ display: "flex", flexDirection: "column" }}>
-      <Button onClick={toggleDrawer(!isOpen)} sx={{ position: "absolute", top: "50%" }}>
-        {isOpen ? <ArrowBackIosIcon /> : <ArrowForwardIosIcon />}
-      </Button>
-        </Box>
+        <Button
+          onClick={toggleDrawer(!isOpen)}
+          sx={{ position: "absolute", top: "50%" }}
+        >
+          {isOpen ? <ArrowBackIosIcon /> : <ArrowForwardIosIcon />}
+        </Button>
+      </Box>
       <SwipeableDrawer
         ModalProps={{ keepMounted: true }}
         anchor="left"
@@ -111,20 +91,9 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
         >
           {isOpen ? <ArrowBackIosIcon /> : <ArrowForwardIosIcon />}
         </IconButton>
-        <Box
-          role="presentation"
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "2rem",
-            padding: "2rem",
-          }}
-        >
-          {isPrivileged(user.role)
+        {isPrivileged(user.role)
             ? renderList(PRIVILEGED_SIDEBAR_CONTENTS[pageType])
             : renderList(EMPLOYEE_SIDEBAR_CONTENTS[pageType])}
-        </Box>
       </SwipeableDrawer>
     </Box>
   );

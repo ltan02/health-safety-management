@@ -40,7 +40,7 @@ function Header() {
     };
 
     return (
-        <AppBar position="static" color="primary"  elevation={0}>
+        <AppBar color="primary"  elevation={0}>
             <Toolbar
                 sx={{
                     display: "flex",
