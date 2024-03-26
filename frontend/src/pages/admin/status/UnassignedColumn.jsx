@@ -53,7 +53,7 @@ function Column({ id, title, tasks, activeId, isOverlayActive }) {
                     <Typography variant="body1" fontWeight={600}>
                         {title}
                     </Typography>
-                    <Chip label={tasks.length} size="small" />
+                    <Chip label={tasks.length} size="small" sx={{bgcolor:"#EB8C00", color: "white"}}/>
                 </Box>
             </Box>
             {tasks && tasks.length > 0 ? (

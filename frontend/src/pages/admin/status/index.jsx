@@ -33,7 +33,7 @@ function AdminStatus() {
                         marginTop: "20px",
                     }}
                 >
-                    <div>
+                    <div style= {{ paddingLeft: "3rem", marginTop: "0.8em"}}>
                         <h2>Columns and statuses</h2>
                     </div>
                     <div>
@@ -43,16 +43,18 @@ function AdminStatus() {
                             onChange={handleView}
                             aria-label="column and statuses view"
                         >
-                            <ToggleButton value="ADMIN" aria-label="admin view">
+                            <ToggleButton value="ADMIN" aria-label="admin view"
+                                          sx = {{'&.Mui-selected, &.Mui-selected:hover': {backgroundColor: '#FFB600'}}}>
                                 Admin view
                             </ToggleButton>
-                            <ToggleButton value="EMPLOYEE" aria-label="employee view">
+                            <ToggleButton value="EMPLOYEE" aria-label="employee view"
+                                          sx = {{'&.Mui-selected, &.Mui-selected:hover': {backgroundColor: '#FFB600'}}}>
                                 Employee view
                             </ToggleButton>
                         </ToggleButtonGroup>
                     </div>
                 </div>
-                <div>
+                <div style= {{ paddingLeft: "3rem", paddingRight: "1.8rem"}}>
                     <p style={{ fontSize: "15px" }}>
                         Use columns and statuses to define how incident reports progress on boards for admins and
                         employees. Store statuses in the left panel to hide their associated reports from the board.

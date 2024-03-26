@@ -13,6 +13,7 @@ function IncidentReport() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { statuses } = useBoard();
 
+
     const styles = {
         styleHeader: {
             backgroundColor: 'red'

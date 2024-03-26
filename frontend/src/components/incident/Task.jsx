@@ -88,17 +88,19 @@ function Task({ id, task, onRefresh }) {
                   <Grid item>
                     <Typography
                       variant="caption"
-                      color="text.secondary"
-                      fontWeight={500}
+                      color="secondary.dark"
+                      fontWeight={700}
                       sx={{ mt: 2 }}
                     >
                       {new Date(task.incidentDate).toLocaleDateString()}
                     </Typography>
                   </Grid>
                   <Grid item>
+                    <Box sx = {{p: 1, backgroundColor: "#DB536A", color: "white", borderRadius: 3}}>
                     <Typography variant="p" color="primary.text" sx={{ mb: 2 }}>
                       {task.incidentCategory}
                     </Typography>
+                    </Box>
                   </Grid>
                 </Grid>
               </Grid>
@@ -108,8 +110,8 @@ function Task({ id, task, onRefresh }) {
                   <Grid container item spacing={1} alignItems="center">
                     <Typography
                       variant="caption"
-                      color="text.secondary"
-                      fontWeight={500}
+                      color="secondary.dark"
+                      fontWeight={600}
                       sx={{
                         display: "flex",
                         alignItems: "center",
@@ -126,8 +128,8 @@ function Task({ id, task, onRefresh }) {
                   <Grid container item spacing={1} alignItems="center">
                     <Typography
                       variant="caption"
-                      color="text.secondary"
-                      fontWeight={500}
+                      color="secondary.dark"
+                      fontWeight={600}
                       p={1.3}
                     >
                       Reviewer:
