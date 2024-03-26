@@ -13,14 +13,11 @@ import { useAuthContext } from "../../context/AuthContext";
 import { isPrivileged } from "../../utils/permissions";
 import pwcLogo from "../../assets/pwcLogo.svg";
 import Profile from "../users/Profile";
-import Sidebar from "./Sidebar";
 
 function Header() {
     const { user, signOut } = useAuthContext();
     const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState(null);
-    const drawerWidth = 240;
-    const [sidebarOpen, setSidebarOpen] = useState(false);
 
     const handleProfileClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -43,16 +40,16 @@ function Header() {
     };
 
     return (
-        <AppBar position="static" color="primary">
+        <AppBar position="static" color="primary"  elevation={0}>
             <Toolbar
                 sx={{
                     display: "flex",
                     flexDirection: "row",
                     justifyContent: "space-between",
                     backgroundColor: "white",
+                    borderBottom: "1px solid #E0E0E0",
                 }}
             >
-                <Sidebar drawerWidth={drawerWidth} isOpen={sidebarOpen} handleSidebarToggle={setSidebarOpen} />
                 <img src={pwcLogo} alt="logo" style={{ height: "3rem", width: "auto", paddingLeft: "15px" }}></img>
                 <Box
                     sx={{
@@ -63,17 +60,6 @@ function Header() {
                         flexGrow: 1,
                     }}
                 >
-                    {/* <Typography
-                            variant="h6"
-                            component="div"
-                            sx={{
-                                // TODO: comment  this if we don't want to push the header to the right when the sidebar is open
-                                marginLeft: sidebarOpen ? `${drawerWidth}px` : "0",
-                                transition: "margin 300ms ease-out",
-                            }}
-                        >
-                            AppName
-                        </Typography> */}
                     {isPrivileged(user.role) && (
                         <Container
                             sx={{
