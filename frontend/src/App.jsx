@@ -58,6 +58,8 @@ function App() {
   const { isUserLoggedIn, user } = useAuthContext();
   const drawerWidth = 240;
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  console.log(user);
+  console.log(isUserLoggedIn())
 
   const getRoutesForRole = () => {
     const routes = !isUserLoggedIn() ? (
@@ -113,12 +115,12 @@ function App() {
             {isUserLoggedIn() && <Header />}
           </Box>
           <Box>
-            <Sidebar
+            {isUserLoggedIn() && <Sidebar
               drawerWidth={drawerWidth}
               isOpen={sidebarOpen}
               handleSidebarToggle={setSidebarOpen}
-            />
-            <Box component="main" sx={{ flexGrow: 1, paddingLeft: sidebarOpen ? drawerWidth + "px" : 0 }} style={{
+            />}
+            <Box component="main" sx={{ flexGrow: 1, paddingLeft: sidebarOpen ? isUserLoggedIn() ? drawerWidth + "px": 0 : 0 }} style={{
                 transition: "padding-left 0.3s ease",
                 overflow: "auto",
                 marginTop: "4rem",
