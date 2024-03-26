@@ -61,7 +61,7 @@ function IncidentSearchInput({ onSearch, handleOpenModal }) {
                                 }}
                             >
                                 <Typography noWrap>
-                                    {task.incidentCategory} on {task.incidentDate}
+                                    {task.incidentCategory} on {task.incidentDate} - {task.customFields.description}
                                 </Typography>
                             </MenuItem>
                         ))}
