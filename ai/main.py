@@ -12,19 +12,21 @@ import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
 
 
-# load_dotenv()
-# google_credentials_json = json.loads(os.getenv("GOOGLE_CREDENTIALS_JSON"))
-# credentials = service_account.Credentials.from_service_account_info(google_credentials_json)
+load_dotenv()
+google_credentials_json = os.getenv("GOOGLE_CREDENTIALS_JSON")
+if google_credentials_json:
+    parsed_credentials = json.loads(google_credentials_json)
+    credentials = service_account.Credentials.from_service_account_info(parsed_credentials)
+    db = firestore.Client(credentials=credentials)
+    aiplatform.init(project="pwc-project-b3778", location="us-west1", credentials=credentials)
+else:
+    db = firestore.Client()
+    aiplatform.init(project="pwc-project-b3778", location="us-west1")
 
-
-# db = firestore.Client(credentials=credentials)
-db = firestore.Client()
 doc_ref = db.collection('categories').document('categories')
 doc = doc_ref.get()
 categories = doc.to_dict().get('words', [])
 
-# aiplatform.init(project="pwc-project-b3778", location="us-central1", credentials=credentials)
-aiplatform.init(project="pwc-project-b3778", location="us-central1")
 model = TextGenerationModel.from_pretrained("text-bison@001")
 app = FastAPI()
 
@@ -105,8 +107,3 @@ async def get_chat_response(chat_prompt: ChatPrompt) -> dict:
         return {"response": "".join(text_response)}
     except Exception as e:
         return {"response": "Please try again with a different query."}
-
-
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)

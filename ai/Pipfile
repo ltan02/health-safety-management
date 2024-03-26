@@ -13,6 +13,7 @@ vertexai = "*"
 python-dotenv = "*"
 firebase-admin = "*"
 uvicorn = "*"
+typing-extensions = "*"
 
 [dev-packages]
 
