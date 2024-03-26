@@ -108,11 +108,11 @@ function App() {
   return (
     <BrowserRouter>
       <ThemeProvider theme={theme}>
-        <Box display="flex" flexDirection="column">
+        <Box>
           <Box display="flex">
             {isUserLoggedIn() && <Header />}
           </Box>
-          <Box display="flex">
+          <Box>
             <Sidebar
               drawerWidth={drawerWidth}
               isOpen={sidebarOpen}
@@ -120,6 +120,8 @@ function App() {
             />
             <Box component="main" sx={{ flexGrow: 1, paddingLeft: sidebarOpen ? drawerWidth + "px" : 0 }} style={{
                 transition: "padding-left 0.3s ease",
+                overflow: "auto",
+                marginTop: "4rem",
             }}>
               {getRoutesForRole()}
             </Box>
