@@ -18,10 +18,10 @@ if google_credentials_json:
     parsed_credentials = json.loads(google_credentials_json)
     credentials = service_account.Credentials.from_service_account_info(parsed_credentials)
     db = firestore.Client(credentials=credentials)
-    aiplatform.init(project="pwc-project-b3778", location="us-west1", credentials=credentials)
+    aiplatform.init(project="pwc-project-b3778", location="us-central1", credentials=credentials)
 else:
     db = firestore.Client()
-    aiplatform.init(project="pwc-project-b3778", location="us-west1")
+    aiplatform.init(project="pwc-project-b3778", location="us-central1")
 
 doc_ref = db.collection('categories').document('categories')
 doc = doc_ref.get()
