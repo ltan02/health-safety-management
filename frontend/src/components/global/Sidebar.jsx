@@ -4,9 +4,6 @@ import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 import List from "@mui/material/List";
 import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
-
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import Typography from "@mui/material/Typography";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import {
@@ -40,24 +37,22 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
   }, [location]);
 
   const renderList = (items) => (
-    <Box>
-      <List
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignContent: "center",
-          width: drawerWidth,
-        }}
-      >
-        {Object.keys(items).map((id) => (
-          <div key={id}>{items[id]}</div>
-        ))}
-      </List>
-    </Box>
+    <List
+      container
+      direction="column"
+      justifyContent={"center"}
+      alignContent={"center"}
+    >
+      {Object.keys(items).map((id) => (
+        <div key={id} style={{ p:0}}>
+          {items[id]}
+        </div>
+      ))}
+    </List>
   );
 
   return (
-    <Box >
+    <Box>
       <Box sx={{ display: "flex", flexDirection: "column" }}>
         <Button
           onClick={toggleDrawer(!isOpen)}
@@ -91,9 +86,17 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
         >
           {isOpen ? <ArrowBackIosIcon /> : <ArrowForwardIosIcon />}
         </IconButton>
-        {isPrivileged(user.role)
+        <Box sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignContent: "center",
+          height: "60%",
+        }}>
+          {isPrivileged(user.role)
             ? renderList(PRIVILEGED_SIDEBAR_CONTENTS[pageType])
             : renderList(EMPLOYEE_SIDEBAR_CONTENTS[pageType])}
+        </Box>
       </SwipeableDrawer>
     </Box>
   );

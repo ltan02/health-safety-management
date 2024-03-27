@@ -58,9 +58,6 @@ function App() {
   const { isUserLoggedIn, user } = useAuthContext();
   const drawerWidth = 240;
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  console.log(user);
-  console.log(isUserLoggedIn())
-
   const getRoutesForRole = () => {
     const routes = !isUserLoggedIn() ? (
       <Routes>
@@ -84,12 +81,11 @@ function App() {
                   <Route path="incidents" element={<IncidentReport />} />
                 </Route>
                 <Route path="report">
-                  <Route index element={<ReportOverview />} />
+                  <Route index element={<ReportDashboard />} />
                   <Route path="bar" element={<BarReport />} />
                   <Route path="scatter" element={<ScatterReport />} />
                   <Route path="line" element={<LineReport />} />
                   <Route path="pie" element={<PieReport />} />
-                  <Route path="dashboard" element={<ReportDashboard />} />
                 </Route>
               </>
             ) : (
