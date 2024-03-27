@@ -14,7 +14,6 @@ import { useState } from "react";
 const Incident = lazy(() => import("./pages/incident"));
 const Login = lazy(() => import("./pages/login"));
 const AdminWorkflow = lazy(() => import("./pages/admin/workflows/index.jsx"));
-const AdminManagement = lazy(() => import("./pages/admin/management/index.jsx"));
 const AdminStatus = lazy(() => import("./pages/admin/status/index.jsx"));
 const AdminForm = lazy(() => import("./pages/admin/form/index.jsx"));
 const ReportDashboard = lazy(() => import("./pages/report/dashboard/index.jsx"));
@@ -54,7 +53,7 @@ function App() {
     const drawerWidth = 240;
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const getRoutesForRole = () => {
-        const routes = !isUserLoggedIn() ? (
+        const routes = !isUserLoggedIn() && user.role ? (
             <Routes>
                 <Route path="/" element={<Login />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
@@ -67,7 +66,6 @@ function App() {
                             <>
                                 <Route path="admin">
                                     <Route path="workflow" element={<AdminWorkflow />} />
-                                    <Route path="management" element={<AdminManagement />} />
                                     <Route path="form" element={<AdminForm />} />
                                     <Route path="status" element={<AdminStatus />} />
                                 </Route>

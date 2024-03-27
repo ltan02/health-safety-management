@@ -17,7 +17,6 @@ export const PRIVILEGED_SIDEBAR_CONTENTS = {
         ["Workflows"]: <RedirectButton to="/admin/workflow">Workflows</RedirectButton>,
         ["Form Customization"]: <RedirectButton to="/admin/form">Form Customization</RedirectButton>,
         ["Columns and Statuses"]: <RedirectButton to="/admin/status">Columns and Statuses</RedirectButton>,
-        ["Workflow Management"]: <RedirectButton to="/admin/management">Workflow Management</RedirectButton>,
     },
     [PAGE_TYPE.INCIDENT]: {
         ["Incident Board"]: <RedirectButton to="/">Incident Board</RedirectButton>,
