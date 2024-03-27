@@ -15,6 +15,8 @@ import { useLocation } from "react-router-dom";
 import { useState } from "react";
 import { useAuthContext } from "../../context/AuthContext";
 import { isPrivileged } from "../../utils/permissions.js";
+import { Typography } from "@mui/material";
+import ViewWeekOutlinedIcon from '@mui/icons-material/ViewWeekOutlined';
 
 function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
   const toggleDrawer = (open) => () => handleSidebarToggle(open);
@@ -44,8 +46,9 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
       alignContent={"center"}
     >
       {Object.keys(items).map((id) => (
-        <div key={id} style={{ p:0}}>
-          {items[id]}
+        <div key={id} style={{ display: "flex", paddingLeft: 2, paddingRight: 2, backgroundColor: "#d5d5d5" }}>
+          <ViewWeekOutlinedIcon />
+          <Typography variant="body2">{items[id]}</Typography>
         </div>
       ))}
     </List>

@@ -1,5 +1,3 @@
-import RedirectButton from "../components/sidebar/RedirectButton";
-
 export const Roles = {
     Admin: "ADMIN",
     SafetyWarden: "SAFETY_WARDEN",
@@ -14,27 +12,27 @@ export const PAGE_TYPE = {
 
 export const PRIVILEGED_SIDEBAR_CONTENTS = {
     [PAGE_TYPE.ADMIN]: {
-        ["Workflows"]: <RedirectButton to="/admin/workflow">Workflows</RedirectButton>,
-        ["Form Customization"]: <RedirectButton to="/admin/form">Form Customization</RedirectButton>,
-        ["Columns and Statuses"]: <RedirectButton to="/admin/status">Columns and Statuses</RedirectButton>,
+        ["Workflows"]: "/admin/workflow",
+        ["Form Customization"]: "/admin/form",
+        ["Columns and Statuses"]: "/admin/status",
     },
     [PAGE_TYPE.INCIDENT]: {
-        ["Incident Board"]: <RedirectButton to="/">Incident Board</RedirectButton>,
-        ["Incident Reports"]: <RedirectButton to="/incidents">Incident Reports</RedirectButton>,
+        ["Incident Board"]: "/",
+        ["Incident Reports"]: "/incidents",
     },
     [PAGE_TYPE.REPORT]: {
-        ["Dashboard"]: <RedirectButton to="/report">Dashboard</RedirectButton>,
-        ["Bar Chart"]: <RedirectButton to="/report/bar">Bar Chart</RedirectButton>,
-        ["Line Chart"]: <RedirectButton to="/report/line">Line Chart</RedirectButton>,
-        ["Pie Chart"]: <RedirectButton to="/report/pie">Pie Chart</RedirectButton>,
-        ["Scatter Chart"]: <RedirectButton to="/report/scatter">Scatter Chart</RedirectButton>,
+        ["Dashboard"]: "/report",
+        ["Bar Chart"]: "/report/bar",
+        ["Line Chart"]: "/report/line",
+        ["Pie Chart"]: "/report/pie",
+        ["Scatter Chart"]: "/report/scatter",
     },
 };
 
 export const EMPLOYEE_SIDEBAR_CONTENTS = {
     [PAGE_TYPE.INCIDENT]: {
-        ["Incident Board"]: <RedirectButton to="/">Incident Board</RedirectButton>,
-        ["Incident Reports"]: <RedirectButton to="/incidents">Incident Reports</RedirectButton>,
+        ["Incident Board"]: "/",
+        ["Incident Reports"]: "/incidents",
     },
 };
 
