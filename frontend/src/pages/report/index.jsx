@@ -62,7 +62,6 @@ function ReportOverview() {
 
     const toggleModal = () => setOpenModal(!openModal);
 
-    console.log(dashData)
 
     return (
         <div>

@@ -55,7 +55,6 @@ function ReportModal({ open, onClose, data, setDashData }) {
               return c;
             }
         });
-        console.log(newData)
         setDashData(newData);
     };
 
