@@ -62,12 +62,8 @@ function PreviewForm({ fields, sortedRows, handleSubmit, onClose }) {
   };
 
   const isRequiredFieldFilled = () => {
-    const requiredFields = sortedRows().map((row) =>
-      row.fields.filter((field) => field.props.required)
-    );
-    return requiredFields.every((fields) =>
-      fields.every((field) => fieldsData[field.props.name])
-    );
+    const allRequiredPresent = fields.every(obj => obj.props.required ? obj.props.name in fieldsData : true);
+    return allRequiredPresent;
   };
 
   return (

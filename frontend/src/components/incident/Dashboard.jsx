@@ -51,18 +51,20 @@ function Dashboard() {
     : null;
 
   const handleAddTask = async (task) => {
+
     const directMapping = {
-      time_of_incident: "incidentDate",
+      incidentDate: "incidentDate",
       category: "incidentCategory",
       employees_involved: "employeesInvolved",
     };
 
     const incident = {
       reporter: user.id,
-      incidentDate: task.time_of_incident,
+      incidentDate: task.incidentDate,
       incidentCategory: task.category,
       employeesInvolved: task.employees_involved,
       customFields: [],
+      comments: [],
       statusId: statuses.find((status) => status.name === "Pending Review")?.id,
     };
 
