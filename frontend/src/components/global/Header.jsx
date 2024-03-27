@@ -18,6 +18,7 @@ function Header() {
     const { user, signOut } = useAuthContext();
     const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState(null);
+    const [currentPage, setCurrentPage] = useState("/")
 
     const handleProfileClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -37,6 +38,7 @@ function Header() {
 
     const directTo = (path) => () => {
         navigate(path);
+        setCurrentPage(path);
     };
 
     return (
@@ -77,6 +79,7 @@ function Header() {
                                     "&:hover": { borderBottom: "3px solid" },
                                     padding: "0.9rem",
                                     marginTop: "0.5rem",
+                                    borderBottom: currentPage === "/admin/workflow" ? "3px solid": "0px"
                                 }}
                             >
                                 Admin
@@ -88,6 +91,7 @@ function Header() {
                                     "&:hover": { borderBottom: "3px solid" },
                                     padding: "0.9rem",
                                     marginTop: "0.5rem",
+                                    borderBottom: currentPage === "/" ? "3px solid": "0px"
                                 }}
                             >
                                 Incident
@@ -99,6 +103,7 @@ function Header() {
                                     "&:hover": { borderBottom: "3px solid" },
                                     padding: "0.9rem",
                                     marginTop: "0.5rem",
+                                    borderBottom: currentPage === "/report" ? "3px solid": "0px"
                                 }}
                             >
                                 Report

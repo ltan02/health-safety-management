@@ -1,15 +1,15 @@
 import { useState, Fragment } from "react";
 import {
-  Modal,
-  Box,
-  Typography,
-  Select,
-  MenuItem,
-  IconButton,
-  Grid,
-  Avatar,
-  TextareaAutosize,
-  Menu,
+    Modal,
+    Box,
+    Typography,
+    Select,
+    MenuItem,
+    IconButton,
+    Grid,
+    Avatar,
+    TextareaAutosize,
+    Menu, Button,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import useAxios from "../../hooks/useAxios";
@@ -53,6 +53,7 @@ export default function IncidentDetailModal({
   const [openReviewer, setOpenReviewer] = useState(false);
   const [employees, setEmployees] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
+    const [isStatusModalOpen, setStatusModalOpen] = useState(false);
 
   if (!incident) return <></>;
 
@@ -75,6 +76,7 @@ export default function IncidentDetailModal({
       return newIncident;
     });
     setIncidentState(newStateId);
+    setStatusModalOpen(true);
 
     if (onRefresh) {
       onRefresh();
@@ -120,6 +122,10 @@ export default function IncidentDetailModal({
     setOpenReviewer(false);
   };
 
+    const toggleStatusModal = () => {
+        setStatusModalOpen(!isStatusModalOpen)
+    }
+
   return (
     <Modal
       open={open}
@@ -139,6 +145,41 @@ export default function IncidentDetailModal({
             <CloseIcon />
           </IconButton>
         </Box>
+          <Modal
+              open={isStatusModalOpen}
+              onClose={toggleStatusModal}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description">
+              <Box sx = {{position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  width: 400,
+                  height: 150,
+                  bgcolor: "white",}}>
+                  <Box
+                      sx={{
+                          display: "flex",
+                          width: "100%",
+                          justifyContent: "flex-end",
+                          bgcolor: "#FFB600"
+                      }}
+                  >
+                      <IconButton onClick={toggleStatusModal}>
+                          <CloseIcon />
+                      </IconButton>
+                  </Box>
+                  <Box sx={ {display: "flex",
+                      flexDirection: "column", justifyContent: "center", padding: 2,alignItems: "center"}}>
+                      <Typography variant="body1" align="center">
+                          Status was successfully changed!
+                      </Typography>
+                      <Box sx = {{ display: 'inline-block', mt: 2, alignItems: "center"}}>
+                      <Button variant="contained" onClick={toggleStatusModal} sx={{borderRadius: 10,}}>Close</Button>
+                  </Box>
+                  </Box>
+              </Box>
+          </Modal>
         <Box
           sx={{
             display: "flex",
