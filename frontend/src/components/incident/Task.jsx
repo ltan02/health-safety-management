@@ -96,8 +96,9 @@ function Task({ id, task, onRefresh }) {
                     </Typography>
                   </Grid>
                   <Grid item>
-                    <Box sx = {{p: 1, backgroundColor: "#DB536A", color: "white", borderRadius: 3}}>
-                    <Typography variant="p" color="primary.text" sx={{ mb: 2 }}>
+                    <Box sx = {{ display: 'inline-block', p: 0.5, backgroundColor:"rgba(255, 182, 0, 0.45)",
+                      borderRadius: 2, mt: 0.5, border: "2px solid #FFB600", alignItems: "center" }}>
+                      <Typography variant="p" color="#EB8C00" sx={{ m: 0, fontWeight: 600}}>
                       {task.incidentCategory}
                     </Typography>
                     </Box>
