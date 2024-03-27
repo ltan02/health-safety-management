@@ -1,65 +1,144 @@
 import { useState } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
-import { Container, Typography, Box, Chip, IconButton } from "@mui/material";
+import {
+  Container,
+  Typography,
+  Box,
+  Chip,
+  IconButton,
+  Modal,
+} from "@mui/material";
 import Task from "./Task";
 import AddIcon from "@mui/icons-material/Add";
 import AddTaskModal from "./AddTaskModal";
 import PreviewForm from "../form/PreviewForm";
 
-function Column({ id, title, tasks, handleAddTask, employees, onRefresh, field, sortedRows }) {
-    const { setNodeRef } = useDroppable({ id });
-    const [openModal, setOpenModal] = useState(false);
+const modalStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: "auto",
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  p: 4,
+  borderRadius: 2,
+  overflow: "auto",
+  maxHeight: "90%",
+  display: "flex",
+  flexDirection: "column",
+};
 
-    const toggleModal = () => setOpenModal(!openModal);
+function Column({
+  id,
+  title,
+  tasks,
+  handleAddTask,
+  employees,
+  onRefresh,
+  field,
+  sortedRows,
+  formName,
+}) {
+  const { setNodeRef } = useDroppable({ id });
+  const [openModal, setOpenModal] = useState(false);
 
-    return (
-        <Container
-            ref={setNodeRef}
-            sx={{
-                bgcolor: "grey.200",
-                padding: 2,
-                borderRadius: 1,
-                minHeight: "100%",
-                width: "350px",
-                minWidth: "350px",
-                margin: 2,
-                boxShadow: 2,
-            }}
-        >
-            <Box
-                sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: 2,
-                }}
-            >
-                <Typography variant="h6" fontWeight={600} sx={{ flexGrow: 1 }}>
-                    {title} <Chip label={tasks.length} size="small" sx={{bgcolor:"#EB8C00", color: "white"}}/>
-                </Typography>
-                <IconButton onClick={toggleModal} color="primary">
-                    <AddIcon />
-                </IconButton>
-            </Box>
-            <SortableContext id={id} items={tasks.map((task) => task.id)} strategy={rectSortingStrategy}>
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                    {tasks.map((task) => (
-                        <Task key={task.id} id={task.id} task={task} onRefresh={onRefresh} />
-                    ))}
-                </Box>
-            </SortableContext>
-            <AddTaskModal
-                open={openModal}
-                onClose={toggleModal}
-                columnId={id}
-                handleAddTask={handleAddTask}
-                allEmployees={employees}
-                field={field}
-                sortedRows={sortedRows}
+  const toggleModal = () => setOpenModal(!openModal);
+  const handleSubmit = (field) => {
+    handleAddTask(field);
+    onClose();
+  };
+  const onClose = () => {
+    setOpenModal(false);
+  };
+  return (
+    <Container
+      ref={setNodeRef}
+      sx={{
+        bgcolor: "grey.200",
+        padding: 2,
+        borderRadius: 1,
+        minHeight: "100%",
+        width: "350px",
+        minWidth: "350px",
+        margin: 2,
+        boxShadow: 2,
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 2,
+        }}
+      >
+        <Typography variant="h6" fontWeight={600} sx={{ flexGrow: 1 }}>
+          {title}{" "}
+          <Chip
+            label={tasks.length}
+            size="small"
+            sx={{ bgcolor: "#EB8C00", color: "white" }}
+          />
+        </Typography>
+        <IconButton onClick={toggleModal} color="primary">
+          <AddIcon />
+        </IconButton>
+      </Box>
+      <SortableContext
+        id={id}
+        items={tasks.map((task) => task.id)}
+        strategy={rectSortingStrategy}
+      >
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          {tasks.map((task) => (
+            <Task
+              key={task.id}
+              id={task.id}
+              task={task}
+              onRefresh={onRefresh}
             />
-        </Container>
-    );
+          ))}
+        </Box>
+      </SortableContext>
+      <AddTaskModal
+        open={openModal}
+        onClose={toggleModal}
+        columnId={id}
+        handleAddTask={handleAddTask}
+        allEmployees={employees}
+        field={field}
+        sortedRows={sortedRows}
+      />
+      <Modal
+        open={openModal}
+        onClose={() => {
+          onClose();
+        }}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={modalStyle}>
+          <Typography
+            id="modal-modal-title"
+            variant="h6"
+            component="h2"
+            sx={{ mb: 2 }}
+          >
+            Report New Incident
+          </Typography>
+          <PreviewForm
+            fields={field}
+            sortedRows={sortedRows}
+            handleSubmit={handleSubmit}
+            onClose={onClose}
+            formName={formName}
+          />
+        </Box>
+      </Modal>
+    </Container>
+  );
 }
 
 export default Column;

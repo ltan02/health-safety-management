@@ -165,6 +165,7 @@ function AdminForm() {
         getLastCoordinate={() => getLastCoordinate(fields)}
         deleteField={handleDeleteField}
         updateField={handleUpdateField}
+        formName={selectingForm.name}
       />
     </Container>
   );

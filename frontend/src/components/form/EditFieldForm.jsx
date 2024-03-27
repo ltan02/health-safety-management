@@ -23,6 +23,7 @@ function EditFieldForm({
   deleteField,
   updateField,
   handleClose,
+  formName,
 }) {
   const [fieldsData, setFieldsData] = useState([]);
   const [activeId, setActiveId] = useState(null);
@@ -126,7 +127,7 @@ function EditFieldForm({
         </Container>
       )}
       <Typography variant="h4" align="left" fontWeight={500} sx={{ marginTop: 5 }}>
-        Incident Report Form
+        {formName}
       </Typography>
       <Divider sx={{ my: 2 }} color="primary" />
       <form onSubmit={(e) => e.preventDefault()}>
