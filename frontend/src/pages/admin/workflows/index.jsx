@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from
 import DeleteWorkflowModal from "../../../components/workflows/DeleteWorkflowModal";
 import useAxios from "../../../hooks/useAxios";
 import ActiveWorkflowModal from "../../../components/workflows/ActiveWorkflowModal";
+import ViewWorkflowModal from "../../../components/workflows/ViewWorkflowModal";
 
 export default function AdminWorkflow() {
     const [activeTasks, setActiveTasks] = useState([]);
@@ -263,6 +264,16 @@ export default function AdminWorkflow() {
                         setWorkflow(null);
                     }}
                     handleSetActive={handleSetActive}
+                />
+            )}
+            {viewModalOpen && (
+                <ViewWorkflowModal
+                    open={viewModalOpen}
+                    handleClose={() => {
+                        setViewModalOpen(false);
+                        setWorkflow(null);
+                    }}
+                    handleEditModal={handleView}
                 />
             )}
         </Container>
