@@ -24,8 +24,11 @@ export const PRIVILEGED_SIDEBAR_CONTENTS = {
         ["Incident Reports"]: <RedirectButton to="/incidents">Incident Reports</RedirectButton>,
     },
     [PAGE_TYPE.REPORT]: {
-        ["Overview"]: <RedirectButton to="/report">Overview</RedirectButton>,
-        ["Dashboard"]: <RedirectButton to="/report/dashboard">Dashboard</RedirectButton>
+        ["Dashboard"]: <RedirectButton to="/report">Dashboard</RedirectButton>,
+        ["Bar Chart"]: <RedirectButton to="/report/bar">Bar Chart</RedirectButton>,
+        ["Line Chart"]: <RedirectButton to="/report/line">Line Chart</RedirectButton>,
+        ["Pie Chart"]: <RedirectButton to="/report/pie">Pie Chart</RedirectButton>,
+        ["Scatter Chart"]: <RedirectButton to="/report/scatter">Scatter Chart</RedirectButton>,
     },
 };
 
