@@ -1,116 +1,11 @@
-import { Grid, CardActionArea, CardContent, Typography, Card, Fab } from "@mui/material";
-import { BarChart, LineChart, PieChart, ScatterChart } from "@mui/x-charts";
+import { Grid,  Fab, Card, CardActionArea, CardContent, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { scatterPlotData } from "./initialData.js";
 import Chatbot from "../../components/report/Chatbot.jsx";
 import ChatIcon from "@mui/icons-material/Chat";
 import Draggable from "react-draggable";
 import { useState } from "react";
-
-const reportCardBarChart = (
-    <Card sx={{ maxWidth: 500, maxHeight: 450 }}>
-        <CardActionArea>
-            <CardContent>
-                <BarChart
-                    xAxis={[{ scaleType: "band", data: ["group A", "group B", "group C"] }]}
-                    series={[{ data: [4, 3, 5] }, { data: [1, 6, 3] }, { data: [2, 5, 6] }]}
-                    height={350}
-                />
-                <Typography gutterBottom variant="h5" component="div">
-                    Bar Graph
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                    This interactive graph provides an in-depth overview of proportion of the incident for this quarter
-                    and the potential of future risk by leveraging a comprehensive dataset from firebase.
-                </Typography>
-            </CardContent>
-        </CardActionArea>
-    </Card>
-);
-
-const reportCardLineChart = (
-    <Card sx={{ maxWidth: 500, maxHeight: 450 }}>
-        <CardActionArea>
-            <CardContent>
-                <LineChart
-                    xAxis={[{ data: [1, 2, 3, 5, 8, 10] }]}
-                    series={[
-                        {
-                            data: [2, 5.5, 2, 8.5, 1.5, 5],
-                        },
-                    ]}
-                    height={350}
-                />
-                <Typography gutterBottom variant="h5" component="div">
-                    Line Graph
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                    This interactive graph provides an in-depth overview of proportion of the incident for this quarter
-                    and the potential of future risk by leveraging a comprehensive dataset from firebase.
-                </Typography>
-            </CardContent>
-        </CardActionArea>
-    </Card>
-);
-
-const reportCardScatterChart = (
-    <Card sx={{ maxWidth: 500, maxHeight: 450 }}>
-        <CardActionArea>
-            <CardContent>
-                <ScatterChart
-                    height={350}
-                    series={[
-                        {
-                            label: "Series A",
-                            data: scatterPlotData.map((v) => ({ x: v.x1, y: v.y1, id: v.id })),
-                        },
-                        {
-                            label: "Series B",
-                            data: scatterPlotData.map((v) => ({ x: v.x1, y: v.y2, id: v.id })),
-                        },
-                    ]}
-                />
-                <Typography gutterBottom variant="h5" component="div">
-                    Scatter Plot
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                    This interactive graph provides an in-depth overview of proportion of the incident for this quarter
-                    and the potential of future risk by leveraging a comprehensive dataset from firebase.
-                </Typography>
-            </CardContent>
-        </CardActionArea>
-    </Card>
-);
-
-const reportCardPieChart = (
-    <Card sx={{ maxWidth: 500, maxHeight: 450 }}>
-        <CardActionArea>
-            <CardContent>
-                <PieChart
-                    series={[
-                        {
-                            data: [
-                                { id: 0, value: 10, label: "series A" },
-                                { id: 1, value: 15, label: "series B" },
-                                { id: 2, value: 20, label: "series C" },
-                            ],
-                            innerRadius: 60,
-                            outerRadius: 100,
-                        },
-                    ]}
-                    height={350}
-                />
-                <Typography gutterBottom variant="h5" component="div">
-                    Pie Chart
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                    This interactive graph provides an in-depth overview of proportion of the incident for this quarter
-                    and the potential of future risk by leveraging a comprehensive dataset from firebase.
-                </Typography>
-            </CardContent>
-        </CardActionArea>
-    </Card>
-);
+import ReportChart from "../../components/report/ReportChart.jsx";
+import ReportModal from "../../components/report/ReportModal.jsx";
 
 function ReportOverview() {
     const [chatbotVisible, setChatbotVisible] = useState(false);
@@ -136,9 +31,50 @@ function ReportOverview() {
         navigate("/report/pie");
     };
 
+    const [dashData, setDashData] = useState([
+        {
+            type: "Bar",
+            field: "category",
+            start: null,
+            end: null
+        }, 
+        {
+            type: "Line",
+            field: "reporter",
+            start: null,
+            end: null
+        },
+        {
+            type: "Pie",
+            field: "status",
+            start: null,
+            end: null
+        }, 
+        {
+            type: "Scatter",
+            field: "date",
+            start: null,
+            end: null
+        } 
+    ]);
+
+    const [openModal, setOpenModal] = useState(false);
+
+    const toggleModal = () => setOpenModal(!openModal);
+
+    console.log(dashData)
+
     return (
         <div>
-            <h1>Overview</h1>
+            <center><h1>Dashboard</h1></center>
+            <ReportModal open={openModal} onClose={toggleModal} data={dashData} setDashData={setDashData}/>
+            <div style={{display: "flex", justifyContent: 'flex-end'}}>
+                    <Button variant="contained" onClick={toggleModal}
+                    style={{display: 'flex', justifyContent: 'flex-end', marginBottom: "1rem",
+                        fontWeight: "bold"}}>
+                        Edit Dashboard
+                    </Button>
+                </div>
             <Grid container sx={{ p: 2 }}>
                 <Grid
                     item
@@ -146,7 +82,13 @@ function ReportOverview() {
                     sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}
                     onClick={handleBarClick}
                 >
-                    {reportCardBarChart}
+                    <Card sx={{ maxWidth: 500, maxHeight: 450 }}>
+                        <CardActionArea>
+                            <CardContent>
+                                <ReportChart type={dashData[0].type} val={dashData[0].field} start={dashData[0].start} end={dashData[0].end} locked={true} height={250} width={350}/>
+                            </CardContent>
+                        </CardActionArea>
+                    </Card>
                 </Grid>
                 <Grid
                     item
@@ -154,7 +96,14 @@ function ReportOverview() {
                     sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}
                     onClick={handleLineClick}
                 >
-                    {reportCardLineChart}
+                    <Card sx={{ maxWidth: 500, maxHeight: 450 }}>
+                        <CardActionArea>
+                            <CardContent>
+                                <ReportChart type={dashData[1].type} val={dashData[1].field} start={dashData[1].start} end={dashData[1].end} locked={true} height={250} width={350}/>
+                            </CardContent>
+                        </CardActionArea>
+                    </Card>
+                    
                 </Grid>
             </Grid>
             <Grid container sx={{ p: 2 }}>
@@ -164,7 +113,13 @@ function ReportOverview() {
                     sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}
                     onClick={handleScatterClick}
                 >
-                    {reportCardScatterChart}
+                    <Card sx={{ maxWidth: 500, maxHeight: 450 }}>
+                        <CardActionArea>
+                            <CardContent>
+                                <ReportChart type={dashData[2].type} val={dashData[2].field} start={dashData[2].start} end={dashData[2].end} locked={true} height={250} width={350}/>
+                            </CardContent>
+                        </CardActionArea>
+                    </Card>
                 </Grid>
                 <Grid
                     item
@@ -172,7 +127,14 @@ function ReportOverview() {
                     sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}
                     onClick={handlePieClick}
                 >
-                    {reportCardPieChart}
+                    <Card sx={{ maxWidth: 500, maxHeight: 450 }}>
+                        <CardActionArea>
+                            <CardContent>
+                                <ReportChart type={dashData[3].type} val={dashData[3].field} start={dashData[3].start} end={dashData[3].end} locked={true} height={250} width={350}/>
+                            </CardContent>
+                        </CardActionArea>
+                    </Card>
+                    
                 </Grid>
             </Grid>
             <Fab
@@ -197,7 +159,7 @@ function ReportOverview() {
                         <Chatbot />
                     </div>
                 </Draggable>
-            }
+            }   
         </div>
     );
 }

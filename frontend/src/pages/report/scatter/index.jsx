@@ -2,7 +2,7 @@ import ReportChart from "../../../components/report/ReportChart.jsx";
 
 function ScatterReport() {
     return (
-        <ReportChart type="Scatter" />
+        <ReportChart type="Scatter" val="category" locked={false} height={350}/>
     );
 }
 

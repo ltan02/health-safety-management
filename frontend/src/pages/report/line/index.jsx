@@ -2,7 +2,7 @@ import ReportChart from "../../../components/report/ReportChart.jsx";
 
 function LineReport() {
     return (
-        <ReportChart type="Line" />
+        <ReportChart type="Line" val="category" locked={false} height={350}/>
     );
 }
 

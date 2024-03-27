@@ -10,6 +10,7 @@ import { isPrivileged } from "./utils/permissions.js";
 import { BoardProvider } from "./context/BoardContext.jsx";
 import Sidebar from "./components/global/Sidebar";
 import { useState } from "react";
+import ReportOverview from "./pages/report/index.jsx";
 
 const Incident = lazy(() => import("./pages/incident"));
 const Login = lazy(() => import("./pages/login"));
@@ -76,7 +77,7 @@ function App() {
                                     <Route path="incidents" element={<IncidentReport />} />
                                 </Route>
                                 <Route path="report">
-                                    <Route index element={<ReportDashboard />} />
+                                    <Route index element={<ReportOverview />} />
                                     <Route path="bar" element={<BarReport />} />
                                     <Route path="scatter" element={<ScatterReport />} />
                                     <Route path="line" element={<LineReport />} />
