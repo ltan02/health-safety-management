@@ -61,7 +61,14 @@ function Login() {
     return (
         <Container
             maxWidth="xs"
-            style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", width: "100vw" }}
+            style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "100vh",
+                width: "100vw",
+                maxHeight: "100vh",
+            }}
         >
             <Card>
                 <CardContent style={{ paddingRight: "1.5rem", paddingLeft: "1.5rem", marginBottom: "100px" }}>

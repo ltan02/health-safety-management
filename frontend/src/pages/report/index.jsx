@@ -113,12 +113,11 @@ const reportCardPieChart = (
 );
 
 function ReportOverview() {
-
     const [chatbotVisible, setChatbotVisible] = useState(false);
     const toggleChatbot = () => {
         setChatbotVisible(!chatbotVisible);
     };
-    
+
     const navigate = useNavigate();
 
     const handleBarClick = () => {
@@ -177,29 +176,28 @@ function ReportOverview() {
                 </Grid>
             </Grid>
             <Fab
-        color="primary"
-        aria-label="chat"
-        sx={{ position: "fixed", bottom: 16, right: 16 }}
-        onClick={toggleChatbot}
-      >
-        <ChatIcon />
-      </Fab>
-
-      {
-        <Draggable>
-          <div
-            style={{
-              position: "fixed",
-              top: 50,
-              left: 50,
-              zIndex: 1500,
-              display: chatbotVisible ? "block" : "none",
-            }}
-          >
-            <Chatbot />
-          </div>
-        </Draggable>
-      }
+                color="primary"
+                aria-label="chat"
+                sx={{ position: "fixed", bottom: 16, right: 16 }}
+                onClick={toggleChatbot}
+            >
+                <ChatIcon />
+            </Fab>
+            {
+                <Draggable>
+                    <div
+                        style={{
+                            position: "absolute",
+                            bottom: 50,
+                            right: 50,
+                            zIndex: 1500,
+                            display: chatbotVisible ? "block" : "none",
+                        }}
+                    >
+                        <Chatbot />
+                    </div>
+                </Draggable>
+            }
         </div>
     );
 }

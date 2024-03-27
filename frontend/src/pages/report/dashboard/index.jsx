@@ -1,8 +1,16 @@
-import { Box, Grid } from "@mui/material";
+import { useState } from "react";
+import ChatIcon from "@mui/icons-material/Chat";
+import { Box, Grid, Fab } from "@mui/material";
 import { BarChart, LineChart, SparkLineChart, PieChart, ScatterChart } from "@mui/x-charts";
 import { scatterPlotData } from "../initialData.js";
+import Chatbot from "../../../components/report/Chatbot.jsx";
 
 function ReportDashboard() {
+    const [chatbotVisible, setChatbotVisible] = useState(false);
+    const toggleChatbot = () => {
+        setChatbotVisible(!chatbotVisible);
+    };
+
     return (
         <div>
             <h1>Dashboard Reports</h1>
@@ -80,6 +88,27 @@ function ReportDashboard() {
                     />
                 </Grid>
             </Grid>
+            <Fab
+                color="primary"
+                aria-label="chat"
+                sx={{ position: "fixed", bottom: 16, right: 16 }}
+                onClick={toggleChatbot}
+            >
+                <ChatIcon />
+            </Fab>
+            {chatbotVisible && (
+                <div
+                    style={{
+                        position: "fixed",
+                        bottom: 80,
+                        right: 80,
+                        zIndex: 1500,
+                        display: chatbotVisible ? "block" : "none",
+                    }}
+                >
+                    <Chatbot />
+                </div>
+            )}
         </div>
     );
 }
