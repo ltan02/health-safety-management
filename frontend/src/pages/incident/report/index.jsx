@@ -8,11 +8,14 @@ import { useBoard } from "../../../context/BoardContext";
 import AddTaskModal from "../../../components/incident/AddTaskModal";
 import useForm from "../../../hooks/useForm";
 import useAxios from "../../../hooks/useAxios";
+import { useAuthContext } from "../../../context/AuthContext";
 
 function IncidentReport() {
-    const { tasks } = useTasks();
+    const { tasks, filterTasks, setTasks, fetchTasks } =
+    useTasks();
     const [rows, setRows] = useState(Object.values(tasks).flat());
-    const [selectedIncident, setSelectedIncident] = useState(null);
+    const { user } = useAuthContext();
+    const [ selectedIncident, setSelectedIncident] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { statuses } = useBoard();
     const { sendRequest } = useAxios();
@@ -59,18 +62,20 @@ function IncidentReport() {
     const toggleAddModal = () => setAddModal(!addModal);
 
     const handleAddTask = async (task) => {
+
         const directMapping = {
-          time_of_incident: "incidentDate",
+          incidentDate: "incidentDate",
           category: "incidentCategory",
           employees_involved: "employeesInvolved",
         };
     
         const incident = {
           reporter: user.id,
-          incidentDate: task.time_of_incident,
+          incidentDate: task.incidentDate,
           incidentCategory: task.category,
           employeesInvolved: task.employees_involved,
           customFields: [],
+          comments: [],
           statusId: statuses.find((status) => status.name === "Pending Review")?.id,
         };
     
