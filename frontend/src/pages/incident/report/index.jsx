@@ -19,6 +19,7 @@ function IncidentReport() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { statuses } = useBoard();
     const { sendRequest } = useAxios();
+    const [formName, setFormName] = useState("");
 
     const styles = {
         styleHeader: {
@@ -117,6 +118,7 @@ function IncidentReport() {
                 handleAddTask={handleAddTask}
                 field={fields}
                 sortedRows={handleSort}
+                formName={forms["GZ4tf8bErd3rZ9YizFOu"]?.name}
             />
             <Typography variant="h4" component="h4"
                         style={{ fontFamily: "ITC Charter", marginLeft: "3rem", fontWeight: "bold",
