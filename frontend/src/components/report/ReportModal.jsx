@@ -130,7 +130,7 @@ function ReportModal({ open, onClose, newData, setNewData, boardId, onRefresh })
                     <MenuItem value={"Scatter"}>Scatter</MenuItem>
                     <MenuItem value={"Pie"}>Pie</MenuItem>
                 </Select>
-                <ReportChart type={newData[selectedVal].type} val={newData[selectedVal].field} locked={false} height={300} width={400} handleSubmit={handleSubmit}/>  
+                <ReportChart type={newData[selectedVal].type} data={newData[selectedVal]} locked={false} height={300} width={400} handleSubmit={handleSubmit}/>  
                 <Button  
                     type="submit"
                     variant="contained"

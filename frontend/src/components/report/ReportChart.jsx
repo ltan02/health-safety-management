@@ -5,19 +5,22 @@ import { useEffect, useState } from "react";
 import useAxios from "../../hooks/useAxios.js";
 import { categoryReports } from "../../pages/report/initialData.js";
 
-function ReportChart({type, locked, val, start, end, height, width, handleSubmit}) {
+function ReportChart({type, locked, data, height, width, handleSubmit}) {
     const { sendRequest, loading } = useAxios();
     const [report, setReport] = useState(categoryReports);
-    const [field, setField] = useState(val);
-    const [startDate, setStartDate] = useState(start);
-    const [endDate, setEndDate] = useState(end);
-    useEffect(() => {
-        setField(val);
-        getReportAPI(val, startDate, endDate);
-    }, [val]);
+    const [field, setField] = useState(data.field);
+    const [startDate, setStartDate] = useState(data.start);
+    const [endDate, setEndDate] = useState(data.end);
 
     useEffect(() => {
-        getReportAPI(field, startDate, endDate);
+        setEndDate(data.end);
+        setStartDate(data.start);
+        setField(data.field);
+        getReportAPI(data.field, data.start, data.end);
+    }, [data]);
+
+    useEffect(() => {
+        getReportAPI(data.field, data.start, data.end);
     }, []);
 
     const handleFieldChange = (event) => {
@@ -151,7 +154,7 @@ function ReportChart({type, locked, val, start, end, height, width, handleSubmit
         </div>
     );
 
-    function getReportAPI(value, start, end) {
+    function getReportAPI(value, start, end) {  
         let url = `/reports/${value}`;
 
         const params = [];
