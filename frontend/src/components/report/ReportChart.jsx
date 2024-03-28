@@ -11,20 +11,31 @@ function ReportChart({type, locked, val, start, end, height, width, handleSubmit
     const [field, setField] = useState(val);
     const [startDate, setStartDate] = useState(start);
     const [endDate, setEndDate] = useState(end);
+    useEffect(() => {
+        setField(val);
+        getReportAPI(val, startDate, endDate);
+    }, [val]);
+
+    useEffect(() => {
+        getReportAPI(field, startDate, endDate);
+    }, []);
+
     const handleFieldChange = (event) => {
-        handleSubmit(event.target.value, startDate, endDate);
+        if (typeof handleSubmit === 'function')
+            handleSubmit(event.target.value, startDate, endDate);
         setField(event.target.value);
         getReportAPI(event.target.value, startDate, endDate);
     };
-
     const handleStartChange = (event) => {
-        handleSubmit(field, event.target.value, endDate);
+        if (typeof handleSubmit === 'function')
+            handleSubmit(field, event.target.value, endDate);
         setStartDate(event.target.value);
         getReportAPI(field, event.target.value, endDate);
     };
 
     const handleEndChange = (event) => {
-        handleSubmit(value, startDate, event.target.value);
+        if (typeof handleSubmit === 'function')
+            handleSubmit(field, startDate, event.target.value);
         setEndDate(event.target.value);
         getReportAPI(field, startDate, event.target.value);
     };
@@ -107,14 +118,14 @@ function ReportChart({type, locked, val, start, end, height, width, handleSubmit
                     <Typography gutterBottom variant="h8"> Start: </Typography>
                     <TextField type="datetime-local" 
                         value={startDate}
-                        onChange={(e) => setStartDate(e.target.value)}
+                        onChange={handleStartChange}
                     />
                 </Grid>
                 <Grid>
                     <Typography gutterBottom variant="h8"> End: </Typography>
                     <TextField type="datetime-local"
                         value={endDate}
-                        onChange={(e) => setEndDate(e.target.value)}
+                        onChange={handleEndChange}
                     />
                 </Grid>
         </>

@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import PreviewForm from "../form/PreviewForm";
 import ReportChart from "./ReportChart";
+import useDashboard from "../../hooks/useDashboard";
 
 const modalStyle = {
     position: "absolute",
@@ -34,19 +35,15 @@ const modalStyle = {
     flexDirection: "column",
 };
 
-const largeTextFieldStyle = {
-    "& .MuiOutlinedInput-root": {
-        height: "5em",
-    },
-};
 
-function ReportModal({ open, onClose, data, setDashData }) {
+function ReportModal({ open, onClose, newData, setNewData, boardId, onRefresh }) {
+    const {updateBoard} = useDashboard();
     
     const handleSubmit = (field, start, end) => {
-        const newData = data.map((c, i) => {
+        const changedData = newData.map((c, i) => {
             if (i === selectedVal) {
               return {
-                type: data[i].type, 
+                type: newData[i].type, 
                 field: field,
                 start: start,
                 end: end
@@ -55,14 +52,44 @@ function ReportModal({ open, onClose, data, setDashData }) {
               return c;
             }
         });
-        setDashData(newData);
+        setNewData(changedData);
     };
 
     const [selectedVal, setSelectedVal] = useState(0);
     const handleChange = (event) => {
         setSelectedVal(event.target.value);
+        setGraphType(newData[event.target.value].type);
     };
 
+    const [graphType, setGraphType] = useState(newData[0].type)
+    const handleGraphChange = (event) => {
+        setGraphType(event.target.value);
+        const changedData = newData.map((c, i) => {
+            if (i === selectedVal) {
+              return {
+                type: event.target.value, 
+                field: newData[i].field,
+                start: newData[i].start,
+                end: newData[i].end
+              };
+            } else {
+              return c;
+            }
+        });
+        setNewData(changedData);
+    }
+
+    const pushCloseButton = () => {
+        onClose();
+    }
+
+    const pushSubmitButton = () => {
+        updateBoard(boardId, newData);
+        onRefresh();
+        onClose();
+    }
+
+    
     return (
         <Modal
             open={open}
@@ -90,7 +117,37 @@ function ReportModal({ open, onClose, data, setDashData }) {
                 <Typography variant="h7" component="h2" sx={{ mb: 2 }}>
                     Widget details
                 </Typography>
-                <ReportChart type={data[selectedVal].type} val={data[selectedVal].field} locked={false} height={300} width={400} handleSubmit={handleSubmit}/>
+                <Typography variant="h8" sx={{ mb: 2 }}>
+                    Select Graph Type
+                </Typography>
+                <Select
+                    value={graphType}
+                    label="Select Graph Type"
+                    onChange={handleGraphChange}
+                >
+                    <MenuItem value={"Bar"}>Bar</MenuItem>
+                    <MenuItem value={"Line"}>Line</MenuItem>
+                    <MenuItem value={"Scatter"}>Scatter</MenuItem>
+                    <MenuItem value={"Pie"}>Pie</MenuItem>
+                </Select>
+                <ReportChart type={newData[selectedVal].type} val={newData[selectedVal].field} locked={false} height={300} width={400} handleSubmit={handleSubmit}/>  
+                <Button  
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    sx={{ mt: 3, position: "fixed", bottom: "0px", right: "10px" }} 
+                    onClick={pushSubmitButton}
+                > 
+                    Submit
+                </Button>
+                <Button
+                    variant="contained"
+                    color="secondary"
+                    sx={{ mt: 3, position: "fixed", bottom: "50px", right: "10px" }}
+                    onClick={pushCloseButton}
+                >
+                    Cancel
+                </Button>
             </Box>
         </Modal>
     );

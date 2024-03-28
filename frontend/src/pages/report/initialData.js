@@ -30,3 +30,30 @@ export const categoryReports = [
         value: 61
     }
 ]
+
+export const dashboardData = [
+    {
+        type: "Bar",
+        field: "category",
+        start: null,
+        end: null
+    }, 
+    {
+        type: "Line",
+        field: "reporter",
+        start: null,
+        end: null
+    },
+    {
+        type: "Pie",
+        field: "status",
+        start: null,
+        end: null
+    }, 
+    {
+        type: "Scatter",
+        field: "date",
+        start: null,
+        end: null
+    } 
+]

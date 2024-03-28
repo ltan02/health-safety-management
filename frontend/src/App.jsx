@@ -18,7 +18,6 @@ const AdminWorkflow = lazy(() => import("./pages/admin/workflows/index.jsx"));
 const AdminManagement = lazy(() => import("./pages/admin/management/index.jsx"));
 const AdminStatus = lazy(() => import("./pages/admin/status/index.jsx"));
 const AdminForm = lazy(() => import("./pages/admin/form/index.jsx"));
-const ReportDashboard = lazy(() => import("./pages/report/dashboard/index.jsx"));
 const IncidentReport = lazy(() => import("./pages/incident/report/index.jsx"));
 const BarReport = lazy(() => import("./pages/report/bar/index.jsx"));
 const LineReport = lazy(() => import("./pages/report/line/index.jsx"));

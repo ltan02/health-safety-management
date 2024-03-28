@@ -3,9 +3,13 @@ import { useNavigate } from "react-router-dom";
 import Chatbot from "../../components/report/Chatbot.jsx";
 import ChatIcon from "@mui/icons-material/Chat";
 import Draggable from "react-draggable";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ReportChart from "../../components/report/ReportChart.jsx";
 import ReportModal from "../../components/report/ReportModal.jsx";
+import useAxios from "../../hooks/useAxios.js";
+import { useAuthContext } from "../../context/AuthContext.jsx";
+import useDashboard from "../../hooks/useDashboard.js";
+import { dashboardData } from "./initialData.js";
 
 function ReportOverview() {
     const [chatbotVisible, setChatbotVisible] = useState(false);
@@ -31,44 +35,43 @@ function ReportOverview() {
         navigate("/report/pie");
     };
 
-    const [dashData, setDashData] = useState([
-        {
-            type: "Bar",
-            field: "category",
-            start: null,
-            end: null
-        }, 
-        {
-            type: "Line",
-            field: "reporter",
-            start: null,
-            end: null
-        },
-        {
-            type: "Pie",
-            field: "status",
-            start: null,
-            end: null
-        }, 
-        {
-            type: "Scatter",
-            field: "date",
-            start: null,
-            end: null
-        } 
-    ]);
-
+    const [dashData, setDashData] = useState(dashboardData);
+    const [newData, setNewData] = useState(dashboardData);
     const [openModal, setOpenModal] = useState(false);
 
     const toggleModal = () => setOpenModal(!openModal);
 
 
+    const {board, fetchBoards, loading} = useDashboard();
+    const [boardId, setBoardId] = useState("");
+    
+    const refreshDashboard = () => {
+        fetchBoards();
+        fetchBoards();
+
+    };
+    
+    useEffect(() => {
+        fetchBoards();
+    },[]);
+
+    useEffect (() => {
+        if(board.graphs) {
+            setDashData(board.graphs);
+            setNewData(board.graphs)
+            setBoardId(board.id);   
+        }   
+    }, [board])
+
     return (
         <div>
             <center><h1>Dashboard</h1></center>
-            <ReportModal open={openModal} onClose={toggleModal} data={dashData} setDashData={setDashData}/>
+            <ReportModal open={openModal} onClose={toggleModal} newData={newData} setNewData={setNewData} boardId={boardId} onRefresh={refreshDashboard}/>
             <div style={{display: "flex", justifyContent: 'flex-end'}}>
-                    <Button variant="contained" onClick={toggleModal}
+                    <Button variant="contained" onClick={() => {
+                        toggleModal();
+                        setNewData(dashData);
+                    }}
                     style={{display: 'flex', justifyContent: 'flex-end', marginBottom: "1rem",
                         fontWeight: "bold"}}>
                         Edit Dashboard
