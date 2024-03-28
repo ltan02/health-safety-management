@@ -118,7 +118,7 @@ function App() {
                             component="main"
                             sx={{
                                 flexGrow: 1,
-                                paddingLeft: sidebarOpen ? (isUserLoggedIn() ? (drawerWidth + 20) + "px" : 0) : 0,
+                                paddingLeft: sidebarOpen ? (isUserLoggedIn() ? drawerWidth + 20 + "px" : 0) : 0,
                             }}
                             style={{
                                 transition: "padding-left 0.3s ease",
