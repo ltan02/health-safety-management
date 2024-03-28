@@ -43,6 +43,11 @@ class IncidentModel(BaseModel):
     incident: str
 
 
+@app.post("/getCategories")
+async def get_categories():
+    return {"categories": str(categories)}
+
+
 @app.post("/categorize/")
 async def generate_text(incident_model: IncidentModel):
     incident = incident_model.incident
