@@ -1,10 +1,14 @@
 import { useState } from "react";
 import { Container, Typography, Button, Grid, Divider } from "@mui/material";
 import { FIELD_TYPES } from "./form_data";
+import useAxios from "../../hooks/useAxios";
 import { FIELD_ELEMENT } from "./form_elements";
+import { set } from "lodash";
 
 function PreviewForm({ fields, sortedRows, handleSubmit, onClose, formName }) {
   const [fieldsData, setFieldsData] = useState({});
+  const { sendAIRequest, aiLoading } = useAxios();
+  const [aiCategrory, setAICategory] = useState("");
 
   const handleChange = (event, field) => {
     const { name, value } = event.target;
@@ -27,6 +31,22 @@ function PreviewForm({ fields, sortedRows, handleSubmit, onClose, formName }) {
         [name]: value,
       }));
     }
+  };
+
+  const onCategorySearch = async () => {
+    console.log(fieldsData);
+    const res = await sendAIRequest({
+      url: "/categorize/",
+      method: "POST",
+      body: {
+        incident: fieldsData.description,
+      },
+    });
+    setAICategory(res.response);
+    setFieldsData((prevData) => ({
+      ...prevData,
+      category: res.response,
+    }));
   };
 
   function findDuplicateIndexes(arr) {
@@ -62,7 +82,9 @@ function PreviewForm({ fields, sortedRows, handleSubmit, onClose, formName }) {
   };
 
   const isRequiredFieldFilled = () => {
-    const allRequiredPresent = fields.every(obj => obj.props.required ? obj.props.name in fieldsData : true);
+    const allRequiredPresent = fields.every((obj) =>
+      obj.props.required ? obj.props.name in fieldsData : true
+    );
     return allRequiredPresent;
   };
 
@@ -88,7 +110,13 @@ function PreviewForm({ fields, sortedRows, handleSubmit, onClose, formName }) {
                   return null;
                 }
                 return (
-                  <Grid item md={12} key={fieldData.id} sx={{ my: 2 }} style={{ paddingLeft: 0}}>
+                  <Grid
+                    item
+                    md={12}
+                    key={fieldData.id}
+                    sx={{ my: 2 }}
+                    style={{ paddingLeft: 0 }}
+                  >
                     <Container
                       sx={{
                         display: "flex",
@@ -100,9 +128,14 @@ function PreviewForm({ fields, sortedRows, handleSubmit, onClose, formName }) {
                         value={
                           fieldData.type === FIELD_TYPES.SELECTION_MULTI
                             ? fieldsData[fieldData.props.name] ?? []
-                            : fieldsData[fieldData.props.name] ?? ""
+                            : fieldData.type === FIELD_TYPES.SELECTION_SINGLE
+                            ? fieldsData[fieldData.props.name]
+                            : aiCategrory
                         }
                         onChange={(e) => handleChange(e, fieldData)}
+                        // onDescriptionChange={(e) => onDescriptionChange(e, fieldData)}
+                        onClick={onCategorySearch}
+                        loading={aiLoading + ""}
                       />
                     </Container>
                   </Grid>
