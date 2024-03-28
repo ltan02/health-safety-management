@@ -410,7 +410,7 @@ export default function IncidentDetailModal({
                 borderRadius: "5px",
                 borderColor: "#464646",
                 width: "100%",
-                height: "100%",
+                height: "90%",
               }}
             >
               <Box
