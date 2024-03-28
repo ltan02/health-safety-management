@@ -54,7 +54,7 @@ function App() {
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const getRoutesForRole = () => {
         const routes =
-            !isUserLoggedIn() && user.role ? (
+            !isUserLoggedIn() && !user?.role ? (
                 <Routes>
                     <Route path="/" element={<Login />} />
                     <Route path="*" element={<Navigate to="/" replace />} />
@@ -63,7 +63,7 @@ function App() {
                 <BoardProvider>
                     <Suspense fallback={<div>Loading...</div>}>
                         <Routes>
-                            {isPrivileged(user.role) ? (
+                            {isPrivileged(user?.role) ? (
                                 <>
                                     <Route path="admin">
                                         <Route path="workflow" element={<AdminWorkflow />} />
