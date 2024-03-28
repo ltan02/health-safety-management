@@ -2,7 +2,6 @@ import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Button from "@mui/material/Button";
-import Container from "@mui/material/Container";
 import { Card } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
@@ -10,7 +9,6 @@ import Popover from "@mui/material/Popover";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuthContext } from "../../context/AuthContext";
-import { isPrivileged } from "../../utils/permissions";
 import pwcLogo from "../../assets/pwcLogo.svg";
 import Profile from "../users/Profile";
 
@@ -18,7 +16,6 @@ function Header() {
     const { user, signOut } = useAuthContext();
     const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState(null);
-    const [currentPage, setCurrentPage] = useState("/")
 
     const handleProfileClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -36,81 +33,19 @@ function Header() {
         navigate("/");
     };
 
-    const directTo = (path) => () => {
-        navigate(path);
-        setCurrentPage(path);
-    };
-
     return (
-        <AppBar color="primary"  elevation={0}>
+        <AppBar color="primary" elevation={0}>
             <Toolbar
                 sx={{
                     display: "flex",
                     flexDirection: "row",
                     justifyContent: "space-between",
                     backgroundColor: "white",
-                    borderBottom: "1px solid #E0E0E0",
+                    borderBottom: "2px solid #E0E0E0",
+                    zIndex: 5,
                 }}
             >
                 <img src={pwcLogo} alt="logo" style={{ height: "3rem", width: "auto", paddingLeft: "15px" }}></img>
-                <Box
-                    sx={{
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        flexGrow: 1,
-                    }}
-                >
-                    {isPrivileged(user.role) && (
-                        <Container
-                            sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                gap: "2rem",
-                                padding: "0px",
-                            }}
-                        >
-                            <Button
-                                color="inherit"
-                                onClick={directTo("/admin/workflow")}
-                                sx={{
-                                    "&:hover": { borderBottom: "3px solid" },
-                                    padding: "0.9rem",
-                                    marginTop: "0.5rem",
-                                    borderBottom: currentPage === "/admin/workflow" ? "3px solid": "0px"
-                                }}
-                            >
-                                Admin
-                            </Button>
-                            <Button
-                                color="inherit"
-                                onClick={directTo("/")}
-                                sx={{
-                                    "&:hover": { borderBottom: "3px solid" },
-                                    padding: "0.9rem",
-                                    marginTop: "0.5rem",
-                                    borderBottom: currentPage === "/" ? "3px solid": "0px"
-                                }}
-                            >
-                                Incident
-                            </Button>
-                            <Button
-                                color="inherit"
-                                onClick={directTo("/report")}
-                                sx={{
-                                    "&:hover": { borderBottom: "3px solid" },
-                                    padding: "0.9rem",
-                                    marginTop: "0.5rem",
-                                    borderBottom: currentPage === "/report" ? "3px solid": "0px"
-                                }}
-                            >
-                                Report
-                            </Button>
-                        </Container>
-                    )}
-                </Box>
                 <Button sx={{ borderRadius: "50%" }} aria-describedby={id} onClick={handleProfileClick}>
                     <Profile user={user} />
                 </Button>
