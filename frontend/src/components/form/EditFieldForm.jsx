@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Container, Typography, Button, Grid, Divider, Box } from "@mui/material";
+import {
+  Container,
+  Typography,
+  Button,
+  Grid,
+  Divider,
+  Box,
+  TextField,
+  InputAdornment
+} from "@mui/material";
 import FieldComponentWrapper from "./FieldComponentWrapper";
 import {
   DndContext,
@@ -22,11 +31,13 @@ function EditFieldForm({
   sortedRows,
   deleteField,
   updateField,
+  updateFormName,
   handleClose,
   formName,
 }) {
   const [fieldsData, setFieldsData] = useState([]);
   const [activeId, setActiveId] = useState(null);
+  const [currentFormName, setCurrentFormName] = useState(formName);
   const [isEdited, setIsEdited] = useState(false);
   const [editingField, setEditingField] = useState(null);
   const [activeField, setActiveField] = useState(null);
@@ -71,7 +82,8 @@ function EditFieldForm({
 
   const handleFieldUpdateCoordinate = async () => {
     setIsEdited(false);
-    updateFieldCoordinate(fieldsData);
+    await updateFieldCoordinate(fieldsData);
+    await updateFormName(currentFormName);
   };
 
   const onHandleDelete = () => {
@@ -87,7 +99,6 @@ function EditFieldForm({
   };
 
   const handleOpenEdit = (fieldData) => {
-
     if (fieldData) {
       setEditingField(fieldData);
       setOpenEdit(true);
@@ -108,6 +119,12 @@ function EditFieldForm({
     updateField(newEditingField);
   };
 
+  const handleFormNameChange = (name) => {
+    console.log(name)
+    setCurrentFormName(name);
+    setIsEdited(true);
+  };
+
   return (
     <Container style={{ height: "80vh", width: "80vh", overflow: "auto" }}>
       {isEdited && (
@@ -126,9 +143,11 @@ function EditFieldForm({
           </Box>
         </Container>
       )}
-      <Typography variant="h4" align="left" fontWeight={500} sx={{ marginTop: 5 }}>
-        {formName}
-      </Typography>
+      <TextField
+        onChange={(e) => handleFormNameChange(e.target.value)}
+        variant="standard"
+        defaultValue={currentFormName}
+      />
       <Divider sx={{ my: 2 }} color="primary" />
       <form onSubmit={(e) => e.preventDefault()}>
         <DndContext
@@ -146,7 +165,7 @@ function EditFieldForm({
               {sortedRows().map((row, rowIndex) => (
                 <Grid container key={rowIndex} alignItems="center">
                   {row.fields.map((fieldData) => (
-                    <Grid item md={12} key={fieldData.id} sx={{ my: 2}}>
+                    <Grid item md={12} key={fieldData.id} sx={{ my: 2 }}>
                       <FieldComponentWrapper
                         fieldData={fieldData}
                         onDelete={() => handleOpenDeleteModal(fieldData)}

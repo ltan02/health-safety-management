@@ -11,7 +11,6 @@ import {
 } from "@mui/material";
 import Task from "./Task";
 import AddIcon from "@mui/icons-material/Add";
-import AddTaskModal from "./AddTaskModal";
 import PreviewForm from "../form/PreviewForm";
 
 const modalStyle = {
@@ -102,15 +101,6 @@ function Column({
           ))}
         </Box>
       </SortableContext>
-      <AddTaskModal
-        open={openModal}
-        onClose={toggleModal}
-        columnId={id}
-        handleAddTask={handleAddTask}
-        allEmployees={employees}
-        field={field}
-        sortedRows={sortedRows}
-      />
       <Modal
         open={openModal}
         onClose={() => {
