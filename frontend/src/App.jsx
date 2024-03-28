@@ -75,7 +75,7 @@ function App() {
                                         <Route path="incidents" element={<IncidentReport />} />
                                     </Route>
                                     <Route path="report">
-                                        <Route index element={<ReportDashboard />} />
+                                        <Route index element={<ReportOverview />} />
                                         <Route path="bar" element={<BarReport />} />
                                         <Route path="scatter" element={<ScatterReport />} />
                                         <Route path="line" element={<LineReport />} />

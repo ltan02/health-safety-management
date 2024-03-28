@@ -19,20 +19,11 @@ function ReportOverview() {
 
     const navigate = useNavigate();
 
-    const handleBarClick = () => {
-        navigate("/report/bar");
-    };
-
-    const handleScatterClick = () => {
-        navigate("/report/scatter");
-    };
-
-    const handleLineClick = () => {
-        navigate("/report/line");
-    };
-
-    const handlePieClick = () => {
-        navigate("/report/pie");
+    const handleClick = (i) => {
+        const typec = dashData[i].type
+        typec.toLowerCase();
+        const nav = `/report/${typec}`;
+        navigate(nav);
     };
 
     const [dashData, setDashData] = useState(dashboardData);
@@ -82,7 +73,9 @@ function ReportOverview() {
                     item
                     xs={6}
                     sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}
-                    onClick={handleBarClick}
+                    onClick={() => {
+                        handleClick(0);
+                    }}
                 >
                     <Card sx={{ maxWidth: 500, maxHeight: 450 }}>
                         <CardActionArea>
@@ -96,7 +89,9 @@ function ReportOverview() {
                     item
                     xs={6}
                     sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}
-                    onClick={handleLineClick}
+                    onClick={() => {
+                        handleClick(1);
+                    }}
                 >
                     <Card sx={{ maxWidth: 500, maxHeight: 450 }}>
                         <CardActionArea>
@@ -113,7 +108,9 @@ function ReportOverview() {
                     item
                     xs={6}
                     sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}
-                    onClick={handleScatterClick}
+                    onClick={() => {
+                        handleClick(2);
+                    }}
                 >
                     <Card sx={{ maxWidth: 500, maxHeight: 450 }}>
                         <CardActionArea>
@@ -127,7 +124,9 @@ function ReportOverview() {
                     item
                     xs={6}
                     sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}
-                    onClick={handlePieClick}
+                    onClick={() => {
+                        handleClick(3);
+                    }}
                 >
                     <Card sx={{ maxWidth: 500, maxHeight: 450 }}>
                         <CardActionArea>
