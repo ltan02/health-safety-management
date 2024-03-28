@@ -50,7 +50,6 @@ export default function useTasks() {
             return acc;
         }, {});
 
-        
 
         const allStatuses = isPrivileged(user.role) ? adminColumns : employeeColumns;
         allStatuses.forEach((column) => {
@@ -92,7 +91,6 @@ export default function useTasks() {
             if (!query) return tasks;
 
             const lowerCaseQuery = query.toLowerCase();
-            console.log(tasks)
             const filtered = Object.keys(tasks).reduce((acc, status) => {
                 acc[status] = tasks[status].filter((task) =>
                     task.incidentCategory.toLowerCase().includes(lowerCaseQuery) ||

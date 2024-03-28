@@ -39,6 +39,8 @@ function Column({
   field,
   sortedRows,
   formName,
+  commentData,
+  setCommentData
 }) {
   const { setNodeRef } = useDroppable({ id });
   const [openModal, setOpenModal] = useState(false);
@@ -97,6 +99,8 @@ function Column({
               id={task.id}
               task={task}
               onRefresh={onRefresh}
+              commentData={commentData}
+              setCommentData={setCommentData}
             />
           ))}
         </Box>

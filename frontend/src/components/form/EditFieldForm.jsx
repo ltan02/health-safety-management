@@ -120,7 +120,6 @@ function EditFieldForm({
   };
 
   const handleFormNameChange = (name) => {
-    console.log(name)
     setCurrentFormName(name);
     setIsEdited(true);
   };
