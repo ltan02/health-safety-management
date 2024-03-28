@@ -50,48 +50,49 @@ const theme = createTheme({
 
 function App() {
     const { isUserLoggedIn, user } = useAuthContext();
-    const drawerWidth = 240;
+    const drawerWidth = 220;
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const getRoutesForRole = () => {
-        const routes = !isUserLoggedIn() && !user?.role ? (
-            <Routes>
-                <Route path="/" element={<Login />} />
-                <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-        ) : (
-            <BoardProvider>
-                <Suspense fallback={<div>Loading...</div>}>
-                    <Routes>
-                        {isPrivileged(user?.role) ? (
-                            <>
-                                <Route path="admin">
-                                    <Route path="workflow" element={<AdminWorkflow />} />
-                                    <Route path="form" element={<AdminForm />} />
-                                    <Route path="status" element={<AdminStatus />} />
-                                </Route>
-                                <Route path="/">
+        const routes =
+            !isUserLoggedIn() && user.role ? (
+                <Routes>
+                    <Route path="/" element={<Login />} />
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+            ) : (
+                <BoardProvider>
+                    <Suspense fallback={<div>Loading...</div>}>
+                        <Routes>
+                            {isPrivileged(user.role) ? (
+                                <>
+                                    <Route path="admin">
+                                        <Route path="workflow" element={<AdminWorkflow />} />
+                                        <Route path="form" element={<AdminForm />} />
+                                        <Route path="status" element={<AdminStatus />} />
+                                    </Route>
+                                    <Route path="/">
+                                        <Route index element={<Incident />} />
+                                        <Route path="incidents" element={<IncidentReport />} />
+                                    </Route>
+                                    <Route path="report">
+                                        <Route index element={<ReportDashboard />} />
+                                        <Route path="bar" element={<BarReport />} />
+                                        <Route path="scatter" element={<ScatterReport />} />
+                                        <Route path="line" element={<LineReport />} />
+                                        <Route path="pie" element={<PieReport />} />
+                                    </Route>
+                                </>
+                            ) : (
+                                <>
                                     <Route index element={<Incident />} />
-                                    <Route path="incidents" element={<IncidentReport />} />
-                                </Route>
-                                <Route path="report">
-                                    <Route index element={<ReportDashboard />} />
-                                    <Route path="bar" element={<BarReport />} />
-                                    <Route path="scatter" element={<ScatterReport />} />
-                                    <Route path="line" element={<LineReport />} />
-                                    <Route path="pie" element={<PieReport />} />
-                                </Route>
-                            </>
-                        ) : (
-                            <>
-                                <Route index element={<Incident />} />
-                                <Route path="/incidents" element={<IncidentReport />} />
-                            </>
-                        )}
-                        <Route path="*" element={<Navigate to="/" replace />} />
-                    </Routes>
-                </Suspense>
-            </BoardProvider>
-        );
+                                    <Route path="/incidents" element={<IncidentReport />} />
+                                </>
+                            )}
+                            <Route path="*" element={<Navigate to="/" replace />} />
+                        </Routes>
+                    </Suspense>
+                </BoardProvider>
+            );
 
         return routes;
     };
@@ -117,7 +118,7 @@ function App() {
                             component="main"
                             sx={{
                                 flexGrow: 1,
-                                paddingLeft: sidebarOpen ? (isUserLoggedIn() ? drawerWidth + "px" : 0) : 0,
+                                paddingLeft: sidebarOpen ? (isUserLoggedIn() ? drawerWidth + 20 + "px" : 0) : 0,
                             }}
                             style={{
                                 transition: "padding-left 0.3s ease",
