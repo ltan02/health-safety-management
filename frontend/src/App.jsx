@@ -10,8 +10,8 @@ import { isPrivileged } from "./utils/permissions.js";
 import { BoardProvider } from "./context/BoardContext.jsx";
 import Sidebar from "./components/global/Sidebar";
 import { useState } from "react";
-import ReportOverview from "./pages/report/index.jsx";
 
+const ReportOverview = lazy(() => import("./pages/report/index.jsx"));
 const Incident = lazy(() => import("./pages/incident"));
 const Login = lazy(() => import("./pages/login"));
 const AdminWorkflow = lazy(() => import("./pages/admin/workflows/index.jsx"));
