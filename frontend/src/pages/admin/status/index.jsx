@@ -19,7 +19,7 @@ function AdminStatus() {
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                width: "100vw",
+                width: "100%",
                 minHeight: "calc(100vh - 65px)",
                 maxHeight: "calc(100vh - 65px)",
             }}
