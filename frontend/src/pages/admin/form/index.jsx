@@ -29,6 +29,7 @@ function AdminForm() {
     deleteField,
     updateField,
     loading,
+    updateFormName,
   } = useForm();
   const [fields, setFields] = useState({});
   const [selectingForm, setSelectingForm] = useState({});
@@ -68,6 +69,12 @@ function AdminForm() {
   const handleUpdateField = async (fieldData) => {
     await updateField(selectingForm.id, fieldData);
     await fetchForms();
+  }
+
+  const handleUpdateFormName = async (formName) => {
+    await updateFormName(selectingForm.id, formName);
+    await fetchForms();
+  
   }
 
   useEffect(() => {
@@ -165,6 +172,8 @@ function AdminForm() {
         getLastCoordinate={() => getLastCoordinate(fields)}
         deleteField={handleDeleteField}
         updateField={handleUpdateField}
+        formName={selectingForm.name}
+        updateFormName={handleUpdateFormName}
       />
     </Container>
   );

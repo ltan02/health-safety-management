@@ -165,6 +165,24 @@ export default function useForm() {
     return lastCoordinate;
   };
 
+
+  const updateFormName = async (formId, name) => {
+    try {
+      if (!formId || !name) {
+        console.error("Invalid input");
+        return;
+      }
+      const response = await sendRequest({
+        url: `/forms/${formId}/name`,
+        method: "POST",
+        body: { name },
+      });
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return {
     fetchForms,
     updateAllFieldCoordinates,
@@ -175,6 +193,7 @@ export default function useForm() {
     sortedRows,
     getLastCoordinate,
     deleteField,
-    loading
+    loading,
+    updateFormName
   };
 }

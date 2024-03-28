@@ -21,8 +21,10 @@ import { useBoard } from "../../context/BoardContext";
 import IncidentDetailModal from "./IncidentDetailModal";
 import useForm from "../../hooks/useForm";
 
+const SELECTED_INCIDENT = "GZ4tf8bErd3rZ9YizFOu";
 function Dashboard() {
     const { tasks, filterTasks, setTasks, fetchTasks } = useTasks();
+    
 
     const { forms, fetchForms, groupedByRows, sortedRows } = useForm();
     const { activeId, handleDragStart, handleDragOver, handleDragEnd } = useDragBehavior(tasks, setTasks);
@@ -97,7 +99,8 @@ function Dashboard() {
 
     useEffect(() => {
         // TODO: remove this when the form is selected from the form list
-        setFields(forms["GZ4tf8bErd3rZ9YizFOu"]?.fields);
+        setFields(forms[SELECTED_INCIDENT]?.fields);
+
     }, [forms]);
 
     return (
@@ -145,6 +148,7 @@ function Dashboard() {
                                 onRefresh={refreshDashboard}
                                 field={fields}
                                 sortedRows={handleSort}
+                                formName={forms[SELECTED_INCIDENT]?.name}
                             />
                         </Box>
                     ))}

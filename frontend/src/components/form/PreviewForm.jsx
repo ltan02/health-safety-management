@@ -3,7 +3,7 @@ import { Container, Typography, Button, Grid, Divider } from "@mui/material";
 import { FIELD_TYPES } from "./form_data";
 import { FIELD_ELEMENT } from "./form_elements";
 
-function PreviewForm({ fields, sortedRows, handleSubmit, onClose }) {
+function PreviewForm({ fields, sortedRows, handleSubmit, onClose, formName }) {
   const [fieldsData, setFieldsData] = useState({});
 
   const handleChange = (event, field) => {
@@ -74,7 +74,7 @@ function PreviewForm({ fields, sortedRows, handleSubmit, onClose }) {
         fontWeight={500}
         sx={{ marginTop: 5 }}
       >
-        Incident Report Form
+        {formName}
       </Typography>
       <Divider sx={{ my: 2 }} color="primary" />
       <form onSubmit={pushSubmitButton}>

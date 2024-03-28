@@ -2,6 +2,7 @@ package com.teamadc.backend.service;
 
 import com.teamadc.backend.model.Form;
 import com.teamadc.backend.dto.request.FieldCoordinateRequest;
+import com.teamadc.backend.dto.request.FormNameRequest;
 import com.teamadc.backend.model.Coordinate;
 import com.teamadc.backend.model.Field;
 import com.teamadc.backend.model.FieldProp;
@@ -40,6 +41,12 @@ public class FormService {
         }
         form.setFields(newForm.getFields());
 
+        return formRepository.save(form);
+    }
+
+    public Form updateFormName(String formId, FormNameRequest request) throws InterruptedException, ExecutionException {
+        Form form = formRepository.findById(formId);
+        form.setName(request.getName());
         return formRepository.save(form);
     }
 
