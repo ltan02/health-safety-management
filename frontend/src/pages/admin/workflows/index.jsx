@@ -5,6 +5,8 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from
 import DeleteWorkflowModal from "../../../components/workflows/DeleteWorkflowModal";
 import useAxios from "../../../hooks/useAxios";
 import ActiveWorkflowModal from "../../../components/workflows/ActiveWorkflowModal";
+import ViewWorkflowModal from "../../../components/workflows/ViewWorkflowModal";
+import AdminManagement from "../management";
 
 export default function AdminWorkflow() {
     const [activeTasks, setActiveTasks] = useState([]);
@@ -17,6 +19,7 @@ export default function AdminWorkflow() {
     const { fetchAllWorkflows, workflows } = useWorkflow();
     const [workflow, setWorkflow] = useState(null);
     const [activeWorkflow, setActiveWorkflow] = useState(null);
+    const [editModalOpen, setEditModalOpen] = useState(false);
 
     useEffect(() => {
         fetchAllWorkflows();
@@ -83,7 +86,10 @@ export default function AdminWorkflow() {
         setWorkflow(null);
     };
 
-    const handleView = async () => {};
+    const handleView = async () => {
+        setEditModalOpen(true);
+        setViewModalOpen(false);
+    };
 
     const handleDelete = async () => {
         await sendRequest({
@@ -265,6 +271,17 @@ export default function AdminWorkflow() {
                     handleSetActive={handleSetActive}
                 />
             )}
+            {viewModalOpen && (
+                <ViewWorkflowModal
+                    open={viewModalOpen}
+                    handleClose={() => {
+                        setViewModalOpen(false);
+                        setWorkflow(null);
+                    }}
+                    handleEdit={handleView}
+                />
+            )}
+            {editModalOpen && <AdminManagement open={editModalOpen} handleClose={() => setEditModalOpen(false)} />}
         </Container>
     );
 }

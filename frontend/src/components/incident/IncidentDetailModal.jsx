@@ -1,4 +1,4 @@
-import { useState, Fragment } from "react";
+import { useState, Fragment, useEffect } from "react";
 import {
   Modal,
   Box,
@@ -10,7 +10,11 @@ import {
   Avatar,
   TextareaAutosize,
   Menu,
+  Button,
+  FormControl,
 } from "@mui/material";
+import { v4 as uuid } from "uuid";
+
 import CloseIcon from "@mui/icons-material/Close";
 import useAxios from "../../hooks/useAxios";
 import { useAuthContext } from "../../context/AuthContext";
@@ -21,6 +25,8 @@ import { dateToDaysAgo } from "../../utils/date";
 import { useBoard } from "../../context/BoardContext";
 import ChangeCircleIcon from "@mui/icons-material/ChangeCircle";
 import { isPrivileged } from "../../utils/permissions";
+import CommentSection from "./CommentSection";
+import { set } from "lodash";
 
 const modalStyle = {
   position: "absolute",
@@ -43,6 +49,8 @@ export default function IncidentDetailModal({
   open,
   onClose,
   onRefresh,
+  commentData,
+  setCommentData,
 }) {
   const { sendRequest } = useAxios();
   const { user } = useAuthContext();
@@ -53,6 +61,8 @@ export default function IncidentDetailModal({
   const [openReviewer, setOpenReviewer] = useState(false);
   const [employees, setEmployees] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [isStatusModalOpen, setStatusModalOpen] = useState(false);
+  const [comment, setComment] = useState("");
 
   if (!incident) return <></>;
 
@@ -75,6 +85,7 @@ export default function IncidentDetailModal({
       return newIncident;
     });
     setIncidentState(newStateId);
+    setStatusModalOpen(true);
 
     if (onRefresh) {
       onRefresh();
@@ -120,6 +131,43 @@ export default function IncidentDetailModal({
     setOpenReviewer(false);
   };
 
+  const toggleStatusModal = () => {
+    setStatusModalOpen(!isStatusModalOpen);
+  };
+
+  const handleAddComment = async (e) => {
+    e.preventDefault();
+    if (!comment) {
+      return;
+    }
+    setComment("");
+    await sendRequest({
+      url: `/incidents/${incidentId}/comments`,
+      method: "POST",
+      body: {
+        content: comment,
+      },
+    });
+    const tempComment = {
+      id: "temp-" + uuid(),
+      comment: {
+        content: comment,
+        timestamp: new Date().toISOString(),
+        userId: user.id,
+      },
+      user: user,
+    };
+    const newCommentData = { ...commentData };
+    if (!newCommentData[incidentId]) {
+      newCommentData[incidentId] = [];
+    }
+    newCommentData[incidentId].push(tempComment);
+    setCommentData(newCommentData);
+    if (onRefresh) {
+      onRefresh();
+    }
+  };
+
   return (
     <Modal
       open={open}
@@ -139,6 +187,61 @@ export default function IncidentDetailModal({
             <CloseIcon />
           </IconButton>
         </Box>
+        <Modal
+          open={isStatusModalOpen}
+          onClose={toggleStatusModal}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: 400,
+              height: 150,
+              bgcolor: "white",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                width: "100%",
+                justifyContent: "flex-end",
+                bgcolor: "#FFB600",
+              }}
+            >
+              <IconButton onClick={toggleStatusModal}>
+                <CloseIcon />
+              </IconButton>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                padding: 2,
+                alignItems: "center",
+              }}
+            >
+              <Typography variant="body1" align="center">
+                Status was successfully changed!
+              </Typography>
+              <Box
+                sx={{ display: "inline-block", mt: 2, alignItems: "center" }}
+              >
+                <Button
+                  variant="contained"
+                  onClick={toggleStatusModal}
+                  sx={{ borderRadius: 10 }}
+                >
+                  Close
+                </Button>
+              </Box>
+            </Box>
+          </Box>
+        </Modal>
         <Box
           sx={{
             display: "flex",
@@ -150,7 +253,7 @@ export default function IncidentDetailModal({
               display: "flex",
               flexDirection: "column",
               width: "55%",
-              marginRight: 2
+              marginRight: 2,
             }}
           >
             <Typography
@@ -180,11 +283,26 @@ export default function IncidentDetailModal({
                 </Fragment>
               );
             })}
-            <Typography
-              sx={{ mt: 2, mb: 0.5, fontWeight: 600, color: "secondary.main" }}
-            >
-              Comments
-            </Typography>
+
+            <Box>
+              <Typography
+                sx={{
+                  mt: 2,
+                  mb: 0.5,
+                  fontWeight: 600,
+                  color: "secondary.main",
+                }}
+              >
+                Comments
+              </Typography>
+              <Box
+                sx={{
+                  mt: 2,
+                }}
+              >
+                <CommentSection commentData={commentData} incidentId={incidentId} />
+              </Box>
+            </Box>
             <Box
               sx={{
                 display: "flex",
@@ -195,31 +313,53 @@ export default function IncidentDetailModal({
                 paddingLeft: "0.5rem",
               }}
             >
-              <Avatar
-                sx={{
-                  bgcolor: "#DB536A",
-                  width: "30px",
-                  height: "30px",
-                  fontSize: "14px",
-                }}
-              >
-                {`${user.firstName[0]}${user.lastName[0]}`}
-              </Avatar>
-              <TextareaAutosize
-                minRows={1}
-                maxRows={4}
-                placeholder="Add a comment..."
+              <form
                 style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexDirection: "row",
+                  gap: 2,
                   width: "100%",
-                  padding: "10px",
-                  textAlign: "start",
-                  border: "none",
-                  resize: "none",
-                  outline: "none",
-                  borderRadius: "7px",
-                  lineHeight: "50px",
                 }}
-              />
+                onSubmit={handleAddComment}
+              >
+                <Avatar
+                  sx={{
+                    bgcolor: "#DB536A",
+                    width: "30px",
+                    height: "30px",
+                    fontSize: "14px",
+                  }}
+                >
+                  {`${user.firstName[0]}${user.lastName[0]}`}
+                </Avatar>
+                <TextareaAutosize
+                  minRows={1}
+                  maxRows={4}
+                  placeholder="Add a comment..."
+                  value={comment}
+                  style={{
+                    width: "100%",
+                    padding: "10px",
+                    textAlign: "start",
+                    border: "none",
+                    resize: "none",
+                    outline: "none",
+                    borderRadius: "7px",
+                    lineHeight: "50px",
+                  }}
+                  onChange={(e) => setComment(e.target.value)}
+                />
+                <Button
+                  variant="outlined"
+                  sx={{ borderRadius: 10 }}
+                  color="primary"
+                  type="submit"
+                >
+                  Submit
+                </Button>
+              </form>
             </Box>
           </Box>
           <Box
@@ -229,6 +369,7 @@ export default function IncidentDetailModal({
               width: "45%",
               alignItems: "flex-start",
               rowGap: 2,
+              justifyContent: "space-between",
             }}
           >
             <Select
@@ -269,6 +410,7 @@ export default function IncidentDetailModal({
                 borderRadius: "5px",
                 borderColor: "#464646",
                 width: "100%",
+                height: "90%",
               }}
             >
               <Box
@@ -293,7 +435,9 @@ export default function IncidentDetailModal({
                   </Grid>
                   <Grid item xs={6}>
                     {incident && (
-                      <Typography sx={{ fontSize: "14px" }}>{incident.incidentDate}</Typography>
+                      <Typography sx={{ fontSize: "14px" }}>
+                        {incident.incidentDate}
+                      </Typography>
                     )}
                   </Grid>
                   <Grid item xs={6}>
@@ -303,7 +447,9 @@ export default function IncidentDetailModal({
                   </Grid>
                   <Grid item xs={6}>
                     {incident && (
-                      <Typography sx={{ fontSize: "14px" }}>{incident.incidentCategory}</Typography>
+                      <Typography sx={{ fontSize: "14px" }}>
+                        {incident.incidentCategory}
+                      </Typography>
                     )}
                   </Grid>
                   <Grid item xs={6}>

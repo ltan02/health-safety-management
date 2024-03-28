@@ -3,17 +3,6 @@ import {
     Box,
     Modal,
     Typography,
-    TextField,
-    Button,
-    Stack,
-    FormControl,
-    MenuItem,
-    Select,
-    InputLabel,
-    OutlinedInput,
-    Chip,
-    Checkbox,
-    Grid,
 } from "@mui/material";
 import PreviewForm from "../form/PreviewForm";
 
@@ -39,15 +28,7 @@ const largeTextFieldStyle = {
     },
 };
 
-function AddTaskModal({ open, onClose, handleAddTask, allEmployees, field, sortedRows }) {
-    // const [timeOfIncident, setTimeOfIncident] = useState("");
-    // const [location, setLocation] = useState("");
-    // const [employeesInvolved, setEmployeesInvolved] = useState([]);
-    // const [description, setDescription] = useState("");
-    // const [category, setCategory] = useState("");
-    // const [actionsTaken, setActionsTaken] = useState("");
-    // const [existingBarriers, setExistingBarriers] = useState("");
-    // const [preventativeMeasures, setPreventativeMeasures] = useState("");
+function AddTaskModal({ open, onClose, handleAddTask, allEmployees, field, sortedRows, formName }) {
 
     const handleSubmit = (field) => {
         handleAddTask(field);
@@ -66,7 +47,7 @@ function AddTaskModal({ open, onClose, handleAddTask, allEmployees, field, sorte
                 <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ mb: 2 }}>
                     Report New Incident
                 </Typography>
-                <PreviewForm fields={field} sortedRows={sortedRows} handleSubmit={handleSubmit} onClose={onClose} />
+                <PreviewForm fields={field} sortedRows={sortedRows} handleSubmit={handleSubmit} onClose={onClose} formName={formName} />
             </Box>
         </Modal>
     );
