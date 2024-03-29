@@ -5,20 +5,43 @@ import { useEffect, useState } from "react";
 import useAxios from "../../hooks/useAxios.js";
 import { categoryReports } from "../../pages/report/initialData.js";
 
-function ReportChart({type}) {
+function ReportChart({type, locked, data, height, width, handleSubmit}) {
     const { sendRequest, loading } = useAxios();
     const [report, setReport] = useState(categoryReports);
-    const [field, setField] = useState("category");
-    const [startDate, setStartDate] = useState();
-    const [endDate, setEndDate] = useState();
-    const handleFieldChange = (event) => {
-        setField(event.target.value);
-        getReportAPI(event.target.value);
-    };
+    const [field, setField] = useState(data.field);
+    const [startDate, setStartDate] = useState(data.start);
+    const [endDate, setEndDate] = useState(data.end);
 
     useEffect(() => {
-        getReportAPI(field);
-    }, [startDate, endDate]);
+        setEndDate(data.end);
+        setStartDate(data.start);
+        setField(data.field);
+        getReportAPI(data.field, data.start, data.end);
+    }, [data]);
+
+    useEffect(() => {
+        getReportAPI(data.field, data.start, data.end);
+    }, []);
+
+    const handleFieldChange = (event) => {
+        if (typeof handleSubmit === 'function')
+            handleSubmit(event.target.value, startDate, endDate);
+        setField(event.target.value);
+        getReportAPI(event.target.value, startDate, endDate);
+    };
+    const handleStartChange = (event) => {
+        if (typeof handleSubmit === 'function')
+            handleSubmit(field, event.target.value, endDate);
+        setStartDate(event.target.value);
+        getReportAPI(field, event.target.value, endDate);
+    };
+
+    const handleEndChange = (event) => {
+        if (typeof handleSubmit === 'function')
+            handleSubmit(field, startDate, event.target.value);
+        setEndDate(event.target.value);
+        getReportAPI(field, startDate, event.target.value);
+    };
 
     const BarChartCard = (
         <>
@@ -27,11 +50,9 @@ function ReportChart({type}) {
                     dataset={report}
                     xAxis={[{ scaleType: "band", dataKey: 'label'}]}
                     series={[{ dataKey: 'value'}]}
-                    height={350}
+                    height={height}
+                    width={width}
             />
-            <Typography gutterBottom variant="h5" component="div">
-                Bar Chart
-            </Typography>  
         </>
     );
     
@@ -46,11 +67,9 @@ function ReportChart({type}) {
                             data: report.map((v) => v.value),
                         },
                     ]}
-                    height={350}
+                    height={height}
+                    width={width}
                 />
-            <Typography gutterBottom variant="h5" component="div">
-                Line Chart
-            </Typography>
         </>
     );
 
@@ -58,7 +77,8 @@ function ReportChart({type}) {
         <>
             <h1>Scatter Chart</h1>
             <ScatterChart
-                    height={350}
+                    height={height}
+                    width={width}
                     series={[
                         {
                             data: report.map((v) => ({ x: v.id, y: v.value, id: v.id })),
@@ -66,9 +86,6 @@ function ReportChart({type}) {
                         },
                     ]}
             />
-            <Typography gutterBottom variant="h5" component="div">
-                Scatter Plot
-            </Typography>
         </>
     );
 
@@ -81,32 +98,14 @@ function ReportChart({type}) {
                             data: report.map((v) => ({ id: v.id, value: v.value, label: v.label }))
                         },
                     ]}
-                    height={350}
+                    height={height}
+                    width={width}
                 />
-                <Typography gutterBottom variant="h5" component="div">
-                    Pie Chart
-                </Typography>
         </>
     );
 
-
-    return (
-        <div>
-            <Container
-            maxWidth="md"
-            sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                mt: 5,
-            }}
-            >
-            
-                {type === 'Bar' && BarChartCard}
-                {type === 'Line' && LineChartCard}
-                {type === 'Scatter' && ScatterChartCard}
-                {type === 'Pie' && PieChartCard}
+    const customize = (
+        <>
                 <Typography gutterBottom variant="h7"> Select Field </Typography>
                 <Select
                     value={field}
@@ -122,26 +121,45 @@ function ReportChart({type}) {
                     <Typography gutterBottom variant="h8"> Start: </Typography>
                     <TextField type="datetime-local" 
                         value={startDate}
-                        onChange={(e) => setStartDate(e.target.value)}
+                        onChange={handleStartChange}
                     />
                 </Grid>
                 <Grid>
                     <Typography gutterBottom variant="h8"> End: </Typography>
                     <TextField type="datetime-local"
                         value={endDate}
-                        onChange={(e) => setEndDate(e.target.value)}
+                        onChange={handleEndChange}
                     />
                 </Grid>
+        </>
+    );
+    return (
+        <div>
+            <Container
+            maxWidth="md"
+            sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                mt: 5,
+            }}
+            >
+                {type === 'Bar' && BarChartCard}
+                {type === 'Line' && LineChartCard}
+                {type === 'Scatter' && ScatterChartCard}
+                {type === 'Pie' && PieChartCard}
+                {!locked && customize}
             </Container>
         </div>
     );
 
-    function getReportAPI(value) {
+    function getReportAPI(value, start, end) {  
         let url = `/reports/${value}`;
 
         const params = [];
-        if (startDate) params.push(`start=${startDate}`);
-        if (endDate) params.push(`end=${endDate}`);
+        if (start) params.push(`start=${start}`);
+        if (end) params.push(`end=${end}`);
         if (params.length > 0) {
             url += '?' + params.join('&');
         }
