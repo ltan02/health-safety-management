@@ -1,9 +1,11 @@
 import { useState } from "react";
 import useAxios from "./useAxios";
 import { FIELD_TYPES } from "../components/form/form_data";
+import { set } from "lodash";
 
 export default function useForm() {
   const [forms, setForms] = useState({});
+  const [activeForm, setActiveForm] = useState({});
 
   const { sendRequest, loading } = useAxios();
 
@@ -14,6 +16,11 @@ export default function useForm() {
     const newForm = {};
     response.map((form) => {
       newForm[form.id] = form;
+    });
+    response.map((form) => {
+      if (form.active) {
+        setActiveForm(form);
+      }
     });
     setForms(newForm);
   };
@@ -124,6 +131,61 @@ export default function useForm() {
     }
   }
 
+  const getActiveForm = async () => {
+    try {
+      const response = await sendRequest({
+        url: "/forms/active",
+      });
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const setFormActive = async (formId) => {
+    try {
+      if (!formId) {
+        console.error("Invalid input");
+        return;
+      }
+      const response = await sendRequest({
+        url: `/forms/${formId}/active`,
+        method: "PUT",
+      });
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const toggleForm = async (formId) => {
+    try {
+      if (!formId || formId === activeForm.id) {
+        return;
+      }
+      await setFormInactive(activeForm.id);
+      await setFormActive(formId);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const setFormInactive = async (formId) => {
+    try {
+      if (!formId) {
+        console.error("Invalid input");
+        return;
+      }
+      const response = await sendRequest({
+        url: `/forms/${formId}/inactive`,
+        method: "PUT",
+      });
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const groupedByRows = (fields, cols) => {
     if(fields.length <= 0) return {};
     const newFields = fields.reduce((acc, field) => {
@@ -202,6 +264,7 @@ export default function useForm() {
   };
 
 
+
   const updateFormName = async (formId, name) => {
     try {
       if (!formId || !name) {
@@ -218,13 +281,18 @@ export default function useForm() {
       console.error(error);
     }
   };
+  
 
   return {
     fetchForms,
+    toggleForm,
     createNewForm,
     deleteForm,
     updateAllFieldCoordinates,
     forms,
+    activeForm,
+    setFormActive,
+    setFormInactive,
     addField,
     updateField,
     groupedByRows,

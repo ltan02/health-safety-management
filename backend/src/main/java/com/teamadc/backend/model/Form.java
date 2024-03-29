@@ -16,6 +16,7 @@ public class Form {
     private String dateAdded;
     private String dateModified;
     private List<Field> fields;
+    private Boolean active = false;
 
     public Form() {
     }

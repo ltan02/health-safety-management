@@ -159,6 +159,19 @@ public class FormService {
         return formRepository.findById(formId);
     }
 
+    public Form setFormStatus(String formId, Boolean active) throws InterruptedException, ExecutionException {
+        Form form = formRepository.findById(formId);
+        form.setActive(active);
+        return formRepository.save(form);
+    }
+
+    public Form getActiveForm() throws InterruptedException, ExecutionException {
+        return formRepository.findAll().stream()
+                .filter(Form::getActive)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No active form found"));
+    }
+
     public List<Form> getForms() throws InterruptedException, ExecutionException {
         return formRepository.findAll();
     }

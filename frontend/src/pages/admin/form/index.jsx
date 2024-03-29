@@ -13,7 +13,10 @@ import {
   CircularProgress,
   Button,
   Box,
+  Tooltip,
 } from "@mui/material";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import FormCustomizationModal from "../../../components/form/FormCustomizationModal";
@@ -21,6 +24,7 @@ import useForm from "../../../hooks/useForm";
 import AddFormModal from "../../../components/form/AddFormModal";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteFormModal from "../../../components/form/DeleteFormModal";
+import ActivateFormModal from "../../../components/form/ActivateFormModal";
 
 function AdminForm() {
   const {
@@ -37,6 +41,7 @@ function AdminForm() {
     updateFormName,
     createNewForm,
     deleteForm,
+    toggleForm,
   } = useForm();
   const [fields, setFields] = useState({});
   const [selectingForm, setSelectingForm] = useState({});
@@ -44,6 +49,7 @@ function AdminForm() {
   const [open, setOpen] = useState(false);
   const [openCreateForm, setOpenCreateForm] = useState(false);
   const [openDeleteForm, setOpenDeleteForm] = useState(false);
+  const [openActiveForm, setOpenActiveForm] = useState(false);
 
   const handleEditModalOpen = (form) => {
     setSelectingForm(form);
@@ -58,6 +64,11 @@ function AdminForm() {
 
   const handleDeleteModalOpen = (form) => {
     setOpenDeleteForm(true);
+    setSelectingForm(form);
+  };
+
+  const handleActivateModalOpen = (form) => {
+    setOpenActiveForm(true);
     setSelectingForm(form);
   };
 
@@ -105,6 +116,12 @@ function AdminForm() {
     setSelectingForm({});
   };
 
+  const handleActiveForm = async () => {
+    await toggleForm(selectingForm.id);
+    await fetchForms();
+    setSelectingForm({});
+  };
+
   useEffect(() => {
     fetchForms();
   }, []);
@@ -122,7 +139,7 @@ function AdminForm() {
   }, [forms]);
 
   return (
-    <Container maxWidth="md" sx={{ mt: 4 }}>
+    <Container sx={{ mt: 4 }}>
       <AddFormModal
         open={openCreateForm}
         handleClose={() => setOpenCreateForm(false)}
@@ -133,6 +150,13 @@ function AdminForm() {
         handleClose={() => setOpenDeleteForm(false)}
         deleteForm={handleDeleteForm}
         form={selectingForm}
+      />
+      <ActivateFormModal
+        open={openActiveForm}
+        handleClose={() => setOpenActiveForm(false)}
+        toggleForm={handleActiveForm}
+        activeForm={Object.values(forms).find((form) => form.active)}
+        selectedForm={selectingForm}
       />
       <TableContainer
         component={Paper}
@@ -157,13 +181,22 @@ function AdminForm() {
                 <Typography variant="subtitle2">Last Updated</Typography>
               </TableCell>
               <TableCell align="center">
+                <Typography variant="subtitle2">In Use</Typography>
+              </TableCell>
+              <TableCell align="center">
                 <Typography variant="subtitle2">Actions</Typography>
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {Object.keys(forms).map((formId) => (
-              <TableRow key={forms[formId].id} hover>
+              <TableRow
+                key={forms[formId].id}
+                hover
+                style={{
+                  backgroundColor: forms[formId].active ? "#E8F5E9" : "inherit",
+                }}
+              >
                 <TableCell component="th" scope="row">
                   <Typography variant="body2">{forms[formId].id}</Typography>
                 </TableCell>
@@ -186,22 +219,36 @@ function AdminForm() {
                     {new Date(forms[formId].dateModified).toLocaleDateString()}
                   </Typography>
                 </TableCell>
-                <TableCell align="right">
+                <TableCell align="center">
+                  {forms[formId].active ? (
+                    <Tooltip title="Active Form" arrow>
+                      <CheckCircleIcon color="success" />
+                    </Tooltip>
+                  ) : (
+                    <Tooltip title="Inactive Form" arrow>
+                      <IconButton size="small" onClick={() => handleActivateModalOpen(forms[formId])}>
+                        <CancelIcon color="error" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </TableCell>
+                <TableCell align="center">
                   <IconButton
                     size="small"
-                    onClick={() => {
-                      handleEditModalOpen(forms[formId]);
-                    }}
+                    onClick={() => handleEditModalOpen(forms[formId])}
                   >
-                    <ModeEditIcon />
+                    <Tooltip title="Edit Form" arrow>
+                      <ModeEditIcon />
+                    </Tooltip>
                   </IconButton>
+
                   <IconButton
                     size="small"
-                    onClick={() => {
-                      handleDeleteModalOpen(forms[formId]);
-                    }}
+                    onClick={() => handleDeleteModalOpen(forms[formId])}
                   >
-                    <DeleteIcon />
+                    <Tooltip title="Delete Form" arrow>
+                      <DeleteIcon />
+                    </Tooltip>
                   </IconButton>
                 </TableCell>
               </TableRow>
@@ -209,6 +256,7 @@ function AdminForm() {
           </TableBody>
         </Table>
       </TableContainer>
+
       <FormCustomizationModal
         open={open}
         updateFieldCoordinate={handleUpdateCoordinate}
