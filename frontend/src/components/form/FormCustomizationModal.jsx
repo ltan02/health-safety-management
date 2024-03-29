@@ -26,16 +26,17 @@ function FormCustomizationModal({
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: "auto",
           maxWidth: "90vw",
+          maxHeight: "90vh",
           bgcolor: "background.paper",
           boxShadow: 24,
           p: 4,
           borderRadius: 2,
+          overflow: "auto",
         }}
       >
         <Paper elevation={0}>
-          <FormTab labels={["Preview Form", "Customize Fields", "Add Fields"]}>
+          <FormTab labels={["Preview Form", "Customize Fields", "Add Fields"]} > 
             <PreviewForm
               fields={fields}
               sortedRows={sortedRows}

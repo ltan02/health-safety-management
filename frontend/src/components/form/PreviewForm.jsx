@@ -3,12 +3,24 @@ import { Container, Typography, Button, Grid, Divider } from "@mui/material";
 import { FIELD_TYPES } from "./form_data";
 import useAxios from "../../hooks/useAxios";
 import { FIELD_ELEMENT } from "./form_elements";
-import { set } from "lodash";
 
-function PreviewForm({ fields, sortedRows, handleSubmit, onClose, formName }) {
+function PreviewForm({
+  fields,
+  sortedRows,
+  handleSubmit,
+  onClose,
+  formName,
+  formHeight,
+}) {
   const [fieldsData, setFieldsData] = useState({});
   const { sendAIRequest, aiLoading } = useAxios();
   const [aiCategrory, setAICategory] = useState("");
+
+  const formHeightStyle = {
+    height: formHeight ? formHeight + "vh": "80vh",
+    width: "80vh",
+    overflow: "auto",
+  };
 
   const handleChange = (event, field) => {
     const { name, value } = event.target;
@@ -34,7 +46,6 @@ function PreviewForm({ fields, sortedRows, handleSubmit, onClose, formName }) {
   };
 
   const onCategorySearch = async () => {
-    console.log(fieldsData);
     const res = await sendAIRequest({
       url: "/categorize/",
       method: "POST",
@@ -89,7 +100,7 @@ function PreviewForm({ fields, sortedRows, handleSubmit, onClose, formName }) {
   };
 
   return (
-    <Container style={{ height: "80vh", width: "80vh", overflow: "auto" }}>
+    <Container style={formHeightStyle}>
       <Typography
         variant="h4"
         align="left"

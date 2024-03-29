@@ -6,7 +6,6 @@ import lombok.Setter;
 
 import java.util.List;
 
-
 @Getter
 @Setter
 public class Form {
@@ -26,6 +25,11 @@ public class Form {
         this.author = author;
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
+    }
+
+    public Form(String name, User author) {
+        this.name = name;
+        this.author = author;
     }
 
     public Form(List<Field> fields) {

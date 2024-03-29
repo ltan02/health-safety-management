@@ -11,11 +11,16 @@ import {
   TableRow,
   Paper,
   CircularProgress,
+  Button,
+  Box,
 } from "@mui/material";
 
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import FormCustomizationModal from "../../../components/form/FormCustomizationModal";
 import useForm from "../../../hooks/useForm";
+import AddFormModal from "../../../components/form/AddFormModal";
+import DeleteIcon from "@mui/icons-material/Delete";
+import DeleteFormModal from "../../../components/form/DeleteFormModal";
 
 function AdminForm() {
   const {
@@ -30,21 +35,30 @@ function AdminForm() {
     updateField,
     loading,
     updateFormName,
+    createNewForm,
+    deleteForm,
   } = useForm();
   const [fields, setFields] = useState({});
   const [selectingForm, setSelectingForm] = useState({});
 
   const [open, setOpen] = useState(false);
+  const [openCreateForm, setOpenCreateForm] = useState(false);
+  const [openDeleteForm, setOpenDeleteForm] = useState(false);
 
-  const handleOpen = (form) => {
+  const handleEditModalOpen = (form) => {
     setSelectingForm(form);
     setOpen(true);
     setFields(form.fields);
   };
 
-  const handleClose = () => {
+  const handleEditModalClose = () => {
     setOpen(false);
     setFields({});
+  };
+
+  const handleDeleteModalOpen = (form) => {
+    setOpenDeleteForm(true);
+    setSelectingForm(form);
   };
 
   const handleUpdateCoordinate = async (fieldsData) => {
@@ -60,22 +74,36 @@ function AdminForm() {
   const handleSort = () => {
     return sortedRows(groupedByRows(fields, 1));
   };
-  
-  const handleDeleteField = async (fieldId) => { 
+
+  const handleDeleteField = async (fieldId) => {
     await deleteField(selectingForm.id, fieldId);
     await fetchForms();
-  }
+  };
 
   const handleUpdateField = async (fieldData) => {
     await updateField(selectingForm.id, fieldData);
     await fetchForms();
-  }
+  };
 
   const handleUpdateFormName = async (formName) => {
     await updateFormName(selectingForm.id, formName);
     await fetchForms();
-  
-  }
+  };
+
+  const handleCreateForm = async (form) => {
+    await createNewForm(form);
+    await fetchForms();
+  };
+
+  const openCreateFormModal = () => {
+    setOpenCreateForm(true);
+  };
+
+  const handleDeleteForm = async () => {
+    await deleteForm(selectingForm.id);
+    await fetchForms();
+    setSelectingForm({});
+  };
 
   useEffect(() => {
     fetchForms();
@@ -89,12 +117,23 @@ function AdminForm() {
     if (selectingForm.id) {
       setSelectingForm(
         Object.values(forms).find((form) => form.id === selectingForm.id)
-      )
+      );
     }
   }, [forms]);
 
   return (
     <Container maxWidth="md" sx={{ mt: 4 }}>
+      <AddFormModal
+        open={openCreateForm}
+        handleClose={() => setOpenCreateForm(false)}
+        createNewForm={handleCreateForm}
+      />
+      <DeleteFormModal
+        open={openDeleteForm}
+        handleClose={() => setOpenDeleteForm(false)}
+        deleteForm={handleDeleteForm}
+        form={selectingForm}
+      />
       <TableContainer
         component={Paper}
         sx={{ maxHeight: "75vh", overflow: "auto" }}
@@ -117,7 +156,7 @@ function AdminForm() {
               <TableCell align="left">
                 <Typography variant="subtitle2">Last Updated</Typography>
               </TableCell>
-              <TableCell align="right">
+              <TableCell align="center">
                 <Typography variant="subtitle2">Actions</Typography>
               </TableCell>
             </TableRow>
@@ -151,10 +190,18 @@ function AdminForm() {
                   <IconButton
                     size="small"
                     onClick={() => {
-                      handleOpen(forms[formId]);
+                      handleEditModalOpen(forms[formId]);
                     }}
                   >
-                    <AddCircleOutlineIcon />
+                    <ModeEditIcon />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    onClick={() => {
+                      handleDeleteModalOpen(forms[formId]);
+                    }}
+                  >
+                    <DeleteIcon />
                   </IconButton>
                 </TableCell>
               </TableRow>
@@ -165,7 +212,7 @@ function AdminForm() {
       <FormCustomizationModal
         open={open}
         updateFieldCoordinate={handleUpdateCoordinate}
-        handleClose={handleClose}
+        handleClose={handleEditModalClose}
         fields={fields}
         handleAddNewField={handleAddNewField}
         sortedRows={handleSort}
@@ -174,7 +221,17 @@ function AdminForm() {
         updateField={handleUpdateField}
         formName={selectingForm.name}
         updateFormName={handleUpdateFormName}
+        deleteForm={handleDeleteForm}
       />
+      <Box sx={{ display: "flex", justifyContent: "right", mt: 2 }}>
+        <Button
+          variant="outlined"
+          color="primary"
+          onClick={openCreateFormModal}
+        >
+          Add New Form
+        </Button>
+      </Box>
     </Container>
   );
 }
