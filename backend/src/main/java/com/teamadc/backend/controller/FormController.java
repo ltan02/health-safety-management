@@ -21,6 +21,8 @@ import com.teamadc.backend.service.FormService;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/forms")
@@ -111,6 +113,37 @@ public class FormController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    @PutMapping("/{formId}/active")
+    public ResponseEntity<Form> setFormActive(@PathVariable String formId) {
+        try {
+            Form newForm = formService.setFormStatus(formId, true);
+            return ResponseEntity.ok(newForm);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PutMapping("/{formId}/inactive")
+    public ResponseEntity<Form> setFormInactive(@PathVariable String formId) {
+        try {
+            Form newForm = formService.setFormStatus(formId, false);
+            return ResponseEntity.ok(newForm);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/active")
+    public ResponseEntity<Form> getActiveForms() {
+        try {
+            Form forms = formService.getActiveForm();
+            return ResponseEntity.ok(forms);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+    
 
     @DeleteMapping("/{formId}")
     public ResponseEntity<Form> deleteForm(@PathVariable String formId) {

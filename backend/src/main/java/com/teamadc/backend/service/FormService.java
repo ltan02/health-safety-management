@@ -9,8 +9,9 @@ import com.teamadc.backend.model.FieldProp;
 import com.teamadc.backend.repository.GenericRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.Date;
 
-
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -21,14 +22,26 @@ public class FormService {
     private final GenericRepository<FieldProp> fieldPropRepository;
 
     @Autowired
-    public FormService(GenericRepository<Form> formRepository, GenericRepository<Field> fieldRepository, GenericRepository<FieldProp> fieldPropRepository) {
+    public FormService(GenericRepository<Form> formRepository, GenericRepository<Field> fieldRepository,
+            GenericRepository<FieldProp> fieldPropRepository) {
         this.formRepository = formRepository;
         this.fieldRepository = fieldRepository;
         this.fieldPropRepository = fieldPropRepository;
     }
 
     public Form createOrUpdateForm(Form form) throws InterruptedException, ExecutionException {
-        form.setFields(List.of());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        if (form.getDateAdded() == null) {
+            String currentDateStr = sdf.format(new Date(System.currentTimeMillis()));
+            form.setDateAdded(currentDateStr);
+        }
+        if (form.getDateModified() == null) {
+            String currentDateStr = sdf.format(new Date(System.currentTimeMillis()));
+            form.setDateModified(currentDateStr);
+        }
+        if (form.getFields() == null) {
+            form.setFields(List.of());
+        }
         return formRepository.save(form);
     }
 
@@ -40,17 +53,18 @@ public class FormService {
             fieldRepository.save(newField);
         }
         form.setFields(newForm.getFields());
-
+        form.setDateModified(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis())));
         return formRepository.save(form);
     }
 
     public Form updateFormName(String formId, FormNameRequest request) throws InterruptedException, ExecutionException {
         Form form = formRepository.findById(formId);
         form.setName(request.getName());
+        form.setDateModified(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis())));
         return formRepository.save(form);
     }
 
-    public Form addField (String formId, Field field) throws InterruptedException, ExecutionException {
+    public Form addField(String formId, Field field) throws InterruptedException, ExecutionException {
         Form form = formRepository.findById(formId);
         FieldProp fieldProp = field.getProps();
         fieldPropRepository.save(fieldProp);
@@ -58,6 +72,7 @@ public class FormService {
         List<Field> fields = form.getFields();
         fields.add(field);
         form.setFields(fields);
+        form.setDateModified(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis())));
         return formRepository.save(form);
     }
 
@@ -72,47 +87,53 @@ public class FormService {
             }
         }
         form.setFields(fields);
+        form.setDateModified(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis())));
         return formRepository.save(form);
     }
 
-    public Form updateField(String formId, String fieldId, Field field) throws InterruptedException, ExecutionException {
+    public Form updateField(String formId, String fieldId, Field field)
+            throws InterruptedException, ExecutionException {
         Form form = formRepository.findById(formId);
         List<Field> fields = form.getFields();
         Field fieldToUpdate = fields.stream()
-                                    .filter(f -> f.getId().equals(fieldId))
-                                    .findFirst()
-                                    .orElseThrow(() -> new IllegalStateException("Field not found with id: " + fieldId));
+                .filter(f -> f.getId().equals(fieldId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Field not found with id: " + fieldId));
         fieldToUpdate.setProps(field.getProps());
         fields.removeIf(f -> f.getId().equals(fieldId));
         fields.add(fieldToUpdate);
-        
+
         fieldRepository.save(fieldToUpdate);
         form.setFields(fields);
+        form.setDateModified(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis())));
         return formRepository.save(form);
     }
 
-    public Field updateCoordinate(String formId, String fieldId, Coordinate coordinate) throws InterruptedException, ExecutionException {
+    public Field updateCoordinate(String formId, String fieldId, Coordinate coordinate)
+            throws InterruptedException, ExecutionException {
         Form form = formRepository.findById(formId);
         List<Field> fields = form.getFields();
         Field fieldToUpdate = fields.stream()
-                                    .filter(f -> f.getId().equals(fieldId))
-                                    .findFirst()
-                                    .orElseThrow(() -> new IllegalStateException("Field not found with id: " + fieldId));
+                .filter(f -> f.getId().equals(fieldId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Field not found with id: " + fieldId));
         fieldToUpdate.setCoordinate(coordinate);
         fields.removeIf(f -> f.getId().equals(fieldId));
         fields.add(fieldToUpdate);
-        
+
         fieldRepository.save(fieldToUpdate);
         form.setFields(fields);
-        formRepository.save(form); // field collection is updated, but field in form is not updated when we try replacing the coordinates
-        
+        formRepository.save(form); // field collection is updated, but field in form is not updated when we try
+                                   // replacing the coordinates
+
         return form.getFields().stream()
                 .filter(f -> f.getId().equals(fieldId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Field not found with id: " + fieldId));
     }
 
-    public Form updateCoordinates(String formId, List<FieldCoordinateRequest> fields) throws InterruptedException, ExecutionException {
+    public Form updateCoordinates(String formId, List<FieldCoordinateRequest> fields)
+            throws InterruptedException, ExecutionException {
         Form form = formRepository.findById(formId);
         List<Field> formFields = form.getFields();
         for (FieldCoordinateRequest field : fields) {
@@ -129,7 +150,6 @@ public class FormService {
         form.setFields(formFields);
         return formRepository.save(form);
     }
-    
 
     public void deleteForm(String formId) throws InterruptedException, ExecutionException {
         formRepository.deleteById(formId);
@@ -137,6 +157,19 @@ public class FormService {
 
     public Form getFormById(String formId) throws InterruptedException, ExecutionException {
         return formRepository.findById(formId);
+    }
+
+    public Form setFormStatus(String formId, Boolean active) throws InterruptedException, ExecutionException {
+        Form form = formRepository.findById(formId);
+        form.setActive(active);
+        return formRepository.save(form);
+    }
+
+    public Form getActiveForm() throws InterruptedException, ExecutionException {
+        return formRepository.findAll().stream()
+                .filter(Form::getActive)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No active form found"));
     }
 
     public List<Form> getForms() throws InterruptedException, ExecutionException {

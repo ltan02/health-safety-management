@@ -28,7 +28,7 @@ function Dashboard() {
     const { tasks, filterTasks, setTasks, fetchTasks } = useTasks();
     
 
-    const { forms, fetchForms, groupedByRows, sortedRows } = useForm();
+    const { forms, fetchForms, groupedByRows, sortedRows, activeForm } = useForm();
     const { activeId, handleDragStart, handleDragOver, handleDragEnd } = useDragBehavior(tasks, setTasks);
     const { user } = useAuthContext();
     const { sendRequest } = useAxios();
@@ -146,7 +146,7 @@ function Dashboard() {
 
     useEffect(() => {
         // TODO: remove this when the form is selected from the form list
-        setFields(forms[SELECTED_INCIDENT]?.fields);
+        setFields(activeForm?.fields);
     }, [forms]);
 
     useEffect(() => {
@@ -199,7 +199,7 @@ function Dashboard() {
                                 onRefresh={refreshDashboard}
                                 field={fields}
                                 sortedRows={handleSort}
-                                formName={forms[SELECTED_INCIDENT]?.name}
+                                formName={activeForm?.name}
                                 commentData={commentData}
                                 setCommentData={setCommentData}
                             />

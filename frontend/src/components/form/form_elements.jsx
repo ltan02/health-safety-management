@@ -8,33 +8,48 @@ import {
   Chip,
   Box,
   Tooltip,
+  Button,
+  Icon,
 } from "@mui/material";
 
 import styled from "@emotion/styled";
 
-import { useDropzone } from 'react-dropzone';
+import { useDropzone } from "react-dropzone";
 import { FIELD_TYPES, VARIANT_TYPES } from "./form_data";
+import SmartToyIcon from "@mui/icons-material/SmartToy";
 
 const FileDropzone = (props) => {
-  const {getRootProps, getInputProps} = useDropzone({
+  const { getRootProps, getInputProps } = useDropzone({
     onDrop: (acceptedFiles) => {
       //handle file upload
     },
   });
 
   return (
-    <Box {...getRootProps()} style={{ border: '1px solid orange', textAlign: 'center', opacity: 0.5, borderRadius: 5 }}>
+    <Box
+      {...getRootProps()}
+      style={{
+        border: "1px solid orange",
+        textAlign: "center",
+        opacity: 0.5,
+        borderRadius: 5,
+      }}
+    >
       <input {...getInputProps()} />
-      <Typography sx={{
-        color: 'orange',
-        fontSize: '1rem',
-        padding: '20px',
-        cursor: 'pointer',
-      }} variant={VARIANT_TYPES.BODY}>+</Typography>
+      <Typography
+        sx={{
+          color: "orange",
+          fontSize: "1rem",
+          padding: "20px",
+          cursor: "pointer",
+        }}
+        variant={VARIANT_TYPES.BODY}
+      >
+        +
+      </Typography>
     </Box>
   );
 };
-
 
 export const FIELD_ELEMENT = {
   [FIELD_TYPES.TEXT_FIELD]: ({
@@ -44,9 +59,10 @@ export const FIELD_ELEMENT = {
     placeholder,
     description,
     onChange,
+    onClick,
     ...props
   }) => (
-    <FormControl fullWidth {...props} style={{minHeight: 100}}>
+    <FormControl fullWidth {...props} style={{ minHeight: 100 }}>
       <Typography fontWeight={600} variant={VARIANT_TYPES.LABEL}>
         {label}
         {required ? "*" : ""}
@@ -69,10 +85,11 @@ export const FIELD_ELEMENT = {
     placeholder,
     description,
     onChange,
+    onClick,
     rows = 3,
     ...props
   }) => (
-    <FormControl fullWidth {...props} >
+    <FormControl fullWidth {...props}>
       <Typography fontWeight={600} variant={VARIANT_TYPES.LABEL}>
         {label}
         {required ? "*" : ""}
@@ -96,6 +113,7 @@ export const FIELD_ELEMENT = {
     required,
     description,
     onChange,
+    onClick,
     ...props
   }) => (
     <FormControl fullWidth {...props}>
@@ -121,6 +139,7 @@ export const FIELD_ELEMENT = {
     onChange,
     value,
     required,
+    onClick,
     ...props
   }) => (
     <FormControl fullWidth {...props}>
@@ -152,10 +171,16 @@ export const FIELD_ELEMENT = {
     value,
     name,
     required,
+    onClick,
     ...props
   }) => (
-    <FormControl fullWidth {...props} variant={VARIANT_TYPES.STANDARD} margin="normal">
-      <Typography  fontWeight={600} variant={VARIANT_TYPES.LABEL} gutterBottom>
+    <FormControl
+      fullWidth
+      {...props}
+      variant={VARIANT_TYPES.STANDARD}
+      margin="normal"
+    >
+      <Typography fontWeight={600} variant={VARIANT_TYPES.LABEL} gutterBottom>
         {label}
         {required ? "*" : ""}
       </Typography>
@@ -211,7 +236,12 @@ export const FIELD_ELEMENT = {
     required,
     ...props
   }) => (
-    <FormControl fullWidth {...props} variant={VARIANT_TYPES.STANDARD} margin="normal">
+    <FormControl
+      fullWidth
+      {...props}
+      variant={VARIANT_TYPES.STANDARD}
+      margin="normal"
+    >
       <Typography fontWeight={600} variant={VARIANT_TYPES.LABEL}>
         {label}
         {required ? "*" : ""}
@@ -239,11 +269,120 @@ export const FIELD_ELEMENT = {
         {label}
       </Typography>
       <Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>
-      <FileDropzone
-        {...props}
+      <FileDropzone {...props} disabled={props.disabled} />
+    </FormControl>
+  ),
+  [FIELD_TYPES.EMPTY]: () => <></>,
+  [FIELD_TYPES.DESCRIPTION]: ({
+    label,
+    name,
+    required,
+    placeholder,
+    description,
+    onChange,
+    onClick,
+    rows = 3,
+    ...props
+  }) => (
+    <FormControl fullWidth {...props}>
+      <Typography fontWeight={600} variant={VARIANT_TYPES.LABEL}>
+        {label}
+        {"*"}
+      </Typography>
+      <Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>
+      <TextField
+        onChange={onChange}
+        name={name}
+        required={true}
+        placeholder={placeholder}
+        multiline
+        rows={rows}
+        variant={VARIANT_TYPES.STANDARD}
         disabled={props.disabled}
       />
     </FormControl>
   ),
-  [FIELD_TYPES.EMPTY]: () => <></>,
+  [FIELD_TYPES.CATEGORY]: ({
+    label,
+    description,
+    value,
+    loading,
+    onClick,
+    disabled,
+    ...props
+  }) => {
+    return (
+      <FormControl
+        fullWidth
+        {...props}
+        sx={{
+          padding: "16px",
+          border: "1px solid #E0E0E0",
+          borderRadius: "8px",
+          boxShadow: "0px 2px 4px rgba(0,0,0,0.1)",
+        }}
+      >
+        <Typography
+          variant={VARIANT_TYPES.LABEL}
+          fontWeight={700}
+          sx={{ marginBottom: "8px" }}
+        >
+          {label}*
+        </Typography>
+        <Typography variant={VARIANT_TYPES.BODY} sx={{ marginBottom: "16px" }}>
+          {description}
+        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 2,
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              border: "1px solid #ccc",
+              borderRadius: "8px",
+              padding: "8px 12px",
+              backgroundColor: "#F5F5F5",
+              flexGrow: 1,
+            }}
+          >
+            <SmartToyIcon color="primary" />
+            {loading?.toString() === "false" ? (
+              <Tooltip title="AI Selected Category" placement="top">
+                <Typography
+                  variant={VARIANT_TYPES.BODY}
+                  sx={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {value}
+                </Typography>
+              </Tooltip>
+            ) : (
+              <Typography variant={VARIANT_TYPES.BODY}>Loading...</Typography>
+            )}
+          </Box>
+          <Tooltip title="Search and Select Category by AI" placement="top">
+            <Button
+              disabled={disabled}
+              onClick={onClick}
+              variant="contained"
+              color="primary"
+              sx={{ boxShadow: "none", "&:hover": { boxShadow: "none" } }}
+            >
+              Search
+            </Button>
+          </Tooltip>
+        </Box>
+      </FormControl>
+    );
+  },
 };

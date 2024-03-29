@@ -8,6 +8,8 @@ export const FIELD_TYPES = {
   SELECTION_MULTI: "selection-multi",
   SELECTION_SINGLE: "selection-single",
   FILE_ATTACHMENT: "file",
+  CATEGORY: "category",
+  DESCRIPTION: "description",
   EMPTY: "empty",
 };
 
