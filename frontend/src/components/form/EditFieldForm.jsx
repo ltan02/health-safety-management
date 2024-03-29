@@ -7,7 +7,7 @@ import {
   Divider,
   Box,
   TextField,
-  InputAdornment
+  CircularProgress,
 } from "@mui/material";
 import FieldComponentWrapper from "./FieldComponentWrapper";
 import {
@@ -44,6 +44,7 @@ function EditFieldForm({
   const [open, setOpen] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const sensors = useSensors(useSensor(PointerSensor));
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setFieldsData(fields);
@@ -81,9 +82,16 @@ function EditFieldForm({
   };
 
   const handleFieldUpdateCoordinate = async () => {
-    setIsEdited(false);
-    await updateFieldCoordinate(fieldsData);
-    await updateFormName(currentFormName);
+    setIsLoading(true);
+    try {
+      await updateFieldCoordinate(fieldsData);
+      await updateFormName(currentFormName);
+    } catch (error) {
+      console.error("Error updating field coordinate:", error);
+    } finally {
+      setIsLoading(false);
+      setIsEdited(false);
+    }
   };
 
   const onHandleDelete = () => {
@@ -136,8 +144,9 @@ function EditFieldForm({
               onClick={handleFieldUpdateCoordinate}
               variant="contained"
               color="primary"
+              disabled={isLoading}
             >
-              Save
+              {isLoading ? <CircularProgress size={24} /> : "Save"}
             </Button>
           </Box>
         </Container>
