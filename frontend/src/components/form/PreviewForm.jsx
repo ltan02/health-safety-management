@@ -22,6 +22,7 @@ function PreviewForm({
     overflow: "auto",
   };
 
+
   const handleChange = (event, field) => {
     const { name, value } = event.target;
     const isMultiSelect = field.type === FIELD_TYPES.SELECTION_MULTI;
@@ -94,7 +95,7 @@ function PreviewForm({
 
   const isRequiredFieldFilled = () => {
     const allRequiredPresent = fields.every((obj) =>
-      obj.props.required ? obj.props.name in fieldsData : true
+      obj.props.required ? obj.props.name in fieldsData && fieldsData[obj.props.name] !== "" : true
     );
     return allRequiredPresent;
   };
@@ -141,7 +142,9 @@ function PreviewForm({
                             ? fieldsData[fieldData.props.name] ?? []
                             : fieldData.type === FIELD_TYPES.SELECTION_SINGLE
                             ? fieldsData[fieldData.props.name]
-                            : aiCategrory
+                            : fieldData.type === FIELD_TYPES.CATEGORY
+                            ? aiCategrory
+                            : fieldsData[fieldData.props.name]
                         }
                         onChange={(e) => handleChange(e, fieldData)}
                         // onDescriptionChange={(e) => onDescriptionChange(e, fieldData)}
