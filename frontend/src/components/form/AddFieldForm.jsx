@@ -11,13 +11,11 @@ import {
   Grid,
   FormControl,
 } from "@mui/material";
-import {
-  FIELD_DATA,
-  FIELD_TYPES,
-  VARIANT_TYPES,
-} from "./form_data";
+import { FIELD_DATA, FIELD_TYPES, VARIANT_TYPES } from "./form_data";
+import { CircularProgress } from "@mui/material";
 
-import {  FIELD_ADD_FORM } from "./add_elements";
+import { FIELD_ADD_FORM } from "./add_elements";
+import { set } from "lodash";
 
 function AddFieldForm({ handleAddNewField, getLastCoordinate }) {
   const [fieldType, setFieldType] = useState([]);
@@ -27,54 +25,62 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate }) {
   const [options, setOptions] = useState([]);
   const [required, setRequired] = useState(true);
   const [select, setSelect] = useState("text");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setFieldType(Object.values(FIELD_DATA));
   }, []);
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    if (fieldTitle === "") {
-      alert("Title is required");
-      return;
-    }
-
-    if (
-      select === FIELD_TYPES.SELECTION_SINGLE ||
-      select === FIELD_TYPES.SELECTION_MULTI
-    ) {
-      if (options.length === 0) {
-        alert("Options are required for selection field");
+  const handleSubmit = async (event) => {
+    setIsLoading(true);
+    try {
+      event.preventDefault();
+      if (fieldTitle === "") {
+        alert("Title is required");
         return;
       }
-      if (options.includes("")) {
-        alert("Options cannot be empty");
-        return;
+
+      if (
+        select === FIELD_TYPES.SELECTION_SINGLE ||
+        select === FIELD_TYPES.SELECTION_MULTI
+      ) {
+        if (options.length === 0) {
+          alert("Options are required for selection field");
+          return;
+        }
+        if (options.includes("")) {
+          alert("Options cannot be empty");
+          return;
+        }
       }
-    }
 
-    const lastCoordinate = getLastCoordinate();
-    if (lastCoordinate.x === 0) {
-      lastCoordinate.x = 1;
-    } else {
-      lastCoordinate.x = 0;
-      lastCoordinate.y += 1;
-    }
+      const lastCoordinate = getLastCoordinate();
+      if (lastCoordinate.x === 0) {
+        lastCoordinate.x = 1;
+      } else {
+        lastCoordinate.x = 0;
+        lastCoordinate.y += 1;
+      }
 
-    const newField = {
-        "name": fieldTitle,
-        "type": select,
-        "props": {
-            "label": fieldTitle,
-            "name": fieldTitle.toLowerCase().replace(" ", "_"),
-            "required": required,
-            "placeholder": placeholder,
-            "description": fieldDescription,
-            "options": options
+      const newField = {
+        name: fieldTitle,
+        type: select,
+        props: {
+          label: fieldTitle,
+          name: fieldTitle.toLowerCase().replace(" ", "_"),
+          required: required,
+          placeholder: placeholder,
+          description: fieldDescription,
+          options: options,
         },
-        "coordinate": lastCoordinate
+        coordinate: lastCoordinate,
+      };
+      await handleAddNewField(newField);
+    } catch (error) {
+      console.error("Error adding new field:", error);
+    } finally {
+      setIsLoading(false);
     }
-    handleAddNewField(newField);
   };
 
   return (
@@ -111,7 +117,12 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate }) {
             })}
           </>
         ) : (
-          <Typography variant="h6" align="center" fontWeight={600} sx={{ my: 5 }}>
+          <Typography
+            variant="h6"
+            align="center"
+            fontWeight={600}
+            sx={{ my: 5 }}
+          >
             Select Field Type
           </Typography>
         )}
@@ -163,8 +174,9 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate }) {
         variant="contained"
         color="primary"
         sx={{ mt: 3 }}
+        disabled={isLoading}
       >
-        Submit
+        {isLoading ? <CircularProgress size={24} /> : "Create"}
       </Button>
     </Container>
   );
