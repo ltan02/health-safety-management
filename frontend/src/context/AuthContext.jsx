@@ -28,14 +28,12 @@ export function AuthProvider({ children }) {
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(async (user) => {
             if (user) {
-                const token = await user.getIdToken();
-                sessionStorage.setItem("token", token);
-
                 try {
+                    const token = await user.getIdToken();
+                    sessionStorage.setItem("token", token);
                     const backendResponse = await sendRequest({
                         url: `/users/${user.uid}`,
                     });
-
                     sessionStorage.setItem("user", JSON.stringify(backendResponse));
                     setUser(backendResponse);
                 } catch (e) {
@@ -50,12 +48,6 @@ export function AuthProvider({ children }) {
 
         return () => unsubscribe();
     }, []);
-
-    useEffect(() => {
-        if (!sessionStorage.getItem("user")) {
-            signOut();
-        }
-    }, [user]);
 
     const signIn = async (email, password) => {
         const firebaseResponse = await auth.signInWithEmailAndPassword(email, password);

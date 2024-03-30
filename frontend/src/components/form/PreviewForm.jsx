@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Container, Typography, Button, Grid, Divider } from "@mui/material";
 import { FIELD_TYPES } from "./form_data";
 import useAxios from "../../hooks/useAxios";
@@ -15,9 +15,10 @@ function PreviewForm({
   const [fieldsData, setFieldsData] = useState({});
   const { sendAIRequest, aiLoading } = useAxios();
   const [aiCategrory, setAICategory] = useState("");
+  const [filledRequired, setFilledRequired] = useState(false);
 
   const formHeightStyle = {
-    height: formHeight ? formHeight + "vh": "80vh",
+    height: formHeight ? formHeight + "vh" : "80vh",
     width: "80vh",
     overflow: "auto",
   };
@@ -100,6 +101,22 @@ function PreviewForm({
     return allRequiredPresent;
   };
 
+  useEffect(() => {
+    setFilledRequired(isRequiredFieldFilled());
+  }, [fieldsData]);
+
+  useEffect(() => {
+    console.log(fields);
+    const dateFields = fields.filter((field) => field.type === FIELD_TYPES.DATETIME_LOCAL);
+    dateFields.forEach((field) => {
+      setFieldsData((prevData) => ({
+        ...prevData,
+        [field.props.name]: new Date().toISOString().split("T")[0],
+      }));
+    });
+    console.log(dateFields)
+  }, []);
+
   return (
     <Container style={formHeightStyle}>
       <Typography
@@ -164,7 +181,7 @@ function PreviewForm({
             variant="contained"
             color="primary"
             sx={{ mt: 3, position: "fixed", bottom: "10px", right: "10px" }}
-            disabled={!isRequiredFieldFilled()}
+            disabled={!filledRequired}
           >
             Submit
           </Button>
