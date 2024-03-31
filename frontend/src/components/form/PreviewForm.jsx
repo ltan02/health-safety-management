@@ -104,17 +104,6 @@ function PreviewForm({
     setFilledRequired(isRequiredFieldFilled());
   }, [fieldsData]);
 
-  useEffect(() => {
-    console.log(fields);
-    const dateFields = fields.filter((field) => field.type === FIELD_TYPES.DATETIME_LOCAL);
-    dateFields.forEach((field) => {
-      setFieldsData((prevData) => ({
-        ...prevData,
-        [field.props.name]: new Date().toISOString().split("T")[0],
-      }));
-    });
-    console.log(dateFields)
-  }, []);
 
   return (
     <Container style={formHeightStyle}>
@@ -156,12 +145,10 @@ function PreviewForm({
                         value={
                           fieldData.type === FIELD_TYPES.SELECTION_MULTI
                             ? fieldsData[fieldData.props.name] ?? []
-                            : fieldData.type === FIELD_TYPES.SELECTION_SINGLE
-                            ? fieldsData[fieldData.props.name]
-                            : aiCategrory
+                            : fieldData.type === FIELD_TYPES.CATEGORY
+                            ? aiCategrory : fieldsData[fieldData.props.name]
                         }
                         onChange={(e) => handleChange(e, fieldData)}
-                        // onDescriptionChange={(e) => onDescriptionChange(e, fieldData)}
                         onClick={onCategorySearch}
                         loading={aiLoading + ""}
                       />
