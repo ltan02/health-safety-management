@@ -155,6 +155,8 @@ function EditFieldForm({
         onChange={(e) => handleFormNameChange(e.target.value)}
         variant="standard"
         defaultValue={currentFormName}
+        InputProps={{ style: { fontSize: 36 } }}
+        sx={{ marginTop: 5 }}
       />
       <Divider sx={{ my: 2 }} color="primary" />
       <form onSubmit={(e) => e.preventDefault()}>

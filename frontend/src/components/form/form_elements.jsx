@@ -52,32 +52,6 @@ const FileDropzone = (props) => {
 };
 
 export const FIELD_ELEMENT = {
-  [FIELD_TYPES.TEXT_FIELD]: ({
-    label,
-    name,
-    required,
-    placeholder,
-    description,
-    onChange,
-    onClick,
-    ...props
-  }) => (
-    <FormControl fullWidth {...props} style={{ minHeight: 100 }}>
-      <Typography fontWeight={600} variant={VARIANT_TYPES.LABEL}>
-        {label}
-        {required ? "*" : ""}
-      </Typography>
-      <Typography variant={VARIANT_TYPES.BODY}> {description} </Typography>
-      <TextField
-        onChange={onChange}
-        name={name}
-        required={required}
-        placeholder={placeholder}
-        variant={VARIANT_TYPES.STANDARD}
-        disabled={props.disabled}
-      />
-    </FormControl>
-  ),
   [FIELD_TYPES.TEXT_BOX]: ({
     label,
     name,
@@ -261,15 +235,6 @@ export const FIELD_ELEMENT = {
           </MenuItem>
         ))}
       </Select>
-    </FormControl>
-  ),
-  [FIELD_TYPES.FILE_ATTACHMENT]: ({ label, description, ...props }) => (
-    <FormControl fullWidth {...props}>
-      <Typography variant={VARIANT_TYPES.LABEL} fontWeight={600}>
-        {label}
-      </Typography>
-      <Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>
-      <FileDropzone {...props} disabled={props.disabled} />
     </FormControl>
   ),
   [FIELD_TYPES.EMPTY]: () => <></>,
