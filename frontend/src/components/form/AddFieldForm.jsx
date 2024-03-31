@@ -85,7 +85,7 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate }) {
 
   return (
     <Container style={{ height: "80vh", width: "80vh", overflow: "auto" }}>
-      <Typography variant="h6" align="center" fontWeight={600} sx={{ my: 5 }}>
+      <Typography variant="h6" fontWeight={600} align="left" sx={{ my: 5 }}>
         Select Field Type
       </Typography>
       <Select
@@ -100,10 +100,18 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate }) {
           </MenuItem>
         ))}
       </Select>
+      {FIELD_ADD_FORM[select] && (
+        <Typography variant="h6" fontWeight={600} align="left" sx={{ marginTop: 5 }}>
+          Customize Field
+        </Typography>
+      )}
       <Container
         sx={{
-          marginTop: "20px",
           marginBottom: "10px",
+        }}
+        style={{
+          paddingLeft: "0px",
+          paddingRight: "0px",
         }}
       >
         {FIELD_ADD_FORM[select] ? (
@@ -117,57 +125,60 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate }) {
             })}
           </>
         ) : (
-          <Typography
-            variant="h6"
-            align="center"
-            fontWeight={600}
-            sx={{ my: 5 }}
-          >
-            Select Field Type
+          <></>
+        )}
+        {FIELD_ADD_FORM[select] && (
+          <Typography variant="h6" fontWeight={600} align="left" sx={{ marginTop: 5 }}>
+            Preview Field
           </Typography>
         )}
-        <Box border={1} borderColor="grey.500" borderRadius={2} p={2} m={2}>
-          <FormControl fullWidth>
-            <Typography variant={VARIANT_TYPES.LABEL}>{fieldTitle}</Typography>
-            <Typography variant={VARIANT_TYPES.BODY}>
-              {fieldDescription} {required ? "(Required)" : "(Optional)"}
-            </Typography>
-            {select === FIELD_TYPES.SELECTION_SINGLE ||
-            select === FIELD_TYPES.SELECTION_MULTI ? (
-              <Select value={""} required={required}>
-                {options.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            ) : select === FIELD_TYPES.FILE_ATTACHMENT ? (
-              <TextField
-                variant={VARIANT_TYPES.OUTLINED}
-                margin="dense"
-                fullWidth
-                InputProps={{
-                  readOnly: true,
-                }}
-                type="file"
-                disabled
-                helperText={`This is a preview of a ${select} field.`}
-              />
-            ) : (
-              <TextField
-                placeholder={placeholder}
-                disabled
-                margin="dense"
-                fullWidth
-                InputProps={{
-                  readOnly: true,
-                }}
-                rows={3}
-                helperText={`This is a preview of a ${select} field.`}
-              />
-            )}
-          </FormControl>
-        </Box>
+        {FIELD_ADD_FORM[select] && (
+          <Box border={1} borderColor="grey.500" borderRadius={2} p={5} marginTop={2}>
+            <FormControl fullWidth>
+              <Typography variant={VARIANT_TYPES.LABEL} fontWeight={600}>
+                {fieldTitle} {required ? "*" : ""}
+              </Typography>
+              <Typography variant={VARIANT_TYPES.BODY}>
+                {fieldDescription}
+              </Typography>
+              {select === FIELD_TYPES.SELECTION_SINGLE ||
+              select === FIELD_TYPES.SELECTION_MULTI ? (
+                <Select value={""} required={required}>
+                  {options.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              ) : select === FIELD_TYPES.TEXT_BOX ? (
+                <TextField
+                  variant={VARIANT_TYPES.OUTLINED}
+                  margin="dense"
+                  fullWidth
+                  InputProps={{
+                    readOnly: true,
+                  }}
+                  multiline
+                  rows={3}
+                  disabled
+                  helperText={`This is a preview of a ${select} field.`}
+                />
+              ) : (
+                <TextField
+                  placeholder={placeholder}
+                  disabled
+                  margin="dense"
+                  fullWidth
+                  InputProps={{
+                    readOnly: true,
+                  }}
+                  rows={3}
+                  helperText={`This is a preview of a ${select} field.`}
+                />
+              )}
+            </FormControl>
+          </Box>
+        )}
       </Container>
       <Button
         onClick={handleSubmit}

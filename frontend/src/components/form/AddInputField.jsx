@@ -17,7 +17,7 @@ function AddInputField({
   initialRequired,
 }) {
   return (
-    <FormControl fullWidth margin="normal">
+    <FormControl fullWidth margin="normal" sx={{gap: 1}}>
       <TextField
         onChange={onTitleChange}
         variant={VARIANT_TYPES.STANDARD}
@@ -52,25 +52,11 @@ function AddInputField({
         onChange={onRequiredChange}
         label="Required"
         defaultValue={true}
+        sx={{marginTop: 2}}
       >
         <MenuItem value={true}>Required</MenuItem>
         <MenuItem value={false}>Optional</MenuItem>
       </Select>
-      {/* <TextField
-        placeholder={`${
-          type.charAt(0).toUpperCase() + type.slice(1)
-        } type field`}
-        multiline
-        variant={VARIANT_TYPES.OUTLINED}
-        disabled
-        margin="dense"
-        fullWidth
-        InputProps={{
-          readOnly: true,
-        }}
-        rows={3}
-        helperText={`This is a preview of a ${type} field.`}
-      /> */}
     </FormControl>
   );
 }
