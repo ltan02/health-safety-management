@@ -12,6 +12,7 @@ import {
   Menu,
   Button,
   FormControl,
+  TextField,
 } from "@mui/material";
 import { v4 as uuid } from "uuid";
 
@@ -62,6 +63,9 @@ export default function IncidentDetailModal({
   const [anchorEl, setAnchorEl] = useState(null);
   const [isStatusModalOpen, setStatusModalOpen] = useState(false);
   const [comment, setComment] = useState("");
+  const [editingCustomField, setEditingCustomField] = useState(null);
+  const [customField, setCustomField] = useState({});
+  const [oldField, setOldField] = useState({});
 
   if (!incident) return <></>;
 
@@ -167,6 +171,40 @@ export default function IncidentDetailModal({
     }
   };
 
+  const handleEditCustomField = (fieldName) => {
+    setEditingCustomField(fieldName);
+  };
+
+  const handleSaveChanges = async () => {
+    setOldField(customField);
+    setEditingCustomField(null);
+  };
+
+  const handleCancelChanges = () => {
+    setCustomField(oldField);
+    setEditingCustomField(null);
+  
+  };
+
+  const isEdited = () => {
+    return Object.keys(customField).some((fieldName) => {
+      return customField[fieldName] !== oldField[fieldName];
+    });
+  };
+
+  useEffect(() => {
+    Object.keys(incident?.customFields ?? {}).map((fieldName) => {
+      setCustomField((prev) => ({
+        ...prev,
+        [fieldName]: incident.customFields[fieldName],
+      }));
+      setOldField((prev) => ({
+        ...prev,
+        [fieldName]: incident.customFields[fieldName],
+      }));
+    })
+  }, []);
+
   return (
     <Modal
       open={open}
@@ -264,7 +302,28 @@ export default function IncidentDetailModal({
             >
               {`${incident.incidentCategory} on ${incident.incidentDate}`}
             </Typography>
-            {Object.keys(incident?.customFields ?? {}).map((fieldName) => {
+            <Box width={"100%"} minHeight={"35px"}>
+              {isEdited() && (
+                <Grid
+                  container
+                  justifyContent={"right"}
+                  spacing={2}
+                  paddingTop={0}
+                >
+                  <Grid item>
+                    <Button variant="contained" color="primary" onClick={handleSaveChanges}>
+                      Save
+                    </Button>
+                  </Grid>
+                  <Grid item>
+                    <Button variant="contained" color="secondary" onClick={handleCancelChanges}>
+                      Cancel
+                    </Button>
+                  </Grid>
+                </Grid>
+              )}
+            </Box>
+            {Object.keys(customField).map((fieldName) => {
               return (
                 <Fragment key={fieldName}>
                   <Typography
@@ -277,9 +336,35 @@ export default function IncidentDetailModal({
                   >
                     {formatCamelCaseToNormalText(fieldName)}
                   </Typography>
-                  <Typography variant="body2">
-                    {incident.customFields[fieldName]}
-                  </Typography>
+                  <Box onClick={() => handleEditCustomField(fieldName)}>
+                    {editingCustomField === fieldName ? (
+                      <FormControl fullWidth margin="normal" >
+                        <TextField
+                          multiline
+                          variant="outlined"
+                          required
+                          fullWidth
+                          defaultValue={customField[fieldName]}
+                          onChange={(e) =>
+                            setCustomField((prev) => ({
+                              ...prev,
+                              [fieldName]: e.target.value,
+                            }))
+                          }
+                        />
+                      </FormControl>
+                    ) : (
+                      <Typography
+                        sx={{
+                          "&:hover": { background: "#f1f2f4" },
+                          py: "10px",
+                        }}
+                        variant="body1"
+                      >
+                        {customField[fieldName]}
+                      </Typography>
+                    )}
+                  </Box>
                 </Fragment>
               );
             })}
