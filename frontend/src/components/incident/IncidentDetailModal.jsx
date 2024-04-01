@@ -69,7 +69,7 @@ export default function IncidentDetailModal({
   const [oldField, setOldField] = useState({});
   const [reviewer, setReviewer] = useState(null);
 
-  if (!incident) return <></>;
+  // if (!incident) return <></>;
 
   const handleStateChange = async (event) => {
     const newStateId = event.target.value;
@@ -206,9 +206,11 @@ export default function IncidentDetailModal({
   };
 
   const handleCancelChanges = () => {
-    setCustomField(oldField);
+    //not updated
     setEditingCustomField(null);
+    setCustomField(oldField);
   };
+
 
   const isEdited = () => {
     return Object.keys(customField).some((fieldName) => {
@@ -229,6 +231,7 @@ export default function IncidentDetailModal({
     });
     setReviewer(incident?.reviewer);
   }, []);
+
 
   return (
     <Modal
@@ -342,10 +345,12 @@ export default function IncidentDetailModal({
                     {formatCamelCaseToNormalText(fieldName)}
                   </Typography>
                   <Box onClick={() => handleEditCustomField(fieldName)}>
+                    {editingCustomField}
                     {editingCustomField === fieldName ? (
-                      <FormControl fullWidth margin="normal">
+                      <FormControl fullWidth>
                         <TextField
                           multiline
+                          rows={2}
                           variant="outlined"
                           required
                           fullWidth
@@ -356,6 +361,7 @@ export default function IncidentDetailModal({
                               [fieldName]: e.target.value,
                             }))
                           }
+                          autoFocus
                         />
                         <Grid
                           container
