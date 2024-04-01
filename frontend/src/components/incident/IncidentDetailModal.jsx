@@ -35,7 +35,6 @@ const modalStyle = {
   transform: "translate(-50%, -50%)",
   width: "70vw",
   maxHeight: "80vh",
-  overflowY: "auto",
   bgcolor: "background.paper",
   boxShadow: 24,
   p: 4,
@@ -255,6 +254,7 @@ export default function IncidentDetailModal({
               width: "55%",
               marginRight: 2,
             }}
+            style={{ overflowY: "auto", height: "70vh" }}
           >
             <Typography
               id="issue-detail-modal-title"
@@ -297,69 +297,72 @@ export default function IncidentDetailModal({
               </Typography>
               <Box
                 sx={{
+                  display: "flex",
+                  mt: 2,
+                  gap: 2,
+                  width: "100%",
+                  alignItems: "center",
+                  paddingLeft: "0px",
+                }}
+              >
+                <form
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexDirection: "row",
+                    gap: 2,
+                    width: "100%",
+                  }}
+                  onSubmit={handleAddComment}
+                >
+                  <Avatar
+                    sx={{
+                      bgcolor: "#DB536A",
+                      width: "30px",
+                      height: "30px",
+                      fontSize: "14px",
+                    }}
+                  >
+                    {`${user.firstName[0]}${user.lastName[0]}`}
+                  </Avatar>
+                  <TextareaAutosize
+                    minRows={1}
+                    maxRows={4}
+                    placeholder="Add a comment..."
+                    value={comment}
+                    style={{
+                      width: "100%",
+                      padding: "10px",
+                      textAlign: "start",
+                      border: "none",
+                      resize: "none",
+                      outline: "none",
+                      borderRadius: "7px",
+                      lineHeight: "50px",
+                    }}
+                    onChange={(e) => setComment(e.target.value)}
+                  />
+                  <Button
+                    variant="outlined"
+                    sx={{ borderRadius: 10 }}
+                    color="primary"
+                    type="submit"
+                  >
+                    Submit
+                  </Button>
+                </form>
+              </Box>
+              <Box
+                sx={{
                   mt: 2,
                 }}
               >
-                <CommentSection commentData={commentData} incidentId={incidentId} />
-              </Box>
-            </Box>
-            <Box
-              sx={{
-                display: "flex",
-                mt: 2,
-                gap: 2,
-                width: "100%",
-                alignItems: "center",
-                paddingLeft: "0.5rem",
-              }}
-            >
-              <form
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexDirection: "row",
-                  gap: 2,
-                  width: "100%",
-                }}
-                onSubmit={handleAddComment}
-              >
-                <Avatar
-                  sx={{
-                    bgcolor: "#DB536A",
-                    width: "30px",
-                    height: "30px",
-                    fontSize: "14px",
-                  }}
-                >
-                  {`${user.firstName[0]}${user.lastName[0]}`}
-                </Avatar>
-                <TextareaAutosize
-                  minRows={1}
-                  maxRows={4}
-                  placeholder="Add a comment..."
-                  value={comment}
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    textAlign: "start",
-                    border: "none",
-                    resize: "none",
-                    outline: "none",
-                    borderRadius: "7px",
-                    lineHeight: "50px",
-                  }}
-                  onChange={(e) => setComment(e.target.value)}
+                <CommentSection
+                  commentData={commentData}
+                  incidentId={incidentId}
                 />
-                <Button
-                  variant="outlined"
-                  sx={{ borderRadius: 10 }}
-                  color="primary"
-                  type="submit"
-                >
-                  Submit
-                </Button>
-              </form>
+              </Box>
             </Box>
           </Box>
           <Box
