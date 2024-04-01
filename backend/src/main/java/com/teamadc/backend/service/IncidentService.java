@@ -1,5 +1,6 @@
 package com.teamadc.backend.service;
 
+import com.teamadc.backend.dto.request.CustomFieldRequest;
 import com.teamadc.backend.model.Comment;
 import com.teamadc.backend.model.Incident;
 import com.teamadc.backend.repository.GenericRepository;
@@ -8,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -43,6 +45,16 @@ public class IncidentService {
         return incidents.stream().filter(incident -> incident.getStatusId().equals(statusId)).toList();
     }
 
+    public Incident updateCustomFields(String incidentId, List<CustomFieldRequest> customFields) throws InterruptedException, ExecutionException {
+        Incident incident = incidentRepository.findById(incidentId);
+
+        for (CustomFieldRequest customField : customFields) {
+            incident.setCustomField(customField.getFieldName(), customField.getValue());
+        }
+
+        return updateModifiedAt(incident);
+    }
+
     public Incident addComment(String incidentId, Comment comment) throws InterruptedException, ExecutionException {
         Incident incident = incidentRepository.findById(incidentId);
 
@@ -72,16 +84,21 @@ public class IncidentService {
     public Incident assignReviewer(String incidentId, String reviewerId) throws InterruptedException, ExecutionException {
         Incident incident = incidentRepository.findById(incidentId);
         incident.setReviewer(reviewerId);
-        return incidentRepository.save(incident);
+        return updateModifiedAt(incident);
     }
 
     public Incident removeReviewer(String incidentId) throws InterruptedException, ExecutionException {
         Incident incident = incidentRepository.findById(incidentId);
         incident.setReviewer(null);
-        return incidentRepository.save(incident);
+        return updateModifiedAt(incident);
     }
     
     public List<Incident> getIncidentsByReviewer(String reviewerId) throws InterruptedException, ExecutionException {
         return incidentRepository.findAll().stream().filter(incident -> incident.getReviewer().equals(reviewerId)).toList();
+    }
+
+    public Incident updateModifiedAt(Incident incident) throws InterruptedException, ExecutionException {
+        incident.setLastUpdatedAt(new Date());
+        return incidentRepository.save(incident);
     }
 }

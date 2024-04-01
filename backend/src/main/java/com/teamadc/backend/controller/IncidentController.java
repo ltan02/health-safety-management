@@ -118,6 +118,17 @@ public class IncidentController {
         }
     }
 
+    @PutMapping("/{incidentId}/fields")
+    public ResponseEntity<Incident> updateCustomFields(@PathVariable String incidentId, @RequestBody IncidentRequest request ) {
+        try {
+            List<CustomFieldRequest> customFieldsRequest = request.getCustomFields();
+            Incident updatedIncident = incidentService.updateCustomFields(incidentId, customFieldsRequest);
+            return ResponseEntity.ok(updatedIncident);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     @PostMapping("/{incidentId}/comments")
     public ResponseEntity<Incident> addComment(@PathVariable String incidentId, @RequestBody CommentRequest commentReq) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
