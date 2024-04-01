@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import { v4 as uuid } from "uuid";
 
+import CircularProgress from "@mui/material/CircularProgress";
 import CloseIcon from "@mui/icons-material/Close";
 import useAxios from "../../hooks/useAxios";
 import { useAuthContext } from "../../context/AuthContext";
@@ -52,7 +53,7 @@ export default function IncidentDetailModal({
   commentData,
   setCommentData,
 }) {
-  const { sendRequest } = useAxios();
+  const { sendRequest, loading } = useAxios();
   const { user } = useAuthContext();
   const { statuses } = useBoard();
 
@@ -66,13 +67,14 @@ export default function IncidentDetailModal({
   const [editingCustomField, setEditingCustomField] = useState(null);
   const [customField, setCustomField] = useState({});
   const [oldField, setOldField] = useState({});
+  const [reviewer, setReviewer] = useState(null);
 
   if (!incident) return <></>;
 
   const handleStateChange = async (event) => {
     const newStateId = event.target.value;
 
-    sendRequest({
+    await sendRequest({
       url: `/incidents/${incidentId}`,
       method: "POST",
       body: {
@@ -96,24 +98,30 @@ export default function IncidentDetailModal({
   };
 
   const handleSwitchReviewer = async (reviewerId) => {
-    sendRequest({
-      url: `/incidents/${incidentId}/reviewer/${reviewerId}`,
-      method: "POST",
-    });
+    try {
+      await sendRequest({
+        url: `/incidents/${incidentId}/reviewer/${reviewerId}`,
+        method: "POST",
+      });
 
-    setIncident((prevIncident) => {
-      const newIncident = {
-        ...prevIncident,
-        reviewerId: reviewerId,
-      };
-      return newIncident;
-    });
+      setIncident((prevIncident) => {
+        const newIncident = {
+          ...prevIncident,
+          reviewerId: reviewerId,
+        };
+        return newIncident;
+      });
 
-    if (onRefresh) {
-      onRefresh();
+      setReviewer(employees.find((employee) => employee.id === reviewerId));
+
+      if (onRefresh) {
+        onRefresh();
+      }
+    } catch (error) {
+      console.error(error);
     }
     setOpenReviewer(false);
-    onClose();
+    // onClose();
   };
 
   const fetchEmployees = async () => {
@@ -176,14 +184,30 @@ export default function IncidentDetailModal({
   };
 
   const handleSaveChanges = async () => {
-    setOldField(customField);
+    const updatedField = [];
+    try {
+      Object.keys(customField).map((fieldName) => {
+        if (customField[fieldName] !== oldField[fieldName]) {
+          updatedField.push({ fieldName, value: customField[fieldName] });
+        }
+      });
+      await sendRequest({
+        url: `/incidents/${incidentId}/fields`,
+        method: "PUT",
+        body: {
+          customFields: updatedField,
+        },
+      });
+      setOldField(customField);
+    } catch (error) {
+      console.error(error);
+    }
     setEditingCustomField(null);
   };
 
   const handleCancelChanges = () => {
     setCustomField(oldField);
     setEditingCustomField(null);
-  
   };
 
   const isEdited = () => {
@@ -202,7 +226,8 @@ export default function IncidentDetailModal({
         ...prev,
         [fieldName]: incident.customFields[fieldName],
       }));
-    })
+    });
+    setReviewer(incident?.reviewer);
   }, []);
 
   return (
@@ -302,27 +327,7 @@ export default function IncidentDetailModal({
             >
               {`${incident.incidentCategory} on ${incident.incidentDate}`}
             </Typography>
-            <Box width={"100%"} minHeight={"35px"}>
-              {isEdited() && (
-                <Grid
-                  container
-                  justifyContent={"right"}
-                  spacing={2}
-                  paddingTop={0}
-                >
-                  <Grid item>
-                    <Button variant="contained" color="primary" onClick={handleSaveChanges}>
-                      Save
-                    </Button>
-                  </Grid>
-                  <Grid item>
-                    <Button variant="contained" color="secondary" onClick={handleCancelChanges}>
-                      Cancel
-                    </Button>
-                  </Grid>
-                </Grid>
-              )}
-            </Box>
+
             {Object.keys(customField).map((fieldName) => {
               return (
                 <Fragment key={fieldName}>
@@ -338,7 +343,7 @@ export default function IncidentDetailModal({
                   </Typography>
                   <Box onClick={() => handleEditCustomField(fieldName)}>
                     {editingCustomField === fieldName ? (
-                      <FormControl fullWidth margin="normal" >
+                      <FormControl fullWidth margin="normal">
                         <TextField
                           multiline
                           variant="outlined"
@@ -352,6 +357,32 @@ export default function IncidentDetailModal({
                             }))
                           }
                         />
+                        <Grid
+                          container
+                          justifyContent={"right"}
+                          spacing={2}
+                          paddingTop={1}
+                        >
+                          <Grid item>
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              onClick={handleSaveChanges}
+                              disabled={loading}
+                            >
+                              Save
+                            </Button>
+                          </Grid>
+                          <Grid item>
+                            <Button
+                              variant="contained"
+                              color="secondary"
+                              onClick={handleCancelChanges}
+                            >
+                              Cancel
+                            </Button>
+                          </Grid>
+                        </Grid>
                       </FormControl>
                     ) : (
                       <Typography
@@ -460,6 +491,9 @@ export default function IncidentDetailModal({
               justifyContent: "space-between",
             }}
           >
+            <Box sx={{ position: "fixed", top: "10%", right: "10%" }}>
+              {loading ? <CircularProgress size={24} /> : <></>}
+            </Box>
             <Select
               value={incidentState ?? ""}
               onChange={handleStateChange}
@@ -596,11 +630,11 @@ export default function IncidentDetailModal({
                   <Grid item xs={6}>
                     <Grid container spacing={1} alignItems="center">
                       <Grid item>
-                        <Profile user={incident.reviewer} />
+                        <Profile user={reviewer} />
                       </Grid>
                       <Grid item sx={{ fontSize: "14px" }}>
-                        {incident.reviewer?.firstName ?? "Unassigned"}
-                        {incident.reviewer?.lastName ?? ""}
+                        {reviewer?.firstName ?? "Unassigned"}
+                        {reviewer?.lastName ?? ""}
                         {isPrivileged(user.role) && (
                           <IconButton onClick={handleOpenModal}>
                             <ChangeCircleIcon />
