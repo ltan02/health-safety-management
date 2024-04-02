@@ -1,16 +1,33 @@
 import { useState, useEffect } from "react";
 import { Typography, Select, MenuItem } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { PieChart } from "@mui/x-charts";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import useAxios from "../../hooks/useAxios";
+import { useBoard } from "../../context/BoardContext";
+
+function stringToColor(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+
+    let color = "#";
+    for (let i = 0; i < 3; i++) {
+        const value = (hash >> (i * 8)) & 0xff;
+        color += ("00" + value.toString(16)).substr(-2);
+    }
+    return color;
+}
 
 function StatusInsights() {
     const [selectedDateRange, setSelectedDateRange] = useState(5);
     const [fromDate, setFromDate] = useState(null);
     const [toDate, setToDate] = useState(null);
     const [data, setData] = useState([]);
+    const { statuses } = useBoard();
+    const [statusMap, setStatusMap] = useState({});
     const { sendRequest } = useAxios();
 
     useEffect(() => {
@@ -18,6 +35,16 @@ function StatusInsights() {
             setSelectedDateRange(-1);
         }
     }, [fromDate, toDate]);
+
+    useEffect(() => {
+        if (statuses) {
+            const tempStatusMap = {};
+            statuses.forEach((status) => {
+                tempStatusMap[status.id] = status.name;
+            });
+            setStatusMap(tempStatusMap);
+        }
+    }, [statuses]);
 
     useEffect(() => {
         const getReport = async () => {
@@ -45,22 +72,36 @@ function StatusInsights() {
                 startDate = new Date(currentDate.setMonth(currentDate.getMonth() - 6));
             }
 
-            const response = await sendRequest({
-                url:
-                    "/reports/status?" +
-                    (startDate ? `start=${startDate.toISOString()}&` : "") +
-                    `end=${endDate.toISOString()}`,
-                method: "GET",
-                params: {
-                    fromDate: fromDate ? fromDate.toISOString() : null,
-                    toDate: toDate ? toDate.toISOString() : null,
-                },
-            });
-            setData(response);
+            const url = `/reports/status-insights?${
+                startDate ? `start=${startDate.toISOString()}&` : ""
+            }end=${endDate.toISOString()}`;
+            const response = await sendRequest({ url, method: "GET" });
+
+            if (response) {
+                const normalizedData = response
+                    .map((item) => ({
+                        ...item,
+                        date: item.date.split("T")[0],
+                        statusName: statusMap[item.statusId],
+                    }))
+                    .sort((a, b) => a.date.localeCompare(b.date));
+
+                const transformedData = {};
+                normalizedData.forEach(({ statusName, percentage, date }) => {
+                    if (!transformedData[date]) transformedData[date] = { date };
+                    transformedData[date][statusName] = (transformedData[date][statusName] || 0) + percentage;
+                });
+
+                const chartData = Object.values(transformedData);
+
+                setData(chartData);
+            }
         };
 
-        getReport();
-    }, [fromDate, toDate, selectedDateRange]);
+        if (Object.keys(statusMap).length) {
+            getReport();
+        }
+    }, [selectedDateRange, fromDate, toDate, selectedDateRange, statusMap]);
 
     const handleDateRangeChange = (event) => {
         const newValue = Number(event.target.value);
@@ -75,16 +116,18 @@ function StatusInsights() {
     const dateRanges = ["Past Week", "Past 2 Weeks", "Past Month", "Past 3 Months", "Past 6 Months", "All Time"];
 
     return (
-        <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column" }}>
+        <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", overflow: "hidden" }}>
             <Typography
                 style={{ fontSize: "24px", color: "#000", fontWeight: 600, marginBottom: "20px", marginTop: "20px" }}
             >
                 Status Insights
             </Typography>
-            <Typography>
-              Understand 
+            <Typography sx={{ paddingRight: 5 }}>
+                This graph displays the cumulative percentage of incidents in each status by day, providing a clear view
+                of incident distribution and trends over time. Use the date range filter to zoom in on incidents created
+                within specific periods, helping you understand how incident statuses evolve.
             </Typography>
-            <div style={{ width: "100%", display: "flex" }}>
+            <div style={{ width: "100%", display: "flex", marginTop: 10 }}>
                 <div style={{ display: "flex", flexDirection: "column" }}>
                     <Typography style={{ fontSize: "14px", fontWeight: 600, color: "#626f86" }}>Date filter</Typography>
                     <Select
@@ -124,14 +167,32 @@ function StatusInsights() {
                     </LocalizationProvider>
                 </div>
             </div>
-            <PieChart
-                series={[
-                    {
-                        data: data.map((v) => ({ id: v.id, value: v.value, label: v.label })),
-                    },
-                ]}
-                height={350}
-            />
+            <AreaChart width={900} height={600} data={data} margin={{ top: 30, right: 30, left: 0, bottom: 0 }}>
+                <defs>
+                    {statuses.map((status) => (
+                        <linearGradient key={status.id} id={`color${status.id}`} x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor={stringToColor(status.id)} stopOpacity={0.8} />
+                            <stop offset="95%" stopColor={stringToColor(status.id)} stopOpacity={0} />
+                        </linearGradient>
+                    ))}
+                </defs>
+                <XAxis dataKey="date" />
+                <YAxis domain={[0, 100]} allowDataOverflow />
+                <CartesianGrid strokeDasharray="3 3" />
+                <Tooltip />
+                <Legend />
+                {statuses.map((status) => (
+                    <Area
+                        key={status.id}
+                        type="monotone"
+                        dataKey={status.name}
+                        stackId="1"
+                        stroke={stringToColor(status.id)}
+                        fillOpacity={1}
+                        fill={`url(#color${status.id})`}
+                    />
+                ))}
+            </AreaChart>
         </div>
     );
 }
