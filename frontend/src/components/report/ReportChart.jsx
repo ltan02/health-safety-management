@@ -170,6 +170,7 @@ function ReportChart({type, locked, data, height, width, handleSubmit}) {
             if (e[0].length === 0) {
                 setReport([{ id: 0, label: "No Data", value: 0 }]);
             } else {
+                console.log(e[0]);
                 setReport(e[0]);
             }
         }).catch((e) => {

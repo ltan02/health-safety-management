@@ -1,25 +1,35 @@
 package com.teamadc.backend.controller;
 
+import com.teamadc.backend.model.Incident;
 import com.teamadc.backend.model.Report;
+import com.teamadc.backend.model.StatusInsight;
+import com.teamadc.backend.service.IncidentService;
 import com.teamadc.backend.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
-import java.util.List;
-import java.util.Optional;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/reports")
 public class ReportController {
 
     private final ReportService reportService;
+    private final IncidentService incidentService;
 
     @Autowired
-    public ReportController(ReportService reportService) {
+    public ReportController(ReportService reportService, IncidentService incidentService) {
         this.reportService = reportService;
+        this.incidentService = incidentService;
     }
 
     @GetMapping("/{type}")
@@ -32,6 +42,52 @@ public class ReportController {
         } catch (ParseException e) {
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    @GetMapping("/status-insights")
+    public ResponseEntity<List<StatusInsight>> getStatusInsights(
+            @RequestParam Optional<String> start,
+            @RequestParam String end) {
+
+        LocalDate startDate = start.map(s -> Instant.parse(s).atZone(ZoneId.systemDefault()).toLocalDate())
+                .orElseGet(() -> incidentService.findEarliestIncidentDate().toInstant()
+                        .atZone(ZoneId.systemDefault()).toLocalDate());
+        LocalDate endDate = Instant.parse(end).atZone(ZoneId.systemDefault()).toLocalDate();
+
+        List<Incident> incidents = incidentService.findIncidentsBetween(Date.from(startDate.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+                Date.from(endDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+
+        // Prepare a map to hold cumulative counts
+        Map<String, Long> cumulativeStatusCounts = new HashMap<>();
+        List<StatusInsight> insights = new ArrayList<>();
+
+        // Sort incidents by date
+        incidents.sort(Comparator.comparing(i -> i.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()));
+
+        // For each day in the range, accumulate incidents
+        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+            final LocalDate finalDate = date;
+            // Filter incidents up to and including this date
+            List<Incident> filteredIncidents = incidents.stream()
+                    .filter(i -> !i.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().isAfter(finalDate))
+                    .toList();
+
+            // Update cumulative counts
+            Map<String, Long> dailyStatusCounts = filteredIncidents.stream()
+                    .collect(Collectors.groupingBy(Incident::getStatusId, Collectors.counting()));
+
+            dailyStatusCounts.forEach((status, count) -> cumulativeStatusCounts.merge(status, count, Long::sum));
+
+            // Calculate and add insights for this day
+            long dailyTotal = cumulativeStatusCounts.values().stream().mapToLong(Long::longValue).sum();
+            LocalDate finalDate1 = date;
+            cumulativeStatusCounts.forEach((statusId, count) -> {
+                double percentage = 100.0 * count / dailyTotal;
+                insights.add(new StatusInsight(statusId, percentage, Date.from(finalDate1.atStartOfDay(ZoneId.systemDefault()).toInstant())));
+            });
+        }
+
+        return ResponseEntity.ok(insights);
     }
 
 }
