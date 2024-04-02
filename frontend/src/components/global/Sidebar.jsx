@@ -42,7 +42,7 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
             onMouseLeave={() => setHoveringSidebar(false)}
             sx={{ width: 240, position: "relative" }}
         >
-            {hoveringSidebar && sidebarOpen && (
+            {/* {hoveringSidebar && sidebarOpen && (
                 <div
                     onMouseEnter={() => setHoveringBack(true)}
                     onMouseLeave={() => setHoveringBack(false)}
@@ -66,7 +66,7 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
                         sx={{ fontSize: "18px", fontWeight: 600, color: hoveringBack ? "#FFF" : "#000" }}
                     />
                 </div>
-            )}
+            )} */}
             <SwipeableDrawer
                 ModalProps={{ keepMounted: true }}
                 anchor="left"
@@ -468,6 +468,42 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
                                         }}
                                     >
                                         Dashboard
+                                    </Typography>
+                                </span>
+                            </Button>
+                            <Button
+                                onClick={() => history("/report/status-insights")}
+                                sx={{
+                                    paddingLeft: "17px",
+                                    paddingY: "8px",
+                                    paddingRight: "8px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "start",
+                                    width: "100%",
+                                    "&:hover": {
+                                        backgroundColor: alpha("#EB8C00", 0.2),
+                                    },
+                                    backgroundColor:
+                                        location.pathname === "/report/status-insights" ? alpha("#EB8C00", 0.2) : "transparent",
+                                }}
+                            >
+                                <TimelineOutlinedIcon
+                                    sx={{
+                                        fontSize: 24,
+                                        marginRight: "10px",
+                                        color: location.pathname === "/report/status-insights" ? "#D04A02" : "#000",
+                                    }}
+                                />
+                                <span>
+                                    <Typography
+                                        style={{
+                                            fontSize: "14px",
+                                            fontWeight: 400,
+                                            color: location.pathname === "/report/status-insights" ? "#D04A02" : "#000",
+                                        }}
+                                    >
+                                        Status Insights
                                     </Typography>
                                 </span>
                             </Button>

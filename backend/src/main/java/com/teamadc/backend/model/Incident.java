@@ -21,6 +21,7 @@ public class Incident {
     private Date createdAt;
     private Date lastUpdatedAt;
     private String reviewer;
+    private List<StatusHistory> statusHistory;
 
     public Incident() {}
 
@@ -37,7 +38,7 @@ public class Incident {
         this.lastUpdatedAt = new Date();
     }
 
-    public Incident(String id, String incidentDate, String incidentCategory, String reporter, List<String> employeesInvolved, String statusId) {
+    public Incident(String id, String incidentDate, String incidentCategory, String reporter, List<String> employeesInvolved, String statusId, List<Comment> comments, List<StatusHistory> statusHistory) {
         this.id = id;
         this.incidentDate = incidentDate;
         this.incidentCategory = incidentCategory;
@@ -45,9 +46,10 @@ public class Incident {
         this.employeesInvolved = employeesInvolved;
         this.customFields = new HashMap<>();
         this.statusId = statusId;
-        this.comments = new ArrayList<>();
+        this.comments = comments;
         this.createdAt = new Date();
         this.lastUpdatedAt = new Date();
+        this.statusHistory = statusHistory;
     }
 
     public Incident(String id, String incidentDate, String incidentCategory, String reporter, List<String> employeesInvolved, Map<String, Object> customFields, String statusId, List<Comment> comments) {
