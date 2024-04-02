@@ -180,6 +180,9 @@ export default function IncidentDetailModal({
   };
 
   const handleEditCustomField = (fieldName) => {
+    if (editingCustomField === fieldName) {
+      return;
+    }
     setEditingCustomField(fieldName);
   };
 
@@ -211,12 +214,6 @@ export default function IncidentDetailModal({
     setCustomField(oldField);
   };
 
-
-  const isEdited = () => {
-    return Object.keys(customField).some((fieldName) => {
-      return customField[fieldName] !== oldField[fieldName];
-    });
-  };
 
   useEffect(() => {
     Object.keys(incident?.customFields ?? {}).map((fieldName) => {
@@ -345,7 +342,6 @@ export default function IncidentDetailModal({
                     {formatCamelCaseToNormalText(fieldName)}
                   </Typography>
                   <Box onClick={() => handleEditCustomField(fieldName)}>
-                    {editingCustomField}
                     {editingCustomField === fieldName ? (
                       <FormControl fullWidth>
                         <TextField
@@ -371,7 +367,7 @@ export default function IncidentDetailModal({
                         >
                           <Grid item>
                             <Button
-                              variant="contained"
+                              variant="outlined"
                               color="primary"
                               onClick={handleSaveChanges}
                               disabled={loading}
@@ -381,9 +377,10 @@ export default function IncidentDetailModal({
                           </Grid>
                           <Grid item>
                             <Button
-                              variant="contained"
+                              variant="outlined"
                               color="secondary"
                               onClick={handleCancelChanges}
+                              disabled={loading}
                             >
                               Cancel
                             </Button>
