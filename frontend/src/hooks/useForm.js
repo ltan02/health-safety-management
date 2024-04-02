@@ -1,9 +1,11 @@
 import { useState } from "react";
 import useAxios from "./useAxios";
 import { FIELD_TYPES } from "../components/form/form_data";
+import { set } from "lodash";
 
 export default function useForm() {
   const [forms, setForms] = useState({});
+  const [activeForm, setActiveForm] = useState({});
 
   const { sendRequest, loading } = useAxios();
 
@@ -15,7 +17,47 @@ export default function useForm() {
     response.map((form) => {
       newForm[form.id] = form;
     });
+    response.map((form) => {
+      if (form.active) {
+        setActiveForm(form);
+      }
+    });
     setForms(newForm);
+  };
+
+  const createNewForm = async (form) => {
+    try {
+      if (!form) {
+        console.error("Invalid input");
+        return;
+      }
+      const response = await sendRequest({
+        url: "/forms",
+        method: "POST",
+        body: form,
+      });
+      return response;
+    }
+    catch (error) {
+      console.error(error);
+    }
+    
+  };
+
+  const deleteForm = async (formId) => {
+    try {
+      if (!formId) {
+        console.error("Invalid input");
+        return;
+      }
+      const response = await sendRequest({
+        url: `/forms/${formId}`,
+        method: "DELETE",
+      });
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const updateAllFieldCoordinates = async (formId, fields) => {
@@ -89,7 +131,63 @@ export default function useForm() {
     }
   }
 
+  const getActiveForm = async () => {
+    try {
+      const response = await sendRequest({
+        url: "/forms/active",
+      });
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const setFormActive = async (formId) => {
+    try {
+      if (!formId) {
+        console.error("Invalid input");
+        return;
+      }
+      const response = await sendRequest({
+        url: `/forms/${formId}/active`,
+        method: "PUT",
+      });
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const toggleForm = async (formId) => {
+    try {
+      if (!formId || formId === activeForm.id) {
+        return;
+      }
+      await setFormInactive(activeForm.id);
+      await setFormActive(formId);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const setFormInactive = async (formId) => {
+    try {
+      if (!formId) {
+        console.error("Invalid input");
+        return;
+      }
+      const response = await sendRequest({
+        url: `/forms/${formId}/inactive`,
+        method: "PUT",
+      });
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const groupedByRows = (fields, cols) => {
+    if(fields.length <= 0) return {};
     const newFields = fields.reduce((acc, field) => {
       const { y } = field.coordinate;
       if (!acc[y]) {
@@ -165,16 +263,43 @@ export default function useForm() {
     return lastCoordinate;
   };
 
+
+
+  const updateFormName = async (formId, name) => {
+    try {
+      if (!formId || !name) {
+        console.error("Invalid input");
+        return;
+      }
+      const response = await sendRequest({
+        url: `/forms/${formId}/name`,
+        method: "POST",
+        body: { name },
+      });
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
+
   return {
     fetchForms,
+    toggleForm,
+    createNewForm,
+    deleteForm,
     updateAllFieldCoordinates,
     forms,
+    activeForm,
+    setFormActive,
+    setFormInactive,
     addField,
     updateField,
     groupedByRows,
     sortedRows,
     getLastCoordinate,
     deleteField,
-    loading
+    loading,
+    updateFormName
   };
 }

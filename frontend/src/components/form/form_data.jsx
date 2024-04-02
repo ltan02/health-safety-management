@@ -8,6 +8,8 @@ export const FIELD_TYPES = {
   SELECTION_MULTI: "selection-multi",
   SELECTION_SINGLE: "selection-single",
   FILE_ATTACHMENT: "file",
+  CATEGORY: "category",
+  DESCRIPTION: "description",
   EMPTY: "empty",
 };
 
@@ -21,11 +23,6 @@ export const VARIANT_TYPES = {
 };
 
 export const FIELD_DATA = {
-  [FIELD_TYPES.TEXT_FIELD]: {
-    id: FIELD_TYPES.TEXT_FIELD,
-    label: "Text Field",
-    description: "A single line of text",
-  },
   [FIELD_TYPES.TEXT_BOX]: {
     id: FIELD_TYPES.TEXT_BOX,
     label: "Text Box",
@@ -50,10 +47,5 @@ export const FIELD_DATA = {
     id: FIELD_TYPES.SELECTION_SINGLE,
     label: "Single-Select",
     description: "Select a single option",
-  },
-  [FIELD_TYPES.FILE_ATTACHMENT]: {
-    id: FIELD_TYPES.FILE_ATTACHMENT,
-    label: "File Attachment",
-    description: "Upload a file",
   },
 };

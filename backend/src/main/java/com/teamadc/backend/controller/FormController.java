@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.teamadc.backend.model.Form;
 import com.teamadc.backend.dto.request.FieldCoordinateRequest;
+import com.teamadc.backend.dto.request.FormNameRequest;
 import com.teamadc.backend.model.Coordinate;
 import com.teamadc.backend.model.Field;
 import com.teamadc.backend.service.FormService;
@@ -20,6 +21,8 @@ import com.teamadc.backend.service.FormService;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/forms")
@@ -40,11 +43,21 @@ public class FormController {
             return ResponseEntity.internalServerError().build();
         }
     }
-
+    
     @PutMapping("/{formId}")
     public ResponseEntity<Form> updateForm(@PathVariable String formId, @RequestBody Form request) {
         try {
             Form newForm = formService.updateForm(formId, request);
+            return ResponseEntity.ok(newForm);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PostMapping("/{formId}/name")
+    public ResponseEntity<Form> updateFormName(@PathVariable String formId, @RequestBody FormNameRequest request) {
+        try {
+            Form newForm = formService.updateFormName(formId, request);
             return ResponseEntity.ok(newForm);
         } catch (InterruptedException | ExecutionException e) {
             return ResponseEntity.internalServerError().build();
@@ -100,6 +113,37 @@ public class FormController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    @PutMapping("/{formId}/active")
+    public ResponseEntity<Form> setFormActive(@PathVariable String formId) {
+        try {
+            Form newForm = formService.setFormStatus(formId, true);
+            return ResponseEntity.ok(newForm);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PutMapping("/{formId}/inactive")
+    public ResponseEntity<Form> setFormInactive(@PathVariable String formId) {
+        try {
+            Form newForm = formService.setFormStatus(formId, false);
+            return ResponseEntity.ok(newForm);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/active")
+    public ResponseEntity<Form> getActiveForms() {
+        try {
+            Form forms = formService.getActiveForm();
+            return ResponseEntity.ok(forms);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+    
 
     @DeleteMapping("/{formId}")
     public ResponseEntity<Form> deleteForm(@PathVariable String formId) {

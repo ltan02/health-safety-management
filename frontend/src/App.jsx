@@ -12,12 +12,12 @@ import Sidebar from "./components/global/Sidebar";
 import { useState } from "react";
 import StatusInsights from "./pages/report/StatusInsights.jsx";
 
+const ReportOverview = lazy(() => import("./pages/report/index.jsx"));
 const Incident = lazy(() => import("./pages/incident"));
 const Login = lazy(() => import("./pages/login"));
 const AdminWorkflow = lazy(() => import("./pages/admin/workflows/index.jsx"));
 const AdminStatus = lazy(() => import("./pages/admin/status/index.jsx"));
 const AdminForm = lazy(() => import("./pages/admin/form/index.jsx"));
-const ReportDashboard = lazy(() => import("./pages/report/dashboard/index.jsx"));
 const IncidentReport = lazy(() => import("./pages/incident/report/index.jsx"));
 const BarReport = lazy(() => import("./pages/report/bar/index.jsx"));
 const LineReport = lazy(() => import("./pages/report/line/index.jsx"));
@@ -76,7 +76,7 @@ function App() {
                                         <Route path="incidents" element={<IncidentReport />} />
                                     </Route>
                                     <Route path="report">
-                                        <Route index element={<ReportDashboard />} />
+                                        <Route index element={<ReportOverview />} />
                                         <Route path="bar" element={<BarReport />} />
                                         <Route path="scatter" element={<ScatterReport />} />
                                         <Route path="line" element={<LineReport />} />

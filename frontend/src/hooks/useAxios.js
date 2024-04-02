@@ -64,13 +64,14 @@ export default function useAxios() {
         }
     };
 
-    const sendAIRequest = async ({ url, method = "GET", body = null }) => {
+    const sendAIRequest = async ({ url, method = "GET", body = null , id}) => {
         setAILoading(true);
         setAIError(null);
         try {
             const headers = {
                 "Content-Type": "application/json",
                 Accept: "application/json",
+                "uuid": id,
             };
 
             const config = {

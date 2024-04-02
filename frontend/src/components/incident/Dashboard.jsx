@@ -9,6 +9,7 @@ import {
     defaultDropAnimation,
     rectIntersection,
 } from "@dnd-kit/core";
+import { v4 as uuidv4 } from "uuid";
 import Column from "./Column";
 import IncidentSearchInput from "./IncidentSearchInput";
 import Task from "./Task";
@@ -20,11 +21,14 @@ import useAxios from "../../hooks/useAxios";
 import { useBoard } from "../../context/BoardContext";
 import IncidentDetailModal from "./IncidentDetailModal";
 import useForm from "../../hooks/useForm";
+import { set } from "lodash";
 
+const SELECTED_INCIDENT = "GZ4tf8bErd3rZ9YizFOu";
 function Dashboard() {
     const { tasks, filterTasks, setTasks, fetchTasks } = useTasks();
+    
 
-    const { forms, fetchForms, groupedByRows, sortedRows } = useForm();
+    const { forms, fetchForms, groupedByRows, sortedRows, activeForm } = useForm();
     const { activeId, handleDragStart, handleDragOver, handleDragEnd } = useDragBehavior(tasks, setTasks);
     const { user } = useAuthContext();
     const { sendRequest } = useAxios();
@@ -32,6 +36,7 @@ function Dashboard() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedTask, setSelectedTask] = useState(null);
     const [fields, setFields] = useState({});
+    const [commentData, setCommentData] = useState({});
 
     const [employees, setEmployees] = useState([]);
 
@@ -86,6 +91,50 @@ function Dashboard() {
         return sortedRows(groupedByRows(fields));
     };
 
+    const handleComment = () =>{
+        const flatTasks = Object.values(tasks).flat()
+        const initialCommentData = {...commentData} // shallow copy
+        if(flatTasks) {
+            flatTasks.map((task) => {
+            const newCommentData = initialCommentData;
+            task.comments.map((comment) => {
+              if(!newCommentData[comment.id] ) {
+                newCommentData[comment.id] = []
+              }
+              const data = {
+                id: uuidv4(),
+                comment,
+                user: employees.filter((employee) =>
+                    employee.id === comment.userId
+                )[0]
+              }
+              const tempId = hasTempComment(newCommentData[comment.id], data)
+              // this is to prevent duplicate temp comments
+              if(tempId) {
+                newCommentData[comment.id][tempId] = data
+              } else {
+                newCommentData[comment.id].push(data)
+              }
+            })
+
+            initialCommentData[task.id] = newCommentData[task.id]
+          })
+        }
+        setCommentData(initialCommentData)
+      }
+
+    const hasTempComment = (commentData, newComment) => {
+        const commentDataCopy = [...commentData]
+        let tempId = null
+        commentDataCopy.map((data) => {
+            if(data.id.includes("temp") && data.comment.content === newComment.comment.content){
+                tempId = data.id
+                return
+            }
+        })        
+        return tempId
+    }
+
     useEffect(() => {
         const fetchEmployees = async () => {
             const res = await sendRequest({ url: "/users" });
@@ -97,8 +146,13 @@ function Dashboard() {
 
     useEffect(() => {
         // TODO: remove this when the form is selected from the form list
-        setFields(forms["GZ4tf8bErd3rZ9YizFOu"]?.fields);
+        setFields(activeForm?.fields);
     }, [forms]);
+
+    useEffect(() => {
+        handleComment()
+    }, [tasks]);
+
 
     return (
         <Container maxWidth="false" disableGutters>
@@ -145,6 +199,9 @@ function Dashboard() {
                                 onRefresh={refreshDashboard}
                                 field={fields}
                                 sortedRows={handleSort}
+                                formName={activeForm?.name}
+                                commentData={commentData}
+                                setCommentData={setCommentData}
                             />
                         </Box>
                     ))}
@@ -161,6 +218,8 @@ function Dashboard() {
                         setIsModalOpen(false);
                         refreshDashboard;
                     }}
+                    commentData={commentData}
+                    setCommentData={setCommentData}
                     onRefresh={refreshDashboard}
                     selectedIncident={selectedTask}
                 />

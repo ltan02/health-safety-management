@@ -1,10 +1,28 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Container, Typography, Button, Grid, Divider } from "@mui/material";
 import { FIELD_TYPES } from "./form_data";
+import useAxios from "../../hooks/useAxios";
 import { FIELD_ELEMENT } from "./form_elements";
 
-function PreviewForm({ fields, sortedRows, handleSubmit, onClose }) {
+function PreviewForm({
+  fields,
+  sortedRows,
+  handleSubmit,
+  onClose,
+  formName,
+  formHeight,
+}) {
   const [fieldsData, setFieldsData] = useState({});
+  const { sendAIRequest, aiLoading } = useAxios();
+  const [aiCategrory, setAICategory] = useState("");
+  const [filledRequired, setFilledRequired] = useState(false);
+
+  const formHeightStyle = {
+    height: formHeight ? formHeight + "vh" : "80vh",
+    width: "80vh",
+    overflow: "auto",
+  };
+
 
   const handleChange = (event, field) => {
     const { name, value } = event.target;
@@ -27,6 +45,21 @@ function PreviewForm({ fields, sortedRows, handleSubmit, onClose }) {
         [name]: value,
       }));
     }
+  };
+
+  const onCategorySearch = async () => {
+    const res = await sendAIRequest({
+      url: "/categorize/",
+      method: "POST",
+      body: {
+        incident: fieldsData.description,
+      },
+    });
+    setAICategory(res.response);
+    setFieldsData((prevData) => ({
+      ...prevData,
+      category: res.response,
+    }));
   };
 
   function findDuplicateIndexes(arr) {
@@ -62,19 +95,26 @@ function PreviewForm({ fields, sortedRows, handleSubmit, onClose }) {
   };
 
   const isRequiredFieldFilled = () => {
-    const allRequiredPresent = fields.every(obj => obj.props.required ? obj.props.name in fieldsData : true);
+    const allRequiredPresent = fields.every((obj) =>
+      obj.props.required ? obj.props.name in fieldsData && fieldsData[obj.props.name] !== "" : true
+    );
     return allRequiredPresent;
   };
 
+  useEffect(() => {
+    setFilledRequired(isRequiredFieldFilled());
+  }, [fieldsData]);
+
+
   return (
-    <Container style={{ height: "80vh", width: "80vh", overflow: "auto" }}>
+    <Container style={formHeightStyle}>
       <Typography
         variant="h4"
         align="left"
         fontWeight={500}
         sx={{ marginTop: 5 }}
       >
-        Incident Report Form
+        {formName}
       </Typography>
       <Divider sx={{ my: 2 }} color="primary" />
       <form onSubmit={pushSubmitButton}>
@@ -88,7 +128,13 @@ function PreviewForm({ fields, sortedRows, handleSubmit, onClose }) {
                   return null;
                 }
                 return (
-                  <Grid item md={12} key={fieldData.id} sx={{ my: 2 }} style={{ paddingLeft: 0}}>
+                  <Grid
+                    item
+                    md={12}
+                    key={fieldData.id}
+                    sx={{ my: 2 }}
+                    style={{ paddingLeft: 0 }}
+                  >
                     <Container
                       sx={{
                         display: "flex",
@@ -100,9 +146,15 @@ function PreviewForm({ fields, sortedRows, handleSubmit, onClose }) {
                         value={
                           fieldData.type === FIELD_TYPES.SELECTION_MULTI
                             ? fieldsData[fieldData.props.name] ?? []
-                            : fieldsData[fieldData.props.name] ?? ""
+                            : fieldData.type === FIELD_TYPES.SELECTION_SINGLE
+                            ? fieldsData[fieldData.props.name]
+                            : fieldData.type === FIELD_TYPES.CATEGORY
+                            ? aiCategrory
+                            : fieldsData[fieldData.props.name]
                         }
                         onChange={(e) => handleChange(e, fieldData)}
+                        onClick={onCategorySearch}
+                        loading={aiLoading + ""}
                       />
                     </Container>
                   </Grid>
@@ -117,7 +169,7 @@ function PreviewForm({ fields, sortedRows, handleSubmit, onClose }) {
             variant="contained"
             color="primary"
             sx={{ mt: 3, position: "fixed", bottom: "10px", right: "10px" }}
-            disabled={!isRequiredFieldFilled()}
+            disabled={!filledRequired}
           >
             Submit
           </Button>

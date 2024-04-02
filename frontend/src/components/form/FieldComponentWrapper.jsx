@@ -49,7 +49,7 @@ const FieldComponentWrapper = ({ fieldData, onEdit, onDelete }) => {
             {...fieldData.props}
             disabled
             value={fieldData.type === FIELD_TYPES.SELECTION_MULTI ? [] : ""}
-            style={{ padding: "10px 0px", flexGrow: 1 }}
+            style={{ padding: "10px 10px", flexGrow: 1 }}
           />
           <div
             style={{

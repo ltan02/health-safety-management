@@ -12,7 +12,7 @@ import {
 import IncidentDetailModal from "./IncidentDetailModal";
 import Profile from "../users/Profile";
 
-function Task({ id, task, onRefresh }) {
+function Task({ id, task, onRefresh, commentData, setCommentData }) {
   const {
     attributes,
     listeners,
@@ -155,6 +155,8 @@ function Task({ id, task, onRefresh }) {
           }}
           onRefresh={onRefresh}
           selectedIncident={selectedIncident}
+          commentData={commentData}
+          setCommentData={setCommentData}
         />
       )}
     </>

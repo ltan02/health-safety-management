@@ -19,6 +19,7 @@ function IncidentReport() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { statuses } = useBoard();
     const { sendRequest } = useAxios();
+    const [formName, setFormName] = useState("");
 
     const styles = {
         styleHeader: {
@@ -94,15 +95,14 @@ function IncidentReport() {
         fetchTasks();
     };
 
-    const {forms, fetchForms, groupedByRows, sortedRows} = useForm();
+    const {forms, fetchForms, groupedByRows, sortedRows, activeForm} = useForm();
     const [fields, setFields] = useState({});
     useEffect(() => {
         fetchForms();
     }, []);
 
     useEffect(() => {
-        // TODO: remove this when the form is selected from the form list
-        setFields(forms["GZ4tf8bErd3rZ9YizFOu"]?.fields);
+        setFields(activeForm?.fields);
     }, [forms]);
 
     const handleSort = () => {
@@ -117,6 +117,7 @@ function IncidentReport() {
                 handleAddTask={handleAddTask}
                 field={fields}
                 sortedRows={handleSort}
+                formName={activeForm?.name}
             />
             <Typography variant="h4" component="h4"
                         style={{ fontFamily: "ITC Charter", marginLeft: "3rem", fontWeight: "bold",

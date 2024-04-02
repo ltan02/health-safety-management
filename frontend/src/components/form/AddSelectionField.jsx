@@ -23,8 +23,9 @@ function AddSelectionField({
   initialOptions = [{ value: "", label: "" }],
   initialRequired,
 }) {
-  const { sendRequest } = useAxios();
+  const { sendAIRequest, sendRequest } = useAxios();
   const [options, setOptions] = useState(initialOptions);
+  const [categories, setCategories] = useState([]);
   const [value, setValue] = useState(0);
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -32,6 +33,7 @@ function AddSelectionField({
       setOptions([{ value: "", label: "" }]);
     } else {
       fetchEmployees();
+      fetchCategories();
     }
   };
 
@@ -59,6 +61,8 @@ function AddSelectionField({
     // add categories here ??
     if (newValue === "employees") {
       onOptionChange(options);
+    } else if (newValue === "categories") {
+      onOptionChange(categories);
     }
   };
 
@@ -77,14 +81,23 @@ function AddSelectionField({
   };
 
   const fetchCategories = async () => {
-    // const response = await sendRequest({
-    //   url: "/users",
-    //   method: "GET",
-    // });
-    // const employees = response.map((employee) => {
-    //   return { value: employee.id, label: employee.firstName };
-    // });
-    // setOptions(employees);
+    // TODO: NEED to change this endpoint
+    try {
+      const response = await sendAIRequest({
+        url: "/getCategories",
+        method: "POST",
+      });
+      const newCategories = JSON.parse(response.categories.replace(/'/g, '"') ).map((category) => {
+        return {
+          value: category,
+          label: category,
+        };
+      });
+
+      setCategories(newCategories);
+    } catch (error) {
+      console.error("Error fetching categories", error);
+    }
   };
 
   useEffect(() => {
@@ -93,7 +106,7 @@ function AddSelectionField({
   }, [options]);
 
   return (
-    <FormControl fullWidth margin="normal">
+    <FormControl fullWidth margin="normal" sx={{ gap: 1 }}>
       <TextField
         onChange={onTitleChange}
         variant={VARIANT_TYPES.STANDARD}
@@ -118,7 +131,8 @@ function AddSelectionField({
         variant={VARIANT_TYPES.STANDARD}
         onChange={onRequiredChange}
         label="Required"
-        defaultValue={initialRequired}
+        defaultValue={initialRequired ?? false}
+        sx={{ marginTop: 2 }}
       >
         <MenuItem value={true}>Required</MenuItem>
         <MenuItem value={false}>Optional</MenuItem>
