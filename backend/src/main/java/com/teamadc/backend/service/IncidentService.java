@@ -9,17 +9,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-<<<<<<< HEAD
 import java.util.Date;
 import java.util.List;
-=======
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
->>>>>>> main
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
