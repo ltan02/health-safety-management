@@ -64,7 +64,7 @@ export default function IncidentDetailField({
                 <FormControl fullWidth>
                   <TextField
                     multiline
-                    rows={2}
+                    rows={customField[fieldName].length / 50}
                     variant="outlined"
                     required
                     fullWidth
