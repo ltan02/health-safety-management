@@ -44,6 +44,17 @@ async def get_categories():
     return {"categories": str(categories)}
 
 
+@app.delete("/purge")
+async def purge():
+    incidents = db.collection('incidents').stream()
+    for incident in incidents:
+        incident_dict = incident.to_dict()
+        if incident_dict['employeesInvolved'] is None and incident_dict['incidentCategory'] is None and incident_dict['incidentDate'] is None and incident_dict['reviewer'] is None and incident_dict['statusId'] is None:
+            print("Deleting incident: ", incident.id)
+            db.collection('incidents').document(incident.id).delete()
+    return {"message": "Incidents purged"}
+
+
 class IncidentModel(BaseModel):
     incident: str
 
