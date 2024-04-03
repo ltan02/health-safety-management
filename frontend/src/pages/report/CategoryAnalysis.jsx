@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Typography, Select, MenuItem, Checkbox } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import useAxios from "../../hooks/useAxios";
@@ -21,7 +21,7 @@ function stringToColor(str) {
     return color;
 }
 
-function StatusInsights() {
+function CategoryAnalysis() {
     const [selectedDateRange, setSelectedDateRange] = useState(5);
     const [fromDate, setFromDate] = useState(null);
     const [toDate, setToDate] = useState(null);
@@ -99,30 +99,35 @@ function StatusInsights() {
                 startDate = new Date(currentDate.setMonth(currentDate.getMonth() - 6));
             }
 
-            const url = `/reports/status-insights?${
+            const url = `/reports/category-analysis?${
                 startDate ? `start=${startDate.toISOString()}&` : ""
             }end=${endDate.toISOString()}`;
             const response = await sendRequest({ url, method: "GET" });
 
             if (response) {
-                const normalizedData = response
-                    .filter((item) => selectedStatusFilters.includes(item.statusId.toString()))
-                    .map((item) => ({
-                        ...item,
-                        date: item.date.split("T")[0],
-                        statusName: statusMap[item.statusId],
-                    }))
-                    .sort((a, b) => a.date.localeCompare(b.date));
+                let filteredData = response.filter((item) => item.categoryName !== "");
 
-                const transformedData = {};
-                normalizedData.forEach(({ statusName, percentage, date }) => {
-                    if (!transformedData[date]) transformedData[date] = { date };
-                    transformedData[date][statusName] = (transformedData[date][statusName] || 0) + percentage;
+                if (selectedStatusFilters.length > 0) {
+                    filteredData = filteredData.map((category) => {
+                        const filteredStatusCounts = category.statusCategoryCounts.filter((status) =>
+                            selectedStatusFilters.includes(status.statusId.toString()),
+                        );
+                        return { ...category, statusCategoryCounts: filteredStatusCounts };
+                    });
+                }
+
+                const transformedData = filteredData.map((category) => {
+                    const categoryData = { categoryName: category.categoryName };
+                    category.statusCategoryCounts.forEach((status) => {
+                        const statusName = statusMap[status.statusId];
+                        if (statusName && selectedStatusFilters.includes(status.statusId.toString())) {
+                            categoryData[statusName] = status.count;
+                        }
+                    });
+                    return categoryData;
                 });
 
-                const chartData = Object.values(transformedData);
-
-                setData(chartData);
+                setData(transformedData);
             }
         };
 
@@ -141,6 +146,11 @@ function StatusInsights() {
         }
     };
 
+    const colors = statuses.reduce((acc, status) => {
+        acc[status.name] = stringToColor(status.id);
+        return acc;
+    }, {});
+
     const dateRanges = ["Past Week", "Past 2 Weeks", "Past Month", "Past 3 Months", "Past 6 Months", "All Time"];
 
     return (
@@ -148,12 +158,14 @@ function StatusInsights() {
             <Typography
                 style={{ fontSize: "24px", color: "#000", fontWeight: 600, marginBottom: "20px", marginTop: "20px" }}
             >
-                Status Insights
+                Category Analysis
             </Typography>
             <Typography sx={{ paddingRight: 5 }}>
-                This graph displays the cumulative percentage of incidents in each status by day, providing a clear view
-                of incident distribution and trends over time. Use the date range filter to zoom in on incidents created
-                within specific periods, helping you understand how incident statuses evolve.
+                This visualization showcases the distribution of incidents across various categories illustrating the
+                frequency of each incident type. By highlighting the most prevalent categories, it aids in pinpointing
+                areas that may benefit from focused preventive strategies. Utilize the date range filter to refine your
+                analysis to incidents occurring within selected intervals, facilitating a deeper understanding of
+                incident category trends over time.
             </Typography>
             <div style={{ width: "100%", display: "flex", marginTop: 10 }}>
                 <div style={{ display: "flex", flexDirection: "column" }}>
@@ -197,52 +209,43 @@ function StatusInsights() {
             </div>
             {renderStatusCheckboxes()}
             <div style={{ width: "100%", height: 500, marginTop: 20 }}>
-                <ResponsiveContainer width="90%" height="100%">
-                    <AreaChart
-                        width={850}
-                        height={550}
+                <ResponsiveContainer width="90%" height={500}>
+                    <BarChart
+                        width={500}
+                        height={300}
                         data={data}
-                        margin={{ top: 30, right: 30, left: 10, bottom: 0 }}
+                        margin={{
+                            top: 20,
+                            right: 30,
+                            left: 20,
+                            bottom: 5,
+                        }}
                     >
-                        <defs>
-                            {statuses.map((status) => (
-                                <linearGradient key={status.id} id={`color${status.id}`} x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor={stringToColor(status.id)} stopOpacity={0.8} />
-                                    <stop offset="95%" stopColor={stringToColor(status.id)} stopOpacity={0} />
-                                </linearGradient>
-                            ))}
-                        </defs>
-                        <XAxis dataKey="date" />
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis
+                            dataKey="categoryName"
+                            height={60}
+                            label={{ value: "Category Name", position: "insideBottom", offset: 0, dy: -15 }}
+                        />
                         <YAxis
-                            domain={[0, 100]}
-                            allowDataOverflow
                             label={{
-                                value: "Percentage of All Incidents",
+                                value: "Incident Count",
                                 angle: -90,
                                 position: "insideLeft",
                                 textAnchor: "middle",
                                 style: { textAnchor: "middle" },
                             }}
                         />
-                        <CartesianGrid strokeDasharray="3 3" />
                         <Tooltip />
                         <Legend />
                         {statuses.map((status) => (
-                            <Area
-                                key={status.id}
-                                type="monotone"
-                                dataKey={status.name}
-                                stackId="1"
-                                stroke={stringToColor(status.id)}
-                                fillOpacity={1}
-                                fill={`url(#color${status.id})`}
-                            />
+                            <Bar key={status.id} dataKey={status.name} stackId="a" fill={colors[status.name]} />
                         ))}
-                    </AreaChart>
+                    </BarChart>
                 </ResponsiveContainer>
             </div>
         </div>
     );
 }
 
-export default StatusInsights;
+export default CategoryAnalysis;
