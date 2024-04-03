@@ -49,6 +49,7 @@ const IncidentDataGrid = ({ rows, columns, onRowClick }) => {
 
     return (
         <DataGrid
+            disableColumnFilter={true}
             rows={filteredRows}
             columns={columns}
             slots={{ Toolbar: CustomToolbar }}
