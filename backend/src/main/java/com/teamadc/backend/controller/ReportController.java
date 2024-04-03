@@ -78,6 +78,42 @@ public class ReportController {
         return ResponseEntity.ok(categoryAnalyses);
     }
 
+    @GetMapping("/employee-involvement")
+    public ResponseEntity<List<EmployeeInvolvement>> getEmployeeInvolvement(@RequestParam Optional<String> start, @RequestParam String end) {
+        LocalDate startDate = start.map(s -> Instant.parse(s).atZone(ZoneId.systemDefault()).toLocalDate())
+                .orElseGet(() -> incidentService.findEarliestIncidentDate().toInstant()
+                        .atZone(ZoneId.systemDefault()).toLocalDate());
+        LocalDate endDate = Instant.parse(end).atZone(ZoneId.systemDefault()).toLocalDate();
+
+        List<Incident> incidents = incidentService.findIncidentsBetween(Date.from(startDate.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+                Date.from(endDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+
+        // Group incidents by reporter
+        Map<String, Long> incidentsReported = incidents.stream()
+                .collect(Collectors.groupingBy(Incident::getReporter, Collectors.counting()));
+
+        // Get a flat list of all employee involvements
+        Map<String, Long> incidentsInvolved = incidents.stream()
+                .flatMap(incident -> incident.getEmployeesInvolved().stream())
+                .collect(Collectors.groupingBy(employeeId -> employeeId, Collectors.counting()));
+
+        // Combine the two maps above to create EmployeeInvolvement objects
+        Set<String> allEmployeeIds = new HashSet<>();
+        allEmployeeIds.addAll(incidentsReported.keySet());
+        allEmployeeIds.addAll(incidentsInvolved.keySet());
+
+        List<EmployeeInvolvement> employeeInvolvements = allEmployeeIds.stream()
+                .map(employeeId -> new EmployeeInvolvement(
+                        employeeId,
+                        incidentsReported.getOrDefault(employeeId, 0L).intValue() + incidentsInvolved.getOrDefault(employeeId, 0L).intValue(),
+                        incidentsReported.getOrDefault(employeeId, 0L).intValue(),
+                        incidentsInvolved.getOrDefault(employeeId, 0L).intValue()
+                ))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(employeeInvolvements);
+    }
+
     @GetMapping("/status-insights")
     public ResponseEntity<List<StatusInsight>> getStatusInsights(
             @RequestParam Optional<String> start,

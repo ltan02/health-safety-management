@@ -5,6 +5,8 @@ import com.teamadc.backend.model.Incident;
 import com.teamadc.backend.model.Status;
 import com.teamadc.backend.service.IncidentService;
 import com.teamadc.backend.service.StatusService;
+import com.teamadc.backend.service.UserService;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -13,10 +15,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/status")
 public class StatusController {
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(UserService.class);
+
     private final StatusService statusService;
     private final IncidentService incidentService;
 
@@ -66,6 +71,7 @@ public class StatusController {
         String uid = (String) authentication.getPrincipal();
 
         try {
+            logger.error("statusId: " + statusId);
             Status status = statusService.getStatusById(statusId);
 
             List<Incident> incidents = incidentService.getIncidentsByStatusId(uid, statusId);

@@ -10,6 +10,7 @@ import { isPrivileged } from "./utils/permissions.js";
 import { BoardProvider } from "./context/BoardContext.jsx";
 import Sidebar from "./components/global/Sidebar";
 import { useState } from "react";
+import EmployeeInvolvement from "./pages/report/EmployeeInvolvement.jsx";
 
 const ReportOverview = lazy(() => import("./pages/report/index.jsx"));
 const Incident = lazy(() => import("./pages/incident"));
@@ -84,6 +85,7 @@ function App() {
                                         <Route path="pie" element={<PieReport />} />
                                         <Route path="status-insights" element={<StatusInsights />} />
                                         <Route path="category-analysis" element={<CategoryAnalysis />} />
+                                        <Route path="employee-involvement" element={<EmployeeInvolvement />} />
                                     </Route>
                                 </>
                             ) : (
