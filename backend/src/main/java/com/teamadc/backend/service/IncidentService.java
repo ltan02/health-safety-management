@@ -125,6 +125,8 @@ public class IncidentService {
         Incident incident = incidentRepository.findById(incidentId);
         incident.setEmployeesInvolved(employeesInvolved);
         return updateModifiedAt(incident);
+    }
+
     public List<Incident> findIncidentsBetween(Date start, Date end) {
         List<Incident> allIncidents;
         try {
