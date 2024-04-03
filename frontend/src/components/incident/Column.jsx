@@ -83,9 +83,6 @@ function Column({
             sx={{ bgcolor: "#EB8C00", color: "white" }}
           />
         </Typography>
-        <IconButton onClick={toggleModal} color="primary">
-          <AddIcon />
-        </IconButton>
       </Box>
       <SortableContext
         id={id}

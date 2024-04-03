@@ -9,13 +9,14 @@ import {
   Typography,
   Container,
   Grid,
-  FormControl,
+  FormControl, IconButton,
 } from "@mui/material";
 import { FIELD_DATA, FIELD_TYPES, VARIANT_TYPES } from "./form_data";
 import { CircularProgress } from "@mui/material";
 
 import { FIELD_ADD_FORM } from "./add_elements";
 import { set } from "lodash";
+import CloseIcon from "@mui/icons-material/Close";
 
 function AddFieldForm({ handleAddNewField, getLastCoordinate }) {
   const [fieldType, setFieldType] = useState([]);
@@ -26,6 +27,7 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate }) {
   const [required, setRequired] = useState(true);
   const [select, setSelect] = useState("text");
   const [isLoading, setIsLoading] = useState(false);
+  const [isStatusModalOpen, setStatusModalOpen] = useState(false);
 
   useEffect(() => {
     setFieldType(Object.values(FIELD_DATA));
@@ -80,8 +82,13 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate }) {
       console.error("Error adding new field:", error);
     } finally {
       setIsLoading(false);
+      setStatusModalOpen(true);
     }
   };
+
+  const toggleStatusModal = () => {
+    setStatusModalOpen(!isStatusModalOpen)
+  }
 
   return (
     <Container style={{ height: "80vh", width: "80vh", overflow: "auto" }}>
@@ -105,6 +112,41 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate }) {
           Customize Field
         </Typography>
       )}
+      <Modal
+          open={isStatusModalOpen}
+          onClose={toggleStatusModal}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description">
+        <Box sx = {{position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: 400,
+          height: 150,
+          bgcolor: "white",}}>
+          <Box
+              sx={{
+                display: "flex",
+                width: "100%",
+                justifyContent: "flex-end",
+                bgcolor: "#FFB600"
+              }}
+          >
+            <IconButton onClick={toggleStatusModal}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+          <Box sx={ {display: "flex",
+            flexDirection: "column", justifyContent: "center", padding: 2,alignItems: "center"}}>
+            <Typography variant="body1" align="center">
+              Field was added successfully!
+            </Typography>
+            <Box sx = {{ display: 'inline-block', mt: 2, alignItems: "center"}}>
+              <Button variant="contained" onClick={toggleStatusModal} sx={{borderRadius: 10,}}>Close</Button>
+            </Box>
+          </Box>
+        </Box>
+      </Modal>
       <Container
         sx={{
           marginBottom: "10px",
