@@ -50,7 +50,7 @@ async def purge():
     for incident in incidents:
         incident_dict = incident.to_dict()
         if incident_dict['employeesInvolved'] is None and incident_dict['incidentCategory'] is None and incident_dict['incidentDate'] is None and incident_dict['reviewer'] is None and incident_dict['statusId'] is None:
-            print("Deleting incident: ", incident.id)
+            # print("Deleting incident: ", incident.id)
             db.collection('incidents').document(incident.id).delete()
     return {"message": "Incidents purged"}
 
@@ -89,7 +89,7 @@ class ChatPrompt(BaseModel):
 model2 = GenerativeModel("gemini-1.0-pro")
 
 
-@app.post("/generate/")
+@app.post("/ganerate/")
 async def talk(prompt_model: Prompt):
     try:
         response = model2.generate_content(prompt_model.prompt)
@@ -106,7 +106,7 @@ def newChat(chatsession):
         texts.append(str(doc1.to_dict()))
 
     a = pd.DataFrame(texts)
-    print(a)
+    # print(a)
 
     prompt = """
     You are now acting as a querying assistant for PricewaterhouseCoopers (PwC), a global leader in professional services, specializing in Assurance, Tax, and Advisory services. With the post-pandemic return to office, there is a renewed focus on Health and Safety, critical for PwC's rapidly growing cloud engineering consulting practice in Canada.
@@ -141,7 +141,7 @@ def newChat(chatsession):
 
     for chunk in r:
         t.append(chunk.text)
-    print("".join(t))
+    # print("".join(t))
 
 
 ids = {}
@@ -150,7 +150,7 @@ ids = {}
 @app.post("/chat/")
 async def get_chat_response(chat_prompt: ChatPrompt, uuid: str = Header(None)) -> dict:
     text_response = []
-    print("uuid", uuid)
+    # print("uuid", uuid)
 
     if uuid not in ids:
         ids[uuid] = model2.start_chat(response_validation=False)
