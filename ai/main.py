@@ -10,7 +10,7 @@ import json
 from vertexai.generative_models import ChatSession, GenerativeModel
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
-import pandas as pd
+# import pandas as pd
 
 load_dotenv()
 google_credentials_json = os.getenv("GOOGLE_CREDENTIALS_JSON")
@@ -105,7 +105,7 @@ def newChat(chatsession):
     for doc1 in docs:
         texts.append(str(doc1.to_dict()))
 
-    a = pd.DataFrame(texts)
+    # a = pd.DataFrame(texts)
     # print(a)
 
     prompt = """
