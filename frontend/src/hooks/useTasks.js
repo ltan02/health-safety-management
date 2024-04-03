@@ -60,28 +60,6 @@ export default function useTasks() {
         setTasks(newTasks);
     }, [adminColumns, employeeColumns]);
 
-    const fetchTaskDetailData = async (incidentId) => {
-        const res = await sendRequest({
-            url: `/incidents/${incidentId}`,
-        });
-
-        res.employeesInvolved = [...new Set([...res.employeesInvolved])].filter((id) => id !== res.reporter);
-
-        const userIds = [...new Set([res.reporter, ...res.employeesInvolved])];
-        const users = await Promise.all(userIds.map((id) => sendRequest({ url: `/users/${id}` })));
-
-        const userMap = users.reduce((acc, user) => ({ ...acc, [user.id]: user }), {});
-
-        const updatedIncident = {
-            ...res,
-            reporter: userMap[res.reporter],
-            employeesInvolved: res.employeesInvolved.map((id) => userMap[id]),
-        };
-
-        return updatedIncident;
-
-    };
-
     useEffect(() => {
         fetchTasks();
     }, [fetchTasks]);
@@ -94,7 +72,7 @@ export default function useTasks() {
             const filtered = Object.keys(tasks).reduce((acc, status) => {
                 acc[status] = tasks[status].filter((task) =>
                     task.incidentCategory.toLowerCase().includes(lowerCaseQuery) ||
-                    task.customFields.description.toLowerCase().includes(lowerCaseQuery),
+                    task.customFields?.description?.toLowerCase().includes(lowerCaseQuery),
                 );
                 return acc;
             }, {});
