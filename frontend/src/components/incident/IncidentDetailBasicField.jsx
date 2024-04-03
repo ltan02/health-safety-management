@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Box,
   Typography,
@@ -8,12 +8,22 @@ import {
   Grid,
   IconButton,
   Menu,
+  TextField,
 } from "@mui/material";
+import { useState } from "react";
 import { ChangeCircle as ChangeCircleIcon } from "@mui/icons-material";
 import { convertToPacificTime } from "../../utils/date";
 import { dateToDaysAgo } from "../../utils/date";
 import { isPrivileged } from "../../utils/permissions";
 import Profile from "../users/Profile";
+
+const FIELD = {
+  DATE: "date",
+  CATEGORY: "category",
+  REPORTER: "reporter",
+  EMPLOYEES_INVOLVED: "employeesInvolved",
+  REVIEWER: "reviewer",
+};
 export default function IncidentDetailBasicField({
   incident,
   reviewer,
@@ -21,15 +31,96 @@ export default function IncidentDetailBasicField({
   user,
   handleStateChange,
   incidentState,
-  handleOpenModal,
+  handleOpenEmployeesListModal,
   openReviewer,
+  openReporter,
   anchorEl,
   open,
   handleClose,
   handleSwitchReviewer,
+  handleSwitchReporter,
   loading,
   statuses,
+  setOpenReviewer,
+  setOpenReporter,
 }) {
+  const [editingField, setEditingField] = useState(null);
+  const [searchEmployee, setSearchEmployee] = useState("");
+  const [filteredEmployees, setFilteredEmployees] = useState([]);
+  const [oldField, setOldField] = useState({
+    [FIELD.DATE]: incident?.incidentDate,
+    [FIELD.CATEGORY]: incident?.incidentCategory,
+    [FIELD.REPORTER]: incident?.reporter,
+    [FIELD.EMPLOYEES_INVOLVED]: incident?.employeesInvolved,
+    [FIELD.REVIEWER]: reviewer,
+  });
+  const [currentField, setCurrentField] = useState({
+    [FIELD.DATE]: incident?.incidentDate,
+    [FIELD.CATEGORY]: incident?.incidentCategory,
+    [FIELD.REPORTER]: incident?.reporter,
+    [FIELD.EMPLOYEES_INVOLVED]: incident?.employeesInvolved,
+    [FIELD.REVIEWER]: reviewer,
+  });
+
+  const handleClickField = (fieldName) => {
+    setEditingField(fieldName);
+  };
+
+  const handleFilterEmployees = (e) => {
+    setSearchEmployee(e.target.value);
+    setFilteredEmployees(
+      employees.filter(
+        (employee) =>
+          employee.firstName.toLowerCase().includes(e.target.value) ||
+          employee.lastName.toLowerCase().includes(e.target.value)
+      )
+    );
+  };
+
+  const handleOpenReporter = (e) => {
+    if (!isPrivileged(user.role)) return;
+    if (editingField) {
+      setEditingField(null);
+      return;
+    }
+    setOpenReviewer(false);
+    setOpenReporter(true);
+    setEditingField(FIELD.REPORTER);
+    setFilteredEmployees();
+    handleOpenEmployeesListModal({ e, privileged: false });
+  };
+
+  const handleOpenReviewer = (e) => {
+    if (!isPrivileged(user.role)) return;
+    if (editingField) {
+      setEditingField(null);
+      return;
+    }
+    setOpenReporter(false);
+    setOpenReviewer(true);
+    setEditingField(FIELD.REVIEWER);
+    setFilteredEmployees();
+    handleOpenEmployeesListModal({ e, privileged: true });
+  };
+
+  useEffect(() => {
+    setCurrentField({
+      [FIELD.DATE]: incident?.incidentDate,
+      [FIELD.CATEGORY]: incident?.incidentCategory,
+      [FIELD.REPORTER]: incident?.reporter,
+      [FIELD.EMPLOYEES_INVOLVED]: incident?.employeesInvolved,
+      [FIELD.REVIEWER]: reviewer,
+    });
+  }, [incident]);
+
+  useEffect(() => {
+    setFilteredEmployees(employees);
+  }, [currentField]);
+
+  useEffect(() => {
+    setFilteredEmployees(employees);
+  },[employees]);
+
   return (
     <Box
       sx={{
@@ -41,9 +132,6 @@ export default function IncidentDetailBasicField({
         justifyContent: "space-between",
       }}
     >
-      <Box sx={{ position: "fixed", top: "10%", right: "10%" }}>
-        {loading ? <CircularProgress size={24} /> : <></>}
-      </Box>
       <Select
         value={incidentState ?? ""}
         onChange={handleStateChange}
@@ -117,10 +205,10 @@ export default function IncidentDetailBasicField({
                 Category
               </Typography>
             </Grid>
-            <Grid item xs={6}>
-              {incident && (
+            <Grid item xs={6} onClick={() => handleClickField(FIELD.CATEGORY)}>
+              {currentField[FIELD.CATEGORY] && (
                 <Typography sx={{ fontSize: "14px" }}>
-                  {incident.incidentCategory}
+                  {currentField[FIELD.CATEGORY]}
                 </Typography>
               )}
             </Grid>
@@ -129,14 +217,20 @@ export default function IncidentDetailBasicField({
                 Reporter
               </Typography>
             </Grid>
-            <Grid item xs={6}>
+            <Grid
+              item
+              xs={6}
+              sx={{ "&:hover": { background: "#f1f2f4", cursor: "pointer" } }}
+              onClick={(e) => handleOpenReporter(e)}
+            >
               {incident && (
                 <Grid container spacing={1} alignItems="center">
                   <Grid item>
-                    <Profile user={incident.reporter} />
+                    <Profile user={currentField[FIELD.REPORTER]} />
                   </Grid>
                   <Grid item sx={{ fontSize: "14px" }}>
-                    {incident.reporter.firstName} {incident.reporter.lastName}
+                    {currentField[FIELD.REPORTER].firstName}{" "}
+                    {currentField[FIELD.REPORTER].lastName}
                   </Grid>
                 </Grid>
               )}
@@ -146,10 +240,18 @@ export default function IncidentDetailBasicField({
                 Employees Involved
               </Typography>
             </Grid>
-            <Grid item xs={6} sx={{ rowGap: 1 }}>
+            <Grid
+              item
+              xs={6}
+              sx={{ rowGap: 1 }}
+              onClick={() => handleClickField(FIELD.EMPLOYEES_INVOLVED)}
+            >
               {incident &&
-                incident.employeesInvolved
-                  .filter((employee) => employee.id !== incident.reporter.id)
+                currentField[FIELD.EMPLOYEES_INVOLVED]
+                  .filter(
+                    (employee) =>
+                      employee.id !== currentField[FIELD.REPORTER].id
+                  )
                   .map((employee) => {
                     return (
                       <Grid
@@ -174,40 +276,67 @@ export default function IncidentDetailBasicField({
                 Reviewer
               </Typography>
             </Grid>
-            <Grid item xs={6}>
+            <Grid
+              item
+              xs={6}
+              sx={{ "&:hover": { background: "#f1f2f4", cursor: "pointer" } }}
+              onClick={(e) => handleOpenReviewer(e)}
+            >
               <Grid container spacing={1} alignItems="center">
                 <Grid item>
-                  <Profile user={reviewer} />
+                  <Profile user={currentField[FIELD.REVIEWER]} />
                 </Grid>
                 <Grid item sx={{ fontSize: "14px" }}>
-                  {reviewer?.firstName ?? "Unassigned"}
-                  {reviewer?.lastName ?? ""}
-                  {isPrivileged(user.role) && (
-                    <IconButton onClick={handleOpenModal}>
-                      <ChangeCircleIcon />
-                    </IconButton>
-                  )}
-                  {openReviewer && (
-                    <Menu
-                      id="basic-menu"
-                      anchorEl={anchorEl}
-                      open={open}
-                      onClose={handleClose}
-                      MenuListProps={{
-                        "aria-labelledby": "basic-button",
+                  {currentField[FIELD.REVIEWER]?.firstName ?? "Unassigned"}
+                  {currentField[FIELD.REVIEWER]?.lastName ?? ""}
+                  {(openReviewer || openReporter) && (
+                    <Box
+                      sx={{
+                        width: "100%",
+                        maxWidth: "360px",
+                        bgcolor: "background.paper",
                       }}
                     >
-                      {employees?.map((employee) => {
-                        return (
+                      
+                      <Menu
+                        id="basic-menu"
+                        anchorEl={anchorEl}
+                        open={open}
+                        onClose={handleClose}
+                        MenuListProps={{
+                          "aria-labelledby": "basic-button",
+                        }}
+                      >
+                        <MenuItem>
+                          <TextField
+                            fullWidth
+                            label="Search"
+                            variant="outlined"
+                            value={searchEmployee}
+                            onChange={handleFilterEmployees}
+                            onKeyDown={(e) => e.stopPropagation()}
+                            size="small"
+                            sx={{ m: 1 }}
+                          />
+                        </MenuItem>
+                        {!loading && filteredEmployees?.map((employee) => (
                           <MenuItem
                             key={employee.id}
-                            onClick={() => handleSwitchReviewer(employee.id)}
+                            onClick={
+                              editingField === FIELD.REVIEWER
+                                ? () => handleSwitchReviewer(employee.id)
+                                : () => handleSwitchReporter(employee.id)
+                            }
+                            sx={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                            }}
                           >
-                            {employee.firstName} {employee.lastName}
+                            {`${employee.firstName} ${employee.lastName}`}
                           </MenuItem>
-                        );
-                      })}
-                    </Menu>
+                        ))}
+                      </Menu>
+                    </Box>
                   )}
                 </Grid>
               </Grid>

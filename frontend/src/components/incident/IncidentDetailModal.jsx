@@ -1,19 +1,5 @@
 import { useState, Fragment, useEffect } from "react";
-import {
-  Modal,
-  Box,
-  Typography,
-  Select,
-  MenuItem,
-  IconButton,
-  Grid,
-  Avatar,
-  TextareaAutosize,
-  Menu,
-  Button,
-  FormControl,
-  TextField,
-} from "@mui/material";
+import { Modal, Box, IconButton } from "@mui/material";
 import { v4 as uuid } from "uuid";
 
 import CircularProgress from "@mui/material/CircularProgress";
@@ -67,6 +53,7 @@ export default function IncidentDetailModal({
   const [customField, setCustomField] = useState({});
   const [oldField, setOldField] = useState({});
   const [reviewer, setReviewer] = useState(null);
+  const [openReporter, setOpenReporter] = useState(false);
 
   // if (!incident) return <></>;
 
@@ -123,22 +110,57 @@ export default function IncidentDetailModal({
     // onClose();
   };
 
-  const fetchEmployees = async () => {
+  const handleSwitchReporter = async (reporterId) => {
+    try {
+      console.log(reporterId);
+      console.log(incident)
+      // await sendRequest({
+      //   url: `/incidents/${incidentId}/reporter/${reporterId}`,
+      //   method: "POST",
+      // });
+
+      // setIncident((prevIncident) => {
+      //   const newIncident = {
+      //     ...prevIncident,
+      //     reporterId: reporterId,
+      //   };
+      //   return newIncident;
+      // });
+
+      if (onRefresh) {
+        onRefresh();
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    setOpenReporter(false);
+    // onClose();
+  };
+  
+
+  const fetchEmployees = async (privileged) => {
     const response = await sendRequest({
       url: "/users",
       method: "GET",
     });
-    setEmployees(response.filter((employee) => isPrivileged(employee.role)));
+    if (!privileged) {
+      setEmployees(response);
+      return;
+    } else {
+      setEmployees(response.filter((employee) => isPrivileged(employee.role)));
+    }
   };
 
-  const handleOpenModal = async (e) => {
+  const handleOpenEmployeesListModal = async ({ e, privileged }) => {
     setAnchorEl(e.currentTarget);
-    await fetchEmployees();
-    setOpenReviewer(true);
+    await fetchEmployees(privileged);
   };
 
   const handleClose = () => {
     setOpenReviewer(false);
+    setOpenReporter(false);
+    console.log("close");
+    setAnchorEl(null);
   };
 
   const toggleStatusModal = () => {
@@ -272,7 +294,29 @@ export default function IncidentDetailModal({
             setComment={setComment}
             loading={loading}
           />
-          <IncidentDetailBasicField incident={incident} user={user} reviewer={reviewer} handleOpenModal={handleOpenModal} employees={employees} handleSwitchReviewer={handleSwitchReviewer} openReviewer={openReviewer} anchorEl={anchorEl} handleClose={handleClose} statuses={statuses} handleStateChange={handleStateChange} incidentState={incidentState} open={open} onClose={onClose} onRefresh={onRefresh} />
+          <IncidentDetailBasicField
+            incident={incident}
+            user={user}
+            reviewer={reviewer}
+            handleOpenEmployeesListModal={handleOpenEmployeesListModal}
+            employees={employees}
+            handleSwitchReviewer={handleSwitchReviewer}
+            openReviewer={openReviewer}
+            anchorEl={anchorEl}
+            handleClose={handleClose}
+            statuses={statuses}
+            handleStateChange={handleStateChange}
+            incidentState={incidentState}
+            open={open}
+            onClose={onClose}
+            onRefresh={onRefresh}
+            handleSwitchReporter={handleSwitchReporter}
+            setOpenReporter={setOpenReporter}
+            setOpenReviewer={setOpenReviewer}
+            openReporter={openReporter}
+            loading={loading}
+          />
+          <CircularProgress sx={{position: "fixed", top: "10%", left: "90%", display: loading ? "block" : "none"}} />
         </Box>
       </Box>
     </Modal>
