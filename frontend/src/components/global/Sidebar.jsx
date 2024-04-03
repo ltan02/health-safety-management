@@ -22,6 +22,7 @@ import PieChartOutlinedIcon from "@mui/icons-material/PieChartOutlined";
 import ManageSearchOutlinedIcon from "@mui/icons-material/ManageSearchOutlined";
 import CorporateFareOutlinedIcon from "@mui/icons-material/CorporateFareOutlined";
 import DynamicFormOutlinedIcon from "@mui/icons-material/DynamicFormOutlined";
+import AnalyticsOutlinedIcon from '@mui/icons-material/AnalyticsOutlined';
 import ChevronLeftOutlinedIcon from "@mui/icons-material/ChevronLeftOutlined";
 
 function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
@@ -504,6 +505,42 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
                                         }}
                                     >
                                         Status Insights
+                                    </Typography>
+                                </span>
+                            </Button>
+                            <Button
+                                onClick={() => history("/report/category-analysis")}
+                                sx={{
+                                    paddingLeft: "17px",
+                                    paddingY: "8px",
+                                    paddingRight: "8px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "start",
+                                    width: "100%",
+                                    "&:hover": {
+                                        backgroundColor: alpha("#EB8C00", 0.2),
+                                    },
+                                    backgroundColor:
+                                        location.pathname === "/report/category-analysis" ? alpha("#EB8C00", 0.2) : "transparent",
+                                }}
+                            >
+                                <AnalyticsOutlinedIcon
+                                    sx={{
+                                        fontSize: 24,
+                                        marginRight: "10px",
+                                        color: location.pathname === "/report/category-analysis" ? "#D04A02" : "#000",
+                                    }}
+                                />
+                                <span>
+                                    <Typography
+                                        style={{
+                                            fontSize: "14px",
+                                            fontWeight: 400,
+                                            color: location.pathname === "/report/category-analysis" ? "#D04A02" : "#000",
+                                        }}
+                                    >
+                                        Category Analysis
                                     </Typography>
                                 </span>
                             </Button>

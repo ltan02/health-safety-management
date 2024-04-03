@@ -1,8 +1,6 @@
 package com.teamadc.backend.controller;
 
-import com.teamadc.backend.model.Incident;
-import com.teamadc.backend.model.Report;
-import com.teamadc.backend.model.StatusInsight;
+import com.teamadc.backend.model.*;
 import com.teamadc.backend.service.IncidentService;
 import com.teamadc.backend.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +40,42 @@ public class ReportController {
         } catch (ParseException e) {
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    @GetMapping("/category-analysis")
+    public ResponseEntity<List<CategoryAnalysis>> getCategoryAnalysis(@RequestParam Optional<String> start, @RequestParam String end) {
+        LocalDate startDate = start.map(s -> Instant.parse(s).atZone(ZoneId.systemDefault()).toLocalDate())
+                .orElseGet(() -> incidentService.findEarliestIncidentDate().toInstant()
+                        .atZone(ZoneId.systemDefault()).toLocalDate());
+        LocalDate endDate = Instant.parse(end).atZone(ZoneId.systemDefault()).toLocalDate();
+
+        List<Incident> incidents = incidentService.findIncidentsBetween(Date.from(startDate.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+                Date.from(endDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+
+        Map<String, List<Incident>> incidentsByCategory = incidents.stream()
+                .collect(Collectors.groupingBy(Incident::getIncidentCategory));
+
+        List<CategoryAnalysis> categoryAnalyses = incidentsByCategory.entrySet().stream()
+                .map(entry -> {
+                    String categoryName = entry.getKey();
+                    List<Incident> categoryIncidents = entry.getValue();
+
+                    // Calculate total incidents in this category
+                    int totalIncidents = categoryIncidents.size();
+
+                    // Further break down by status, if desired
+                    Map<String, Long> statusCount = categoryIncidents.stream()
+                            .collect(Collectors.groupingBy(Incident::getStatusId, Collectors.counting()));
+
+                    List<StatusCategoryCount> statusCategoryCounts = statusCount.entrySet().stream()
+                            .map(statusEntry -> new StatusCategoryCount(statusEntry.getKey(), statusEntry.getValue().intValue()))
+                            .collect(Collectors.toList());
+
+                    return new CategoryAnalysis(categoryName, totalIncidents, statusCategoryCounts);
+                })
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(categoryAnalyses);
     }
 
     @GetMapping("/status-insights")
