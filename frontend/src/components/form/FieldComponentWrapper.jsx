@@ -7,7 +7,7 @@ import { FIELD_TYPES } from "./form_data";
 import { FIELD_ELEMENT } from "./form_elements";
 import { useSortable } from "@dnd-kit/sortable";
 
-const FieldComponentWrapper = ({ fieldData, onEdit, onDelete }) => {
+const FieldComponentWrapper = ({ fieldData, onEdit, onDelete,fields }) => {
   const FieldComponent = FIELD_ELEMENT[fieldData.type];
   const {
     attributes,
@@ -29,8 +29,9 @@ const FieldComponentWrapper = ({ fieldData, onEdit, onDelete }) => {
     cursor: "grab",
   };
 
-  const isDisabled = fieldData.name === "Employees Involved";
-
+  const findFieldById = (id) => {
+    return fields.find((field) => field.id === id);
+  };
   return (
     <Container
       sx={{
@@ -48,7 +49,11 @@ const FieldComponentWrapper = ({ fieldData, onEdit, onDelete }) => {
           <FieldComponent
             {...fieldData.props}
             disabled
-            value={fieldData.type === FIELD_TYPES.SELECTION_MULTI ? [] : ""}
+            value={fieldData.type === FIELD_TYPES.SELECTION_MULTI ? [] : fieldData.type === FIELD_TYPES.AI_TEXT ? {
+              referenceField: findFieldById(fieldData.aiField.referenceId),
+              prompt: fieldData.aiField.prompt,
+              generated: "somethingggg"
+            } : ""}
             style={{ padding: "10px 10px", flexGrow: 1 }}
           />
           <div

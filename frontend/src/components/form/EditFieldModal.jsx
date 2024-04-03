@@ -14,7 +14,7 @@ import {
 import { useState } from "react";
 import { FIELD_TYPES, VARIANT_TYPES } from "./form_data";
 import { FIELD_ADD_FORM } from "./add_elements";
-function EditFieldModal({ open, setOpen, onHandleEdit, fieldData }) {
+function EditFieldModal({ open, setOpen, onHandleEdit, fieldData, fieldsData }) {
   const [title, setTitle] = useState(
     fieldData.props.label ? fieldData.props.label : ""
   );
@@ -101,6 +101,7 @@ function EditFieldModal({ open, setOpen, onHandleEdit, fieldData }) {
               initialOptions: options,
               initialRequired: required,
               initialPlaceholder: placeholder,
+              currentFields: () => fieldsData,
             })}
           </>
         ) : (

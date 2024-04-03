@@ -56,6 +56,7 @@ function FormCustomizationModal({
             <AddFieldForm
               handleAddNewField={handleAddNewField}
               getLastCoordinate={getLastCoordinate}
+              currentFields={fields}
             />
           </FormTab>
         </Paper>

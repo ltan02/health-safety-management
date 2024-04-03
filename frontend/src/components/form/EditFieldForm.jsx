@@ -180,6 +180,7 @@ function EditFieldForm({
                         fieldData={fieldData}
                         onDelete={() => handleOpenDeleteModal(fieldData)}
                         onEdit={handleOpenEdit}
+                        fields={fields}
                       />
                     </Grid>
                   ))}
@@ -200,6 +201,7 @@ function EditFieldForm({
           setOpen={setOpenEdit}
           onHandleEdit={handleEditField}
           fieldData={editingField}
+          fieldsData={fieldsData}
         />
       )}
     </Container>
