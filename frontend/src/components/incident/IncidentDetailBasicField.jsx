@@ -16,6 +16,7 @@ import { convertToPacificTime } from "../../utils/date";
 import { dateToDaysAgo } from "../../utils/date";
 import { isPrivileged } from "../../utils/permissions";
 import Profile from "../users/Profile";
+import EmployeesInvolveEditModal from "./EmployeesInvolveEditModal";
 
 const FIELD = {
   DATE: "date",
@@ -43,17 +44,13 @@ export default function IncidentDetailBasicField({
   statuses,
   setOpenReviewer,
   setOpenReporter,
+  handleUpdateEmployeesInvolved
 }) {
   const [editingField, setEditingField] = useState(null);
   const [searchEmployee, setSearchEmployee] = useState("");
   const [filteredEmployees, setFilteredEmployees] = useState([]);
-  const [oldField, setOldField] = useState({
-    [FIELD.DATE]: incident?.incidentDate,
-    [FIELD.CATEGORY]: incident?.incidentCategory,
-    [FIELD.REPORTER]: incident?.reporter,
-    [FIELD.EMPLOYEES_INVOLVED]: incident?.employeesInvolved,
-    [FIELD.REVIEWER]: reviewer,
-  });
+  const [openEmployeesInolveModal, setOpenEmployeesInvolveModal] =
+    useState(false);
   const [currentField, setCurrentField] = useState({
     [FIELD.DATE]: incident?.incidentDate,
     [FIELD.CATEGORY]: incident?.incidentCategory,
@@ -77,30 +74,38 @@ export default function IncidentDetailBasicField({
     );
   };
 
+  const handleOpenInvolvedEmployees = (e) => {
+    setEditingField(FIELD.EMPLOYEES_INVOLVED);
+    // handleOpenEmployeesListModal({ e, privileged: false });
+    setOpenEmployeesInvolveModal(true);
+  };
+
+  const handleAddEmployee =  async(selectedEmployees) => {
+    handleUpdateEmployeesInvolved(selectedEmployees);
+  };
+
   const handleOpenReporter = (e) => {
     if (!isPrivileged(user.role)) return;
-    if (editingField) {
-      setEditingField(null);
-      return;
-    }
     setOpenReviewer(false);
     setOpenReporter(true);
     setEditingField(FIELD.REPORTER);
-    setFilteredEmployees();
     handleOpenEmployeesListModal({ e, privileged: false });
   };
 
   const handleOpenReviewer = (e) => {
     if (!isPrivileged(user.role)) return;
-    if (editingField) {
-      setEditingField(null);
-      return;
-    }
     setOpenReporter(false);
     setOpenReviewer(true);
     setEditingField(FIELD.REVIEWER);
-    setFilteredEmployees();
     handleOpenEmployeesListModal({ e, privileged: true });
+  };
+
+  const handleSelectEmployee = (id) => {
+    if (editingField === FIELD.REPORTER) {
+      handleSwitchReporter(id);
+    } else if (editingField === FIELD.REVIEWER) {
+      handleSwitchReviewer(id);
+    }
   };
 
   useEffect(() => {
@@ -111,15 +116,13 @@ export default function IncidentDetailBasicField({
       [FIELD.EMPLOYEES_INVOLVED]: incident?.employeesInvolved,
       [FIELD.REVIEWER]: reviewer,
     });
-  }, [incident]);
+  
+  }, [incident, reviewer, employees]);
 
   useEffect(() => {
     setFilteredEmployees(employees);
   }, [currentField]);
 
-  useEffect(() => {
-    setFilteredEmployees(employees);
-  },[employees]);
 
   return (
     <Box
@@ -217,23 +220,22 @@ export default function IncidentDetailBasicField({
                 Reporter
               </Typography>
             </Grid>
-            <Grid
-              item
-              xs={6}
-              sx={{ "&:hover": { background: "#f1f2f4", cursor: "pointer" } }}
-              onClick={(e) => handleOpenReporter(e)}
-            >
-              {incident && (
-                <Grid container spacing={1} alignItems="center">
-                  <Grid item>
-                    <Profile user={currentField[FIELD.REPORTER]} />
-                  </Grid>
-                  <Grid item sx={{ fontSize: "14px" }}>
-                    {currentField[FIELD.REPORTER].firstName}{" "}
-                    {currentField[FIELD.REPORTER].lastName}
-                  </Grid>
+            <Grid item xs={6}>
+              <Grid
+                container
+                spacing={1}
+                alignItems="center"
+                sx={{ "&:hover": { background: "#f1f2f4", cursor: "pointer" } }}
+                onClick={(e) => handleOpenReporter(e)}
+              >
+                <Grid item>
+                  <Profile user={currentField[FIELD.REPORTER]} />
                 </Grid>
-              )}
+                <Grid item sx={{ fontSize: "14px" }}>
+                  {currentField[FIELD.REPORTER].firstName}{" "}
+                  {currentField[FIELD.REPORTER].lastName}
+                </Grid>
+              </Grid>
             </Grid>
             <Grid item xs={6}>
               <Typography fontWeight={"bold"} color={"secondary.main"}>
@@ -243,8 +245,8 @@ export default function IncidentDetailBasicField({
             <Grid
               item
               xs={6}
-              sx={{ rowGap: 1 }}
-              onClick={() => handleClickField(FIELD.EMPLOYEES_INVOLVED)}
+              onClick={(e) => handleOpenInvolvedEmployees(e)}
+              sx={{ "&:hover": { background: "#f1f2f4", cursor: "pointer" } }}
             >
               {incident &&
                 currentField[FIELD.EMPLOYEES_INVOLVED]
@@ -289,58 +291,54 @@ export default function IncidentDetailBasicField({
                 <Grid item sx={{ fontSize: "14px" }}>
                   {currentField[FIELD.REVIEWER]?.firstName ?? "Unassigned"}
                   {currentField[FIELD.REVIEWER]?.lastName ?? ""}
-                  {(openReviewer || openReporter) && (
-                    <Box
-                      sx={{
-                        width: "100%",
-                        maxWidth: "360px",
-                        bgcolor: "background.paper",
-                      }}
-                    >
-                      
-                      <Menu
-                        id="basic-menu"
-                        anchorEl={anchorEl}
-                        open={open}
-                        onClose={handleClose}
-                        MenuListProps={{
-                          "aria-labelledby": "basic-button",
-                        }}
-                      >
-                        <MenuItem>
-                          <TextField
-                            fullWidth
-                            label="Search"
-                            variant="outlined"
-                            value={searchEmployee}
-                            onChange={handleFilterEmployees}
-                            onKeyDown={(e) => e.stopPropagation()}
-                            size="small"
-                            sx={{ m: 1 }}
-                          />
-                        </MenuItem>
-                        {!loading && filteredEmployees?.map((employee) => (
-                          <MenuItem
-                            key={employee.id}
-                            onClick={
-                              editingField === FIELD.REVIEWER
-                                ? () => handleSwitchReviewer(employee.id)
-                                : () => handleSwitchReporter(employee.id)
-                            }
-                            sx={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                            }}
-                          >
-                            {`${employee.firstName} ${employee.lastName}`}
-                          </MenuItem>
-                        ))}
-                      </Menu>
-                    </Box>
-                  )}
                 </Grid>
               </Grid>
             </Grid>
+            {(openReviewer || openReporter) && !loading && (
+              <Box
+                sx={{
+                  width: "100%",
+                  maxWidth: "360px",
+                  bgcolor: "background.paper",
+                }}
+              >
+                <Menu
+                  id="basic-menu"
+                  anchorEl={anchorEl}
+                  open={open}
+                  onClose={handleClose}
+                  MenuListProps={{
+                    "aria-labelledby": "basic-button",
+                  }}
+                >
+                  <MenuItem>
+                    <TextField
+                      fullWidth
+                      label="Search"
+                      variant="outlined"
+                      value={searchEmployee}
+                      onChange={handleFilterEmployees}
+                      onKeyDown={(e) => e.stopPropagation()}
+                      size="small"
+                      sx={{ m: 1 }}
+                    />
+                  </MenuItem>
+                  {!loading &&
+                    filteredEmployees?.map((employee) => (
+                      <MenuItem
+                        key={employee.id}
+                        onClick={() => handleSelectEmployee(employee.id)}
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        {`${employee.firstName} ${employee.lastName}`}
+                      </MenuItem>
+                    ))}
+                </Menu>
+              </Box>
+            )}
           </Grid>
         </Box>
       </Box>
@@ -358,6 +356,18 @@ export default function IncidentDetailBasicField({
           convertToPacificTime(incident.lastUpdatedAt)
         )}`}</Typography>
       </Box>
+      <EmployeesInvolveEditModal
+        open={openEmployeesInolveModal}
+        onClose={() => setOpenEmployeesInvolveModal(false)}
+        employees={filteredEmployees}
+        involvedEmployees={currentField[FIELD.EMPLOYEES_INVOLVED]}
+        setEmployees={setFilteredEmployees}
+        handleFilterEmployees={handleFilterEmployees}
+        handleOpenEmployeesListModal={handleOpenEmployeesListModal}
+        search={searchEmployee}
+        handleAddEmployee={handleAddEmployee}
+        loading={loading}
+      />
     </Box>
   );
 }

@@ -101,4 +101,22 @@ public class IncidentService {
         incident.setLastUpdatedAt(new Date());
         return incidentRepository.save(incident);
     }
+
+    public Incident updateReporter(String incidentId, String userId) throws InterruptedException, ExecutionException {
+        Incident incident = incidentRepository.findById(incidentId);
+        incident.setReporter(userId);
+        return updateModifiedAt(incident);
+    }
+
+    public Incident updateCategory(String incidentId, String category) throws InterruptedException, ExecutionException {
+        Incident incident = incidentRepository.findById(incidentId);
+        incident.setIncidentCategory(category);
+        return updateModifiedAt(incident);
+    }
+
+    public Incident updateEmployeesInvolved(String incidentId, List<String> employeesInvolved) throws InterruptedException, ExecutionException {
+        Incident incident = incidentRepository.findById(incidentId);
+        incident.setEmployeesInvolved(employeesInvolved);
+        return updateModifiedAt(incident);
+    }
 }

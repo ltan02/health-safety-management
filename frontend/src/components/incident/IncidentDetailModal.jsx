@@ -6,10 +6,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import CloseIcon from "@mui/icons-material/Close";
 import useAxios from "../../hooks/useAxios";
 import { useAuthContext } from "../../context/AuthContext";
-import Profile from "../users/Profile";
-import { dateToDaysAgo } from "../../utils/date";
 import { useBoard } from "../../context/BoardContext";
-import ChangeCircleIcon from "@mui/icons-material/ChangeCircle";
 import { isPrivileged } from "../../utils/permissions";
 import StatusModal from "./StatusModal";
 import IncidentDetailField from "./IncidentDetailField";
@@ -38,7 +35,7 @@ export default function IncidentDetailModal({
   commentData,
   setCommentData,
 }) {
-  const { sendRequest, loading } = useAxios();
+  const { sendRequest, loading, sendAIRequest } = useAxios();
   const { user } = useAuthContext();
   const { statuses } = useBoard();
 
@@ -85,8 +82,9 @@ export default function IncidentDetailModal({
 
   const handleSwitchReviewer = async (reviewerId) => {
     try {
+      console.log(reviewerId);
       await sendRequest({
-        url: `/incidents/${incidentId}/reviewer/${reviewerId}`,
+        url: `/incidents/${incidentId}/reporter/${reviewerId}`,
         method: "POST",
       });
 
@@ -113,12 +111,12 @@ export default function IncidentDetailModal({
   const handleSwitchReporter = async (reporterId) => {
     try {
       console.log(reporterId);
-      console.log(incident)
-      // await sendRequest({
-      //   url: `/incidents/${incidentId}/reporter/${reporterId}`,
-      //   method: "POST",
-      // });
-
+      console.log(incidentId);
+      console.log(user.id);
+      await sendRequest({
+        url: `/incidents/${incidentId}/reporter/${reporterId}`,
+        method: "`POST`",
+      });
       // setIncident((prevIncident) => {
       //   const newIncident = {
       //     ...prevIncident,
@@ -126,7 +124,6 @@ export default function IncidentDetailModal({
       //   };
       //   return newIncident;
       // });
-
       if (onRefresh) {
         onRefresh();
       }
@@ -136,7 +133,6 @@ export default function IncidentDetailModal({
     setOpenReporter(false);
     // onClose();
   };
-  
 
   const fetchEmployees = async (privileged) => {
     const response = await sendRequest({
@@ -156,10 +152,33 @@ export default function IncidentDetailModal({
     await fetchEmployees(privileged);
   };
 
+  const handleUpdateEmployeesInvolved = async (employees) => {
+    const involvedEmployees = employees.map((employee) => employee.id);
+    await sendRequest({
+      url: `/incidents/${incidentId}/employees_involved`,
+      method: "PUT",
+      body: {
+        employeesInvolved: involvedEmployees,
+      },
+    });
+    const newInvolvedEmployees = employees.filter((employee) =>
+      involvedEmployees.includes(employee.id)
+    );
+    setIncident((prevIncident) => {
+      const newIncident = {
+        ...prevIncident,
+        employeesInvolved: newInvolvedEmployees,
+      };
+      return newIncident;
+    });
+    if (onRefresh) {
+      onRefresh();
+    }
+  };
+
   const handleClose = () => {
     setOpenReviewer(false);
     setOpenReporter(false);
-    console.log("close");
     setAnchorEl(null);
   };
 
@@ -222,6 +241,30 @@ export default function IncidentDetailModal({
           customFields: updatedField,
         },
       });
+      if (customField.description) {
+        const res = await sendAIRequest({
+          url: "/categorize/",
+          method: "POST",
+          body: {
+            incident: customField.description,
+          },
+        });
+        await sendRequest({
+          url: `/incidents/${incidentId}/category`,
+          method: "PUT",
+          body: {
+            incidentCategory: res.response,
+          },
+        });
+        setIncident((prevIncident) => {
+          const newIncident = {
+            ...prevIncident,
+            incidentCategory: res.response,
+          };
+          return newIncident;
+        });
+      }
+
       setOldField(customField);
     } catch (error) {
       console.error(error);
@@ -313,10 +356,18 @@ export default function IncidentDetailModal({
             handleSwitchReporter={handleSwitchReporter}
             setOpenReporter={setOpenReporter}
             setOpenReviewer={setOpenReviewer}
+            handleUpdateEmployeesInvolved={handleUpdateEmployeesInvolved}
             openReporter={openReporter}
             loading={loading}
           />
-          <CircularProgress sx={{position: "fixed", top: "10%", left: "90%", display: loading ? "block" : "none"}} />
+          <CircularProgress
+            sx={{
+              position: "fixed",
+              top: "10%",
+              left: "90%",
+              display: loading ? "block" : "none",
+            }}
+          />
         </Box>
       </Box>
     </Modal>
