@@ -10,6 +10,7 @@ import { isPrivileged } from "./utils/permissions.js";
 import { BoardProvider } from "./context/BoardContext.jsx";
 import Sidebar from "./components/global/Sidebar";
 import { useState } from "react";
+import EmployeeInvolvement from "./pages/report/EmployeeInvolvement.jsx";
 
 const ReportOverview = lazy(() => import("./pages/report/index.jsx"));
 const Incident = lazy(() => import("./pages/incident"));
@@ -22,6 +23,8 @@ const BarReport = lazy(() => import("./pages/report/bar/index.jsx"));
 const LineReport = lazy(() => import("./pages/report/line/index.jsx"));
 const PieReport = lazy(() => import("./pages/report/pie/index.jsx"));
 const ScatterReport = lazy(() => import("./pages/report/scatter/index.jsx"));
+const StatusInsights = lazy(() => import("./pages/report/StatusInsights.jsx"));
+const CategoryAnalysis = lazy(() => import("./pages/report/CategoryAnalysis.jsx"));
 
 const theme = createTheme({
     typography: {
@@ -80,6 +83,9 @@ function App() {
                                         <Route path="scatter" element={<ScatterReport />} />
                                         <Route path="line" element={<LineReport />} />
                                         <Route path="pie" element={<PieReport />} />
+                                        <Route path="status-insights" element={<StatusInsights />} />
+                                        <Route path="category-analysis" element={<CategoryAnalysis />} />
+                                        <Route path="employee-involvement" element={<EmployeeInvolvement />} />
                                     </Route>
                                 </>
                             ) : (

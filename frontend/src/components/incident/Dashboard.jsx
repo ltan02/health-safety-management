@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Container, Box } from "@mui/material";
+import {Container, Box, Button} from "@mui/material";
 import {
     DndContext,
     PointerSensor,
@@ -21,12 +21,10 @@ import useAxios from "../../hooks/useAxios";
 import { useBoard } from "../../context/BoardContext";
 import IncidentDetailModal from "./IncidentDetailModal";
 import useForm from "../../hooks/useForm";
-import { set } from "lodash";
+import AddTaskModal from "./AddTaskModal.jsx";
 
-const SELECTED_INCIDENT = "GZ4tf8bErd3rZ9YizFOu";
 function Dashboard() {
     const { tasks, filterTasks, setTasks, fetchTasks } = useTasks();
-    
 
     const { forms, fetchForms, groupedByRows, sortedRows, activeForm } = useForm();
     const { activeId, handleDragStart, handleDragOver, handleDragEnd } = useDragBehavior(tasks, setTasks);
@@ -39,6 +37,7 @@ function Dashboard() {
     const [commentData, setCommentData] = useState({});
 
     const [employees, setEmployees] = useState([]);
+    const [addModal, setAddModal] = useState(false);
 
     const unsortedColumns = isPrivileged(user.role) ? adminColumns : employeeColumns;
     const columns = unsortedColumns.filter((column) => column.id !== "UNASSIGNED").sort((a, b) => a.order - b.order);
@@ -91,49 +90,49 @@ function Dashboard() {
         return sortedRows(groupedByRows(fields));
     };
 
-    const handleComment = () =>{
-        const flatTasks = Object.values(tasks).flat()
-        const initialCommentData = {...commentData} // shallow copy
-        if(flatTasks) {
+    const handleComment = () => {
+        const flatTasks = Object.values(tasks).flat();
+        const initialCommentData = { ...commentData }; // shallow copy
+        if (flatTasks) {
             flatTasks.map((task) => {
-            const newCommentData = initialCommentData;
-            task.comments.map((comment) => {
-              if(!newCommentData[comment.id] ) {
-                newCommentData[comment.id] = []
-              }
-              const data = {
-                id: uuidv4(),
-                comment,
-                user: employees.filter((employee) =>
-                    employee.id === comment.userId
-                )[0]
-              }
-              const tempId = hasTempComment(newCommentData[comment.id], data)
-              // this is to prevent duplicate temp comments
-              if(tempId) {
-                newCommentData[comment.id][tempId] = data
-              } else {
-                newCommentData[comment.id].push(data)
-              }
-            })
+                const newCommentData = initialCommentData;
+                task.comments.map((comment) => {
+                    if (!newCommentData[comment.id]) {
+                        newCommentData[comment.id] = [];
+                    }
+                    const data = {
+                        id: uuidv4(),
+                        comment,
+                        user: employees.filter((employee) => employee.id === comment.userId)[0],
+                    };
+                    const tempId = hasTempComment(newCommentData[comment.id], data);
+                    // this is to prevent duplicate temp comments
+                    if (tempId) {
+                        newCommentData[comment.id][tempId] = data;
+                    } else {
+                        newCommentData[comment.id].push(data);
+                    }
+                });
 
-            initialCommentData[task.id] = newCommentData[task.id]
-          })
+                initialCommentData[task.id] = newCommentData[task.id];
+            });
         }
-        setCommentData(initialCommentData)
-      }
+        setCommentData(initialCommentData);
+    };
 
     const hasTempComment = (commentData, newComment) => {
-        const commentDataCopy = [...commentData]
-        let tempId = null
+        const commentDataCopy = [...commentData];
+        let tempId = null;
         commentDataCopy.map((data) => {
-            if(data.id.includes("temp") && data.comment.content === newComment.comment.content){
-                tempId = data.id
-                return
+            if (data.id.includes("temp") && data.comment.content === newComment.comment.content) {
+                tempId = data.id;
+                return;
             }
-        })        
-        return tempId
-    }
+        });
+        return tempId;
+    };
+
+    const toggleAddModal = () => setAddModal(!addModal);
 
     useEffect(() => {
         const fetchEmployees = async () => {
@@ -150,13 +149,27 @@ function Dashboard() {
     }, [forms]);
 
     useEffect(() => {
-        handleComment()
+        handleComment();
     }, [tasks]);
-
 
     return (
         <Container maxWidth="false" disableGutters>
+            <AddTaskModal
+                open={addModal}
+                onClose={toggleAddModal}
+                handleAddTask={handleAddTask}
+                field={fields}
+                sortedRows={handleSort}
+                formName={activeForm?.name}
+            />
             <IncidentSearchInput onSearch={filterTasks} handleOpenModal={handleOpenModal} />
+            <div style={{display: "flex", justifyContent: 'flex-end', marginTop: "1rem", marginRight: "1rem",}}>
+                <Button variant="contained" onClick={toggleAddModal}
+                        style={{display: 'flex', justifyContent: 'flex-end',
+                            fontWeight: "bold"}}>
+                    Add Incident
+                </Button>
+            </div>
             <DndContext
                 sensors={useSensors(
                     useSensor(PointerSensor, {

@@ -9,9 +9,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+<<<<<<< HEAD
 import java.util.Date;
 import java.util.List;
+=======
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.*;
+>>>>>>> main
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @Service
 public class IncidentService {
@@ -118,5 +128,56 @@ public class IncidentService {
         Incident incident = incidentRepository.findById(incidentId);
         incident.setEmployeesInvolved(employeesInvolved);
         return updateModifiedAt(incident);
+    public List<Incident> findIncidentsBetween(Date start, Date end) {
+        List<Incident> allIncidents;
+        try {
+            allIncidents = incidentRepository.findAll(); // Fetch all incidents
+        } catch (InterruptedException | ExecutionException e) {
+            logger.error("Error fetching incidents", e);
+            return new ArrayList<>(); // Return an empty list or handle appropriately
+        }
+
+        return allIncidents.stream()
+                .filter(incident -> {
+                    Date incidentDate = incident.getCreatedAt();
+                    if (start == null) {
+                        return (end == null) || !incidentDate.after(end);
+                    }
+                    // If start is not null but end is, only check that the incident is on or after start
+                    if (end == null) {
+                        return !incidentDate.before(start);
+                    }
+                    // If both start and end are not null, check that the incident is within the range
+                    return !incidentDate.before(start) && !incidentDate.after(end);
+                })
+                .collect(Collectors.toList());
+    }
+
+    public long totalIncidents() {
+        try {
+            List<Incident> allIncidents = incidentRepository.findAll();
+            return allIncidents.size();
+        } catch (InterruptedException | ExecutionException e) {
+            logger.error("Error fetching the total count of incidents", e);
+            return 0;
+        }
+    }
+
+    public Date findEarliestIncidentDate() {
+        // Fetch all incidents
+        List<Incident> allIncidents;
+        try {
+            allIncidents = incidentRepository.findAll();
+        } catch (InterruptedException | ExecutionException e) {
+            logger.error("Error fetching incidents", e);
+            return null; // Handle this as appropriate
+        }
+
+        // Find the earliest date among all incidents
+        return allIncidents.stream()
+                .map(Incident::getCreatedAt)
+                .filter(Objects::nonNull) // Ensure the date is not null
+                .min(Comparator.naturalOrder())
+                .orElse(null); // Return null if no incidents are found or all dates are null
     }
 }

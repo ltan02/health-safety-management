@@ -6,6 +6,7 @@ import com.teamadc.backend.dto.request.IncidentRequest;
 import com.teamadc.backend.dto.response.BasicIncidentResponse;
 import com.teamadc.backend.model.Comment;
 import com.teamadc.backend.model.Incident;
+import com.teamadc.backend.model.StatusHistory;
 import com.teamadc.backend.service.CommentService;
 import com.teamadc.backend.service.IncidentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +39,13 @@ public class IncidentController {
 
     @PostMapping
     public ResponseEntity<Incident> createIncident(@RequestBody IncidentRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = (String) authentication.getPrincipal();
+
         List<CustomFieldRequest> customFieldsRequest = request.getCustomFields();
-        Incident incident = new Incident(null, request.getIncidentDate(), request.getIncidentCategory(), request.getReporter(), request.getEmployeesInvolved(), request.getStatusId());
+        List<StatusHistory> statusHistory = new ArrayList<>();
+        statusHistory.add(new StatusHistory(request.getStatusId(), uid, new Date()));
+        Incident incident = new Incident(null, request.getIncidentDate(), request.getIncidentCategory(), request.getReporter(), request.getEmployeesInvolved(), request.getStatusId(), new ArrayList<Comment>(), statusHistory);
 
         for (CustomFieldRequest field : customFieldsRequest) {
             incident.setCustomField(field.getFieldName(), field.getValue());
@@ -74,6 +80,9 @@ public class IncidentController {
 
     @PostMapping("/{incidentId}")
     public ResponseEntity<Incident> updateIncident(@PathVariable String incidentId, @RequestBody IncidentRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = (String) authentication.getPrincipal();
+
         try {
             Incident existingIncident = incidentService.getIncidentById(incidentId);
             if (existingIncident == null) {
@@ -84,7 +93,15 @@ public class IncidentController {
             if (request.getIncidentCategory() != null) existingIncident.setIncidentCategory(request.getIncidentCategory());
             if (request.getReporter() != null) existingIncident.setReporter(request.getReporter());
             if (request.getEmployeesInvolved() != null) existingIncident.setEmployeesInvolved(request.getEmployeesInvolved());
-            if (request.getStatusId() != null) existingIncident.setStatusId(request.getStatusId());
+            if (request.getStatusId() != null) {
+                existingIncident.setStatusId(request.getStatusId());
+                List<StatusHistory> statusHistory = existingIncident.getStatusHistory();
+
+                if (statusHistory == null) statusHistory = new ArrayList<>();
+
+                statusHistory.add(new StatusHistory(request.getStatusId(), uid, new Date()));
+                existingIncident.setStatusHistory(statusHistory);
+            }
             if (request.getComments() != null) existingIncident.setComments(request.getComments());
 
             existingIncident.setLastUpdatedAt(new Date());

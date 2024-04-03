@@ -22,6 +22,8 @@ import PieChartOutlinedIcon from "@mui/icons-material/PieChartOutlined";
 import ManageSearchOutlinedIcon from "@mui/icons-material/ManageSearchOutlined";
 import CorporateFareOutlinedIcon from "@mui/icons-material/CorporateFareOutlined";
 import DynamicFormOutlinedIcon from "@mui/icons-material/DynamicFormOutlined";
+import AnalyticsOutlinedIcon from "@mui/icons-material/AnalyticsOutlined";
+import MyLocationOutlinedIcon from "@mui/icons-material/MyLocationOutlined";
 import ChevronLeftOutlinedIcon from "@mui/icons-material/ChevronLeftOutlined";
 
 function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
@@ -42,7 +44,7 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
             onMouseLeave={() => setHoveringSidebar(false)}
             sx={{ width: 240, position: "relative" }}
         >
-            {hoveringSidebar && sidebarOpen && (
+            {/* {hoveringSidebar && sidebarOpen && (
                 <div
                     onMouseEnter={() => setHoveringBack(true)}
                     onMouseLeave={() => setHoveringBack(false)}
@@ -66,7 +68,7 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
                         sx={{ fontSize: "18px", fontWeight: 600, color: hoveringBack ? "#FFF" : "#000" }}
                     />
                 </div>
-            )}
+            )} */}
             <SwipeableDrawer
                 ModalProps={{ keepMounted: true }}
                 anchor="left"
@@ -76,7 +78,7 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
                 variant="persistent"
                 sx={{
                     "& .MuiDrawer-paper": {
-                        width: drawerWidth,
+                        width: drawerWidth + 2,
                         boxSizing: "border-box",
                         display: "flex",
                         flexDirection: "column",
@@ -472,7 +474,7 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
                                 </span>
                             </Button>
                             <Button
-                                onClick={() => history("/report/bar")}
+                                onClick={() => history("/report/status-insights")}
                                 sx={{
                                     paddingLeft: "17px",
                                     paddingY: "8px",
@@ -485,86 +487,16 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
                                         backgroundColor: alpha("#EB8C00", 0.2),
                                     },
                                     backgroundColor:
-                                        location.pathname === "/report/bar" ? alpha("#EB8C00", 0.2) : "transparent",
-                                }}
-                            >
-                                <InsertChartOutlinedRoundedIcon
-                                    sx={{
-                                        fontSize: 24,
-                                        marginRight: "10px",
-                                        color: location.pathname === "/report/bar" ? "#D04A02" : "#000",
-                                    }}
-                                />
-                                <span>
-                                    <Typography
-                                        style={{
-                                            fontSize: "14px",
-                                            fontWeight: 400,
-                                            color: location.pathname === "/report/bar" ? "#D04A02" : "#000",
-                                        }}
-                                    >
-                                        Bar Chart
-                                    </Typography>
-                                </span>
-                            </Button>
-                            <Button
-                                onClick={() => history("/report/scatter")}
-                                sx={{
-                                    paddingLeft: "17px",
-                                    paddingY: "8px",
-                                    paddingRight: "8px",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "start",
-                                    width: "100%",
-                                    "&:hover": {
-                                        backgroundColor: alpha("#EB8C00", 0.2),
-                                    },
-                                    backgroundColor:
-                                        location.pathname === "/report/scatter" ? alpha("#EB8C00", 0.2) : "transparent",
-                                }}
-                            >
-                                <ScatterPlotOutlinedIcon
-                                    sx={{
-                                        fontSize: 24,
-                                        marginRight: "10px",
-                                        color: location.pathname === "/report/scatter" ? "#D04A02" : "#000",
-                                    }}
-                                />
-                                <span>
-                                    <Typography
-                                        style={{
-                                            fontSize: "14px",
-                                            fontWeight: 400,
-                                            color: location.pathname === "/report/scatter" ? "#D04A02" : "#000",
-                                        }}
-                                    >
-                                        Scatter Plot
-                                    </Typography>
-                                </span>
-                            </Button>
-                            <Button
-                                onClick={() => history("/report/line")}
-                                sx={{
-                                    paddingLeft: "17px",
-                                    paddingY: "8px",
-                                    paddingRight: "8px",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "start",
-                                    width: "100%",
-                                    "&:hover": {
-                                        backgroundColor: alpha("#EB8C00", 0.2),
-                                    },
-                                    backgroundColor:
-                                        location.pathname === "/report/line" ? alpha("#EB8C00", 0.2) : "transparent",
+                                        location.pathname === "/report/status-insights"
+                                            ? alpha("#EB8C00", 0.2)
+                                            : "transparent",
                                 }}
                             >
                                 <TimelineOutlinedIcon
                                     sx={{
                                         fontSize: 24,
                                         marginRight: "10px",
-                                        color: location.pathname === "/report/line" ? "#D04A02" : "#000",
+                                        color: location.pathname === "/report/status-insights" ? "#D04A02" : "#000",
                                     }}
                                 />
                                 <span>
@@ -572,15 +504,15 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
                                         style={{
                                             fontSize: "14px",
                                             fontWeight: 400,
-                                            color: location.pathname === "/report/line" ? "#D04A02" : "#000",
+                                            color: location.pathname === "/report/status-insights" ? "#D04A02" : "#000",
                                         }}
                                     >
-                                        Line Graph
+                                        Status Insights
                                     </Typography>
                                 </span>
                             </Button>
                             <Button
-                                onClick={() => history("/report/pie")}
+                                onClick={() => history("/report/category-analysis")}
                                 sx={{
                                     paddingLeft: "17px",
                                     paddingY: "8px",
@@ -593,14 +525,16 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
                                         backgroundColor: alpha("#EB8C00", 0.2),
                                     },
                                     backgroundColor:
-                                        location.pathname === "/report/pie" ? alpha("#EB8C00", 0.2) : "transparent",
+                                        location.pathname === "/report/category-analysis"
+                                            ? alpha("#EB8C00", 0.2)
+                                            : "transparent",
                                 }}
                             >
-                                <PieChartOutlinedIcon
+                                <AnalyticsOutlinedIcon
                                     sx={{
                                         fontSize: 24,
                                         marginRight: "10px",
-                                        color: location.pathname === "/report/pie" ? "#D04A02" : "#000",
+                                        color: location.pathname === "/report/category-analysis" ? "#D04A02" : "#000",
                                     }}
                                 />
                                 <span>
@@ -608,10 +542,53 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
                                         style={{
                                             fontSize: "14px",
                                             fontWeight: 400,
-                                            color: location.pathname === "/report/pie" ? "#D04A02" : "#000",
+                                            color:
+                                                location.pathname === "/report/category-analysis" ? "#D04A02" : "#000",
                                         }}
                                     >
-                                        Pie Chart
+                                        Category Analysis
+                                    </Typography>
+                                </span>
+                            </Button>
+                            <Button
+                                onClick={() => history("/report/employee-involvement")}
+                                sx={{
+                                    paddingLeft: "17px",
+                                    paddingY: "8px",
+                                    paddingRight: "8px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "start",
+                                    width: "100%",
+                                    "&:hover": {
+                                        backgroundColor: alpha("#EB8C00", 0.2),
+                                    },
+                                    backgroundColor:
+                                        location.pathname === "/report/employee-involvement"
+                                            ? alpha("#EB8C00", 0.2)
+                                            : "transparent",
+                                }}
+                            >
+                                <MyLocationOutlinedIcon
+                                    sx={{
+                                        fontSize: 24,
+                                        marginRight: "10px",
+                                        color:
+                                            location.pathname === "/report/employee-involvement" ? "#D04A02" : "#000",
+                                    }}
+                                />
+                                <span>
+                                    <Typography
+                                        style={{
+                                            fontSize: "14px",
+                                            fontWeight: 400,
+                                            color:
+                                                location.pathname === "/report/employee-involvement"
+                                                    ? "#D04A02"
+                                                    : "#000",
+                                        }}
+                                    >
+                                        Employee Involvement
                                     </Typography>
                                 </span>
                             </Button>
