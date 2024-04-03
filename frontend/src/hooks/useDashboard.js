@@ -20,7 +20,6 @@ export default function useDashboard() {
   const updateBoard = async (boardId, graphs) => {
     try {
       if (!boardId || !graphs) {
-        console.log(boardId, graphs)
         console.error("Invalid input");
         return;
       }
