@@ -89,7 +89,7 @@ class ChatPrompt(BaseModel):
 model2 = GenerativeModel("gemini-1.0-pro")
 
 
-@app.post("/ganerate/")
+@app.post("/generate")
 async def talk(prompt_model: Prompt):
     try:
         response = model2.generate_content(prompt_model.prompt)
