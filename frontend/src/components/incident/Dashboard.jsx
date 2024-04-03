@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Container, Box } from "@mui/material";
+import {Container, Box, Button} from "@mui/material";
 import {
     DndContext,
     PointerSensor,
@@ -21,6 +21,7 @@ import useAxios from "../../hooks/useAxios";
 import { useBoard } from "../../context/BoardContext";
 import IncidentDetailModal from "./IncidentDetailModal";
 import useForm from "../../hooks/useForm";
+import AddTaskModal from "./AddTaskModal.jsx";
 
 function Dashboard() {
     const { tasks, filterTasks, setTasks, fetchTasks } = useTasks();
@@ -36,6 +37,7 @@ function Dashboard() {
     const [commentData, setCommentData] = useState({});
 
     const [employees, setEmployees] = useState([]);
+    const [addModal, setAddModal] = useState(false);
 
     const unsortedColumns = isPrivileged(user.role) ? adminColumns : employeeColumns;
     const columns = unsortedColumns.filter((column) => column.id !== "UNASSIGNED").sort((a, b) => a.order - b.order);
@@ -130,6 +132,8 @@ function Dashboard() {
         return tempId;
     };
 
+    const toggleAddModal = () => setAddModal(!addModal);
+
     useEffect(() => {
         const fetchEmployees = async () => {
             const res = await sendRequest({ url: "/users" });
@@ -150,7 +154,22 @@ function Dashboard() {
 
     return (
         <Container maxWidth="false" disableGutters>
+            <AddTaskModal
+                open={addModal}
+                onClose={toggleAddModal}
+                handleAddTask={handleAddTask}
+                field={fields}
+                sortedRows={handleSort}
+                formName={activeForm?.name}
+            />
             <IncidentSearchInput onSearch={filterTasks} handleOpenModal={handleOpenModal} />
+            <div style={{display: "flex", justifyContent: 'flex-end', marginTop: "1rem", marginRight: "1rem",}}>
+                <Button variant="contained" onClick={toggleAddModal}
+                        style={{display: 'flex', justifyContent: 'flex-end',
+                            fontWeight: "bold"}}>
+                    Add Incident
+                </Button>
+            </div>
             <DndContext
                 sensors={useSensors(
                     useSensor(PointerSensor, {
