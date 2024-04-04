@@ -373,7 +373,7 @@ export const FIELD_ELEMENT = {
           // onChange={onChange}
           name={name}
           required={required}
-          placeholder={`The AI will generate the text for you base on "${value.referenceField.name}"`}
+          placeholder={`The AI will generate the text for you base on "${value.referenceField.map((referenceId) => referenceId.name).join(", ")}"`}
           multiline
           value={value.generated}
           rows={rows}

@@ -115,9 +115,6 @@ public class FormService {
     public Form addField(String formId, Field field) throws InterruptedException, ExecutionException {
         Form form = formRepository.findById(formId);
         FieldProp fieldProp = field.getProps();
-        AiField aiField = field.getAiField();
-        System.out.println(aiField.getPrompt());
-        System.out.println(aiField.getReferenceId());
 
         fieldPropRepository.save(fieldProp);
         fieldRepository.save(field);

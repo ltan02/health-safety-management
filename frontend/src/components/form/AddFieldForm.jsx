@@ -27,7 +27,7 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate, currentFields }) {
   const [options, setOptions] = useState([]);
   const [required, setRequired] = useState(true);
   const [select, setSelect] = useState("text");
-  const [referenceField, setReferenceField] = useState("");
+  const [referenceField, setReferenceField] = useState([]);
   const [prompt, setPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isStatusModalOpen, setStatusModalOpen] = useState(false);
@@ -69,8 +69,7 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate, currentFields }) {
       const newField = {
         name: fieldTitle,
         type: select,
-        isAi:
-          select === FIELD_TYPES.AI_TEXT,
+        isAi: select === FIELD_TYPES.AI_TEXT,
         aiField: {
           referenceId: referenceField,
           prompt: prompt,
@@ -195,7 +194,12 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate, currentFields }) {
               onOptionChange: (option) => setOptions(option),
               onRequiredChange: (e) => setRequired(e.target.value),
               onPlaceHolderChange: (e) => setPlaceholder(e.target.value),
-              onReferenceFieldChange: (fieldId) => setReferenceField(fieldId),
+              onReferenceFieldChange: (e) =>
+                setReferenceField(
+                  typeof e.target.value === "string"
+                    ? e.target.value.split(",")
+                    : e.target.value
+                ),
               onPromptChange: (e) => setPrompt(e.target.value),
               currentFields: currentFields,
               initialDescription: fieldDescription,
@@ -204,6 +208,7 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate, currentFields }) {
               initialRequired: required,
               initialPlaceholder: placeholder,
               initialPrompt: prompt,
+              initialReferenceField: referenceField,
             })}
           </>
         ) : (

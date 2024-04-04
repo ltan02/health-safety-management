@@ -119,7 +119,13 @@ function EditFieldModal({
               onPromptChange: (e) =>
                 setAiField({ ...aiField, prompt: e.target.value }),
               onReferenceFieldChange: (e) =>
-                setAiField({ ...aiField, referenceId: e.target.value }),
+                setAiField({
+                  ...aiField,
+                  referenceId:
+                    typeof e.target.value === "string"
+                      ? e.target.value.split(",")
+                      : e.target.value,
+                }),
               initialDescription: description,
               initialTitle: title,
               initialOptions: options,
@@ -130,7 +136,7 @@ function EditFieldModal({
               initialReferenceField:
                 fieldData.type === FIELD_TYPES.AI_TEXT
                   ? aiField.referenceId
-                  : "",
+                  : [],
               currentFields: fieldsData,
             })}
           </>
