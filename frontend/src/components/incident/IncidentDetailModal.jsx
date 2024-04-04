@@ -24,13 +24,13 @@ const modalStyle = {
     borderColor: "#7D7D7D",
 };
 
-export default function IncidentDetailModal({ incidentId, selectedIncident, open, onClose, onRefresh, commentData }) {
+export default function IncidentDetailModal({ selectedIncident, open, onClose, onRefresh, commentData, setTasks }) {
     const { sendRequest, loading, sendAIRequest } = useAxios();
     const { user } = useAuthContext();
-    const { statuses } = useBoard();
+    const { statuses, adminColumns, employeeColumns } = useBoard();
 
     const [incident, setIncident] = useState(selectedIncident);
-    const [incidentState, setIncidentState] = useState(selectedIncident.statusId);
+    const [incidentState, setIncidentState] = useState(selectedIncident?.statusId);
     const [openReviewer, setOpenReviewer] = useState(false);
     const [employees, setEmployees] = useState([]);
     const [anchorEl, setAnchorEl] = useState(null);
@@ -62,49 +62,76 @@ export default function IncidentDetailModal({ incidentId, selectedIncident, open
         const newStateId = event.target.value;
 
         await sendRequest({
-            url: `/incidents/${incidentId}`,
+            url: `/incidents/${incident.id}`,
             method: "POST",
             body: {
                 statusId: newStateId,
             },
         });
 
-        setIncident((prevIncident) => {
-            const newIncident = {
-                ...prevIncident,
-                statusId: newStateId,
-            };
-            return newIncident;
-        });
-        setIncidentState(newStateId);
-        setStatusModalOpen(true);
+        const oldStatusId = incident.statusId;
+        const newIncident = {
+            ...incident,
+            statusId: newStateId,
+        };
 
-        if (onRefresh) {
-            onRefresh();
-        }
+        setIncident(newIncident);
+        setIncidentState(newStateId);
+
+        setTasks((prevTasks) => {
+            const updatedTasks = { ...prevTasks };
+            const columns = isPrivileged(user.role) ? adminColumns : employeeColumns;
+
+            const currentColumn = columns.find((column) => column.statusIds.includes(oldStatusId)).id;
+            const newColumn = columns.find((column) => column.statusIds.includes(newStateId)).id;
+
+            updatedTasks[currentColumn] = updatedTasks[currentColumn].filter((task) => task.id !== incident.id);
+            updatedTasks[newColumn].push(newIncident);
+
+            Object.keys(updatedTasks).forEach((key) => {
+                updatedTasks[key] = updatedTasks[key].sort(
+                    (a, b) => new Date(a.incidentDate) - new Date(b.incidentDate),
+                );
+            });
+
+            return updatedTasks;
+        });
+        setStatusModalOpen(true);
     };
 
     const handleSwitchReviewer = async (reviewerId) => {
         try {
-            console.log(reviewerId);
             await sendRequest({
-                url: `/incidents/${incidentId}/reviewer/${reviewerId}`,
+                url: `/incidents/${incident.id}/reviewer/${reviewerId}`,
                 method: "POST",
             });
 
-            setIncident((prevIncident) => {
-                const newIncident = {
-                    ...prevIncident,
-                    reviewer: employees.find((employee) => employee.id === reviewerId),
-                };
-                return newIncident;
-            });
+            const newIncident = {
+                ...incident,
+                reviewer: employees.find((employee) => employee.id === reviewerId),
+            };
+
+            setIncident(newIncident);
 
             setReviewer(employees.find((employee) => employee.id === reviewerId));
 
-            if (onRefresh) {
-                onRefresh();
-            }
+            setTasks((prevTasks) => {
+                const updatedTasks = { ...prevTasks };
+                const columns = isPrivileged(user.role) ? adminColumns : employeeColumns;
+
+                const columnId = columns.find((column) => column.statusIds.includes(incidentState)).id;
+
+                updatedTasks[columnId] = updatedTasks[columnId].filter((task) => task.id !== incident.id);
+                updatedTasks[columnId].push(newIncident);
+
+                Object.keys(updatedTasks).forEach((key) => {
+                    updatedTasks[key] = updatedTasks[key].sort(
+                        (a, b) => new Date(a.incidentDate) - new Date(b.incidentDate),
+                    );
+                });
+
+                return updatedTasks;
+            });
         } catch (error) {
             console.error(error);
         }
@@ -115,21 +142,34 @@ export default function IncidentDetailModal({ incidentId, selectedIncident, open
     const handleSwitchReporter = async (reporterId) => {
         try {
             await sendRequest({
-                url: `/incidents/${incidentId}/reporter/${reporterId}`,
+                url: `/incidents/${incident.id}/reporter/${reporterId}`,
                 method: "POST",
             });
-            setIncident((prevIncident) => {
-                console.log(prevIncident);
-              const newIncident = {
-                ...prevIncident,
+
+            const newIncident = {
+                ...incident,
                 reporter: employees.find((employee) => employee.id === reporterId),
-              };
-              console.log(newIncident);
-              return newIncident;
+            };
+
+            setIncident(newIncident);
+
+            setTasks((prevTasks) => {
+                const updatedTasks = { ...prevTasks };
+                const columns = isPrivileged(user.role) ? adminColumns : employeeColumns;
+
+                const columnId = columns.find((column) => column.statusIds.includes(incidentState)).id;
+
+                updatedTasks[columnId] = updatedTasks[columnId].filter((task) => task.id !== incident.id);
+                updatedTasks[columnId].push(newIncident);
+
+                Object.keys(updatedTasks).forEach((key) => {
+                    updatedTasks[key] = updatedTasks[key].sort(
+                        (a, b) => new Date(a.incidentDate) - new Date(b.incidentDate),
+                    );
+                });
+
+                return updatedTasks;
             });
-            if (onRefresh) {
-                onRefresh();
-            }
         } catch (error) {
             console.error(error);
         }
@@ -157,20 +197,40 @@ export default function IncidentDetailModal({ incidentId, selectedIncident, open
 
     const handleUpdateEmployeesInvolved = async (employees) => {
         const involvedEmployees = employees.map((employee) => employee.id);
+
         await sendRequest({
-            url: `/incidents/${incidentId}/employees_involved`,
+            url: `/incidents/${incident.id}/employees_involved`,
             method: "PUT",
             body: {
                 employeesInvolved: involvedEmployees,
             },
         });
+
         const newInvolvedEmployees = employees.filter((employee) => involvedEmployees.includes(employee.id));
-        setIncident((prevIncident) => {
-            const newIncident = {
-                ...prevIncident,
-                employeesInvolved: newInvolvedEmployees,
-            };
-            return newIncident;
+
+        const newIncident = {
+            ...incident,
+            employeesInvolved: newInvolvedEmployees,
+        };
+
+        setIncident(newIncident);
+
+        setTasks((prevTasks) => {
+            const updatedTasks = { ...prevTasks };
+            const columns = isPrivileged(user.role) ? adminColumns : employeeColumns;
+
+            const columnId = columns.find((column) => column.statusIds.includes(incidentState)).id;
+
+            updatedTasks[columnId] = updatedTasks[columnId].filter((task) => task.id !== incident.id);
+            updatedTasks[columnId].push(newIncident);
+
+            Object.keys(updatedTasks).forEach((key) => {
+                updatedTasks[key] = updatedTasks[key].sort(
+                    (a, b) => new Date(a.incidentDate) - new Date(b.incidentDate),
+                );
+            });
+
+            return updatedTasks;
         });
         if (onRefresh) {
             onRefresh();
@@ -192,13 +252,40 @@ export default function IncidentDetailModal({ incidentId, selectedIncident, open
         if (!comment) {
             return;
         }
+
         setComment("");
-        await sendRequest({
-            url: `/incidents/${incidentId}/comments`,
+
+        const response = await sendRequest({
+            url: `/incidents/${incident.id}/comments`,
             method: "POST",
             body: {
                 content: comment,
             },
+        });
+
+        const newIncident = {
+            ...incident,
+            comments: response.comments,
+        };
+
+        setIncident(newIncident);
+
+        setTasks((prevTasks) => {
+            const updatedTasks = { ...prevTasks };
+            const columns = isPrivileged(user.role) ? adminColumns : employeeColumns;
+
+            const columnId = columns.find((column) => column.statusIds.includes(incidentState)).id;
+
+            updatedTasks[columnId] = updatedTasks[columnId].filter((task) => task.id !== incident.id);
+            updatedTasks[columnId].push(newIncident);
+
+            Object.keys(updatedTasks).forEach((key) => {
+                updatedTasks[key] = updatedTasks[key].sort(
+                    (a, b) => new Date(a.incidentDate) - new Date(b.incidentDate),
+                );
+            });
+
+            return updatedTasks;
         });
     };
 
@@ -218,13 +305,21 @@ export default function IncidentDetailModal({ incidentId, selectedIncident, open
                 }
             });
             await sendRequest({
-                url: `/incidents/${incidentId}/fields`,
+                url: `/incidents/${incident.id}/fields`,
                 method: "PUT",
                 body: {
                     customFields: updatedField,
                 },
             });
-            if (customField.description) {
+
+            const newIncident = {
+                ...incident,
+                customFields: {
+                    ...customField,
+                },
+            };
+
+            if (customField?.description) {
                 const res = await sendAIRequest({
                     url: "/categorize/",
                     method: "POST",
@@ -233,22 +328,36 @@ export default function IncidentDetailModal({ incidentId, selectedIncident, open
                     },
                 });
                 await sendRequest({
-                    url: `/incidents/${incidentId}/category`,
+                    url: `/incidents/${incident.id}/category`,
                     method: "PUT",
                     body: {
                         incidentCategory: res.response,
                     },
                 });
-                setIncident((prevIncident) => {
-                    const newIncident = {
-                        ...prevIncident,
-                        incidentCategory: res.response,
-                    };
-                    return newIncident;
-                });
+
+                newIncident.incidentCategory = res.response;
             }
 
             setOldField(customField);
+            setIncident(newIncident);
+
+            setTasks((prevTasks) => {
+                const updatedTasks = { ...prevTasks };
+                const columns = isPrivileged(user.role) ? adminColumns : employeeColumns;
+
+                const columnId = columns.find((column) => column.statusIds.includes(incidentState)).id;
+
+                updatedTasks[columnId] = updatedTasks[columnId].filter((task) => task.id !== incident.id);
+                updatedTasks[columnId].push(newIncident);
+
+                Object.keys(updatedTasks).forEach((key) => {
+                    updatedTasks[key] = updatedTasks[key].sort(
+                        (a, b) => new Date(a.incidentDate) - new Date(b.incidentDate),
+                    );
+                });
+
+                return updatedTasks;
+            });
         } catch (error) {
             console.error(error);
         }
@@ -286,7 +395,7 @@ export default function IncidentDetailModal({ incidentId, selectedIncident, open
                         incident={incident}
                         user={user}
                         commentData={commentData}
-                        incidentId={incidentId}
+                        incidentId={incident.id}
                         customField={customField}
                         handleAddComment={handleAddComment}
                         handleEditCustomField={handleEditCustomField}

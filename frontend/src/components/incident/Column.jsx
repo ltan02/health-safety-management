@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
 import { Container, Typography, Box, Chip, Modal } from "@mui/material";
 import Task from "./Task";
 import PreviewForm from "../form/PreviewForm";
+import DoNotDisturbIcon from "@mui/icons-material/DoNotDisturb";
+import DroppableTransitionBox from "./DroppableTransitionBox";
 
 const modalStyle = {
     position: "absolute",
@@ -22,19 +23,17 @@ const modalStyle = {
 };
 
 function Column({
+    activeId,
     id,
     title,
     tasks,
     handleAddTask,
-    onRefresh,
     field,
     sortedRows,
     formName,
-    commentData,
-    setCommentData,
-    employees,
+    columnMap,
+    handleOpenModal,
 }) {
-    const { setNodeRef } = useDroppable({ id });
     const [openModal, setOpenModal] = useState(false);
 
     const handleSubmit = (field) => {
@@ -44,9 +43,9 @@ function Column({
     const onClose = () => {
         setOpenModal(false);
     };
+
     return (
         <Container
-            ref={setNodeRef}
             sx={{
                 bgcolor: "grey.200",
                 padding: 2,
@@ -70,20 +69,54 @@ function Column({
                     {title} <Chip label={tasks.length} size="small" sx={{ bgcolor: "#EB8C00", color: "white" }} />
                 </Typography>
             </Box>
-            <SortableContext id={id} items={tasks.map((task) => task.id)} strategy={rectSortingStrategy}>
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                    {tasks.map((task) => (
-                        <Task
-                            key={task.id}
-                            id={task.id}
-                            task={task}
-                            onRefresh={onRefresh}
-                            commentData={commentData}
-                            setCommentData={setCommentData}
-                        />
-                    ))}
-                </Box>
-            </SortableContext>
+            {!activeId && (
+                <SortableContext id={id} items={tasks.map((task) => task.id)} strategy={rectSortingStrategy}>
+                    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                        {tasks.map((task) => (
+                            <Task key={task.id} task={task} handleOpenModal={handleOpenModal} />
+                        ))}
+                    </Box>
+                </SortableContext>
+            )}
+            {activeId && (
+                <div
+                    style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        height: "90%",
+                        width: "100%",
+                        alignItems: "center",
+                    }}
+                >
+                    {columnMap && columnMap.length > 0 ? (
+                        columnMap.map((column, index) => (
+                            <DroppableTransitionBox
+                                key={index}
+                                statusId={column.statusId}
+                                statusName={column.statusName}
+                                transitionName={column.transitionName}
+                            />
+                        ))
+                    ) : tasks.some((task) => task.id === activeId) ? (
+                        <></>
+                    ) : (
+                        <Box
+                            sx={{
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                width: "60%",
+                                textAlign: "center",
+                            }}
+                        >
+                            <DoNotDisturbIcon />
+                            <p style={{ fontSize: 12, marginTop: 5 }}>
+                                You can&apos;t move this incident to this column due to workflow configuration.
+                            </p>
+                        </Box>
+                    )}
+                </div>
+            )}
             <Modal
                 open={openModal}
                 onClose={() => {
@@ -102,7 +135,6 @@ function Column({
                         handleSubmit={handleSubmit}
                         onClose={onClose}
                         formName={formName}
-                        employees={employees}
                     />
                 </Box>
             </Modal>

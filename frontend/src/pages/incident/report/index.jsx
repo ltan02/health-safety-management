@@ -11,7 +11,7 @@ import useAxios from "../../../hooks/useAxios";
 import { useAuthContext } from "../../../context/AuthContext";
 
 function IncidentReport() {
-    const { filteredTasks, fetchTasks } = useTasks();
+    const { filteredTasks, fetchTasks, setFilteredTasks } = useTasks();
     const [rows, setRows] = useState(Object.values(filteredTasks).flat());
     const { user } = useAuthContext();
     const [selectedIncident, setSelectedIncident] = useState(null);
@@ -155,6 +155,7 @@ function IncidentReport() {
                         selectedIncident={selectedIncident}
                         incidentId={selectedIncident.id}
                         onClose={handleCloseModal}
+                        setTasks={setFilteredTasks}
                     />
                 )}
             </div>
