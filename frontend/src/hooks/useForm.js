@@ -145,6 +145,23 @@ export default function useForm() {
     }
   };
 
+  const updateForm = async (form) => {
+    try {
+      if (!form) {
+        console.error("Invalid input");
+        return;
+      }
+      const response = await sendRequest({
+        url: `/forms/${form.id}`,
+        method: "PUT",
+        body: form,
+      });
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const updateField = async (formId, field) => {
     try {
       if (!formId || !field || !field.props) {
@@ -220,6 +237,7 @@ export default function useForm() {
 
   const groupedByRows = (fields, cols) => {
     if(fields.length <= 0) return {};
+    console.log(fields);
     const newFields = fields.reduce((acc, field) => {
       const { y } = field.coordinate;
       if (!acc[y]) {
@@ -234,6 +252,7 @@ export default function useForm() {
         newFields[i] = [];
       }
     }
+
 
     Object.keys(newFields).map((key) => {
       if (newFields[key].length < cols) {
@@ -332,6 +351,7 @@ export default function useForm() {
     getLastCoordinate,
     deleteField,
     loading,
-    updateFormName
+    updateFormName,
+    updateForm
   };
 }
