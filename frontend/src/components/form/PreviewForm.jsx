@@ -11,6 +11,7 @@ function PreviewForm({
   onClose,
   formName,
   formHeight,
+  disableSubmit,
 }) {
   const [fieldsData, setFieldsData] = useState({});
   const { sendAIRequest, aiLoading } = useAxios();
@@ -46,6 +47,7 @@ function PreviewForm({
     }
   };
 
+  
   const onCategorySearch = async () => {
     const res = await sendAIRequest({
       url: "/categorize/",
@@ -103,7 +105,7 @@ function PreviewForm({
   };
 
   const findFieldDetails = (fieldId) => {
-    return fields.find((field) => field.id === fieldId);
+    return fields.filter((field) => fieldId.includes(field.id));
   };
 
   const fillFieldBaseOnPrompt = async (fieldData, referenceField) => {
@@ -113,17 +115,19 @@ function PreviewForm({
         method: "POST",
         body: {
           prompt:
-            " **THE RESPONSE WILL BE PLANE TEXT. DO NOT WRITE IN MARKDOWN. DO NOT BE REPETITIVE* " +
+            "THE RESPONSE WILL BE PLANE TEXT. DO NOT WRITE IN MARKDOWN. DO NOT BE REPETITIVE" +
             fieldData.aiField.prompt +
-            ". GENERATE THE RESPONSE BASE ON: '" +
-            fieldsData[referenceField.props.name],
+            ". GENERATE THE RESPONSE BASE ON: " +
+            referenceField.map((field) => "[" + fieldsData[field.props.name]) +
+            "], " +
+            "'",
         },
       });
       setFieldsData((prevData) => ({
         ...prevData,
         [fieldData.props.name]: res.response,
       }));
-      // console.log("AI response:", res);
+      console.log("AI response:", res);
     } catch (error) {
       console.error("Error filling field based on prompt:", error);
     }
@@ -151,7 +155,7 @@ function PreviewForm({
                 const FieldComponent = FIELD_ELEMENT[fieldData.type];
                 if (!FieldComponent) {
                   console.error("Missing FieldComponent:", fieldData);
-                  return null;
+                  return <></>;
                 }
                 return (
                   <Grid
@@ -184,7 +188,7 @@ function PreviewForm({
                                 prompt: fieldData.aiField.prompt,
                                 generated: fieldsData[fieldData.props.name]
                                   ? fieldsData[fieldData.props.name]
-                                  : "AI generated text will appear here",
+                                  : "",
                               }
                             : fieldsData[fieldData.props.name]
                         }
@@ -211,7 +215,12 @@ function PreviewForm({
             </Grid>
           ))}
         </Grid>
-        <Grid container spacing={2} alignItems="top">
+        <Grid
+          container
+          spacing={2}
+          alignItems="top"
+          display={disableSubmit ? "none" : "flex"}
+        >
           <Button
             type="submit"
             variant="contained"
