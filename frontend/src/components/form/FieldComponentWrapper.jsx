@@ -8,6 +8,7 @@ import { FIELD_ELEMENT } from "./form_elements";
 import { useSortable } from "@dnd-kit/sortable";
 
 const FieldComponentWrapper = ({ fieldData, onEdit, onDelete,fields }) => {
+  if(!FIELD_ELEMENT[fieldData.type]) return (<></>)
   const FieldComponent = FIELD_ELEMENT[fieldData.type];
   const {
     attributes,

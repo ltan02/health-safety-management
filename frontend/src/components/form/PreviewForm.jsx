@@ -153,7 +153,7 @@ function PreviewForm({
                 const FieldComponent = FIELD_ELEMENT[fieldData.type];
                 if (!FieldComponent) {
                   console.error("Missing FieldComponent:", fieldData);
-                  return null;
+                  return <></>
                 }
                 return (
                   <Grid

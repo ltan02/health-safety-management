@@ -43,9 +43,10 @@ function AdminForm() {
     createNewForm,
     deleteForm,
     toggleForm,
+    updateForm
   } = useForm();
 
-  const {sendAiRequest} = useAxios();
+  const { sendAIRequest } = useAxios();
   const [fields, setFields] = useState({});
   const [selectingForm, setSelectingForm] = useState({});
 
@@ -104,16 +105,70 @@ function AdminForm() {
     await fetchForms();
   };
 
-  const handleCreateForm = async (form) => {
-    await createNewForm(form);
-    // await sendAiRequest({
-    //   url: "/categorize/",
-    //   method: "POST",
-    //   body: {
-    //     prompt: "base on the following description, pick the " + form.description,
-    //   }
-    // });
+  const handleCreateForm = async (form, isAiChecked) => {
+    const newForm = await createNewForm(form);
+    if (isAiChecked) {
+      const newField =
+        '\n\n{\n  "fields": [\n    {\n      "name": null,\n      "type": "description",\n      "props": {\n        "label": "Description of the incident",\n        "name": "description",\n        "required": false,\n        "description": "A brief summary outlining the key events and outcomes of the incident.",\n        "options": null\n      }\n    },\n    {\n      "name": null,\n      "type": "datetime-local",\n      "props": {\n        "label": "Time Of Incident",\n        "name": "incidentDate",\n        "required": true,\n        "description": "The precise date and time when the incident took place, in YYYY/MM/DD HH:MM format.",\n        "options": null\n      }\n    },\n    \n    {\n      "name": null,\n      "type": "text-box",\n      "props": {\n        "label": "Actions Taken",\n        "name": "actions_taken",\n        "required": false,\n        "placeholder": "First aid was applied etc.",\n        "description": "Immediate response actions taken following the incident, including first aid or emergency services contacted.",\n        "options": null\n      }\n    },\n    {\n      "name": "Preventive Measures",\n      "type": "text-box",\n      "props": {\n        "label": "Preventive Measures",\n        "name": "preventive_measures",\n        "required": true,\n        "description": "Proposed steps and strategies to prevent similar incidents in the future.",\n        "options": []\n      }\n    },\n    {\n      "name": "Existing Barriers",\n      "type": "text-box",\n      "props": {\n        "label": "Existing Barriers",\n        "name": "existing_barriers",\n        "required": true,\n        "description": "Pre-existing safety measures or protocols in place at the time of the incident.",\n        "options": []\n      }\n    },\n    {\n      "name": null,\n      "type": "selection-single",\n      "props": {\n        "label": "Category",\n        "required": true,\n        "description": "The specific type of incident, such as a workplace injury or equipment failure.",\n        "options": [\n          {\n            "label": "test",\n            "value": "test"\n          },\n          {\n            "label": "Minor",\n            "value": "minor"\n          },\n          {\n            "label": "Major",\n            "value": "major"\n          }\n        ]\n      }\n    }\n  ]\n}\n';
+      const res = await sendAIRequest({
+        url: "/generate",
+        method: "POST",
+        body: {
+          prompt:
+            "Create a list of JSON for Incident Report for the following: [" +
+            form.description +
+            "]. Generate the VALID JSON by following the data format given. But do not generate the JSON for date, description, and category. Data Format:" +
+            newField,
+        },
+      });
+      console.log(res);
+
+      // console.log(extractAndParseJson(res.response));
+      const newFields = JSON.parse(res.response)?.fields
+      let x = 0;
+      let y = 2;
+      newFields.forEach((field, index) => {
+        newFields[index]["coordinate"] = {
+          x: x,
+          y: y,
+        };
+        if(x === 0){
+          x = 1;
+        } else {
+          x = 0;
+          y++;
+        }
+      })
+      console.log(newFields);
+      newForm.fields = [...newForm.fields, ...newFields]
+      console.log(newForm);
+      const fields = await updateForm(newForm)
+      console.log(fields);
+    }
     await fetchForms();
+  };
+
+  const extractAndParseJson = (inputString) => {
+    // Regular expression to find code block with optional 'json' language identifier
+    const codeBlockRegex = /```json\s*([\s\S]*?)```/g;
+
+    // Attempt to find and extract JSON string from the input
+    const matches = codeBlockRegex.exec(inputString);
+
+    if (matches && matches[1]) {
+      // Attempt to parse the extracted JSON string
+      try {
+        const parsedJson = JSON.parse(matches[1]);
+        console.log("Parsed JSON:", parsedJson);
+        return parsedJson;
+      } catch (error) {
+        console.error("Failed to parse JSON:", error);
+        return null;
+      }
+    } else {
+      console.error("No JSON found in input string.");
+      return null;
+    }
   };
 
   const openCreateFormModal = () => {
