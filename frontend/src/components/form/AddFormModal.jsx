@@ -13,12 +13,13 @@ import { useAuthContext } from "../../context/AuthContext";
 export default function AddFormModal({ open, handleClose, createNewForm }) {
   const [formName, setFormName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [description, setDescription] = useState("");
   const { user } = useAuthContext();
 
   const handleCreateForm = async () => {
     setIsLoading(true);
     try {
-      await createNewForm({ name: formName, author: user });
+      await createNewForm({ name: formName, author: user, description: description });
       handleClose();
     } catch (error) {
       console.error("Error creating form:", error);
@@ -41,12 +42,23 @@ export default function AddFormModal({ open, handleClose, createNewForm }) {
           autoFocus
           margin="dense"
         />
+        <TextField
+          label="Description"
+          variant="outlined"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          fullWidth
+          multiline
+          rows={4}
+          placeholder="Enter a description for the form. Based on the description, fields will be automatically generated."
+          margin="dense"
+        />
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} variant="outlined" color="primary">
           Cancel
         </Button>
-        <Button onClick={handleCreateForm} variant="contained" color="primary">
+        <Button onClick={handleCreateForm} variant="contained" color="primary" disabled={isLoading}>
           {isLoading ? <CircularProgress size={24} /> : "Create"}
         </Button>
       </DialogActions>

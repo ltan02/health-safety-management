@@ -25,6 +25,7 @@ import AddFormModal from "../../../components/form/AddFormModal";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteFormModal from "../../../components/form/DeleteFormModal";
 import ActivateFormModal from "../../../components/form/ActivateFormModal";
+import useAxios from "../../../hooks/useAxios";
 
 function AdminForm() {
   const {
@@ -43,6 +44,8 @@ function AdminForm() {
     deleteForm,
     toggleForm,
   } = useForm();
+
+  const {sendAiRequest} = useAxios();
   const [fields, setFields] = useState({});
   const [selectingForm, setSelectingForm] = useState({});
 
@@ -103,6 +106,13 @@ function AdminForm() {
 
   const handleCreateForm = async (form) => {
     await createNewForm(form);
+    // await sendAiRequest({
+    //   url: "/categorize/",
+    //   method: "POST",
+    //   body: {
+    //     prompt: "base on the following description, pick the " + form.description,
+    //   }
+    // });
     await fetchForms();
   };
 

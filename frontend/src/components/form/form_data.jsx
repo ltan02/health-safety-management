@@ -61,3 +61,7 @@ export const FIELD_DATA = {
     description: "AI generated number",
   },
 };
+
+export const emptyDataForAi = {
+  
+};
