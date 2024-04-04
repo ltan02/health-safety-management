@@ -12,7 +12,6 @@ export const FIELD_TYPES = {
   DESCRIPTION: "description",
   EMPTY: "empty",
   AI_TEXT: "ai-text",
-  AI_NUMBER: "ai-number",
 };
 
 export const VARIANT_TYPES = {
@@ -54,11 +53,6 @@ export const FIELD_DATA = {
     id: FIELD_TYPES.AI_TEXT,
     label: "AI Text",
     description: "AI generated text",
-  },
-  [FIELD_TYPES.AI_NUMBER]: {
-    id: FIELD_TYPES.AI_NUMBER,
-    label: "AI Number",
-    description: "AI generated number",
   },
 };
 
