@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Container, Box, Button, Input } from "@mui/material";
 import {
     DndContext,
@@ -22,6 +22,7 @@ import useForm from "../../hooks/useForm";
 import AddTaskModal from "./AddTaskModal.jsx";
 import { useWorkflowNew } from "../../context/WorkflowContext";
 import IncidentDetailModal from "./IncidentDetailModal";
+import useAutoScroll from "../../hooks/useAutoScroll";
 
 function Dashboard() {
     const { filteredTasks, filterTasks, setFilteredTasks, fetchTasks } = useTasks();
@@ -43,6 +44,10 @@ function Dashboard() {
 
     const unsortedColumns = isPrivileged(user.role) ? adminColumns : employeeColumns;
     const columns = unsortedColumns.filter((column) => column.id !== "UNASSIGNED").sort((a, b) => a.order - b.order);
+
+    const containerRef = useRef(null);
+
+    useAutoScroll(containerRef, Boolean(activeId));
 
     const activeTask = activeId
         ? Object.values(filteredTasks)
@@ -186,6 +191,19 @@ function Dashboard() {
         }
     }, [activeId]);
 
+    useEffect(() => {
+        const handleMouseMove = (e) => {
+            window.mouseX = e.clientX;
+            window.mouseY = e.clientY;
+        };
+
+        window.addEventListener("mousemove", handleMouseMove);
+
+        return () => {
+            window.removeEventListener("mousemove", handleMouseMove);
+        };
+    }, []);
+
     return (
         <Container maxWidth="false" disableGutters>
             <AddTaskModal
@@ -230,6 +248,7 @@ function Dashboard() {
                 onDragStart={handleDragStart}
             >
                 <Box
+                    ref={containerRef}
                     sx={{
                         display: "flex",
                         overflowX: "auto",
