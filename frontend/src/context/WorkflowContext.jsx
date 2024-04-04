@@ -75,11 +75,6 @@ export const WorkflowProvider = ({ children }) => {
         fetchWorkflow();
     }, [fetchWorkflow]);
 
-    console.log("activeWorkflow", activeWorkflow);
-    console.log("activeStateMap", activeStateMap);
-    console.log("activeTransitionMap", activeTransitionMap);
-    console.log("flowMap", flowMap);
-
     const value = useMemo(
         () => ({ activeWorkflow, activeStateMap, activeTransitionMap, flowMap }),
         [activeStateMap, activeTransitionMap, activeWorkflow, flowMap],

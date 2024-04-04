@@ -5,7 +5,7 @@ import useAxios from "../../hooks/useAxios.js";
 import { categoryReports } from "../../pages/report/initialData.js";
 
 function ReportChart({ type, locked, data, height, width, handleSubmit }) {
-    const { sendRequest, loading } = useAxios();
+    const { sendRequest } = useAxios();
     const [report, setReport] = useState(categoryReports);
     const [field, setField] = useState(data.field);
     const [startDate, setStartDate] = useState(data.start);
