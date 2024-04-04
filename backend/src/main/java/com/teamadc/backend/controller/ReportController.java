@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -23,6 +24,7 @@ public class ReportController {
 
     private final ReportService reportService;
     private final IncidentService incidentService;
+    private static final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
 
     @Autowired
     public ReportController(ReportService reportService, IncidentService incidentService) {
@@ -132,14 +134,26 @@ public class ReportController {
         List<StatusInsight> insights = new ArrayList<>();
 
         // Sort incidents by date
-        incidents.sort(Comparator.comparing(i -> i.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()));
+        incidents.sort(Comparator.comparing(i -> {
+            try {
+                return dateTimeFormatter.parse(i.getIncidentDate()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        }));
 
         // For each day in the range, accumulate incidents
         for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
             final LocalDate finalDate = date;
             // Filter incidents up to and including this date
             List<Incident> filteredIncidents = incidents.stream()
-                    .filter(i -> !i.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().isAfter(finalDate))
+                    .filter(i -> {
+                        try {
+                            return !(dateTimeFormatter.parse(i.getIncidentDate())).toInstant().atZone(ZoneId.systemDefault()).toLocalDate().isAfter(finalDate);
+                        } catch (ParseException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
                     .toList();
 
             // Update cumulative counts

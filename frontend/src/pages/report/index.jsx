@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 import ReportChart from "../../components/report/ReportChart.jsx";
 import ReportModal from "../../components/report/ReportModal.jsx";
 import useDashboard from "../../hooks/useDashboard.js";
-import { dashboardData } from "./initialData.js";
 
 function ReportOverview() {
     const [chatbotVisible, setChatbotVisible] = useState(false);
@@ -50,20 +49,31 @@ function ReportOverview() {
         }
     }, [loading]);
 
-    
     const boardFn = (
         <>
-            <ReportModal open={openModal} onClose={toggleModal} newData={newData} setNewData={setNewData} boardId={boardId} onRefresh={refreshDashboard} />
+            <ReportModal
+                open={openModal}
+                onClose={toggleModal}
+                newData={newData}
+                setNewData={setNewData}
+                boardId={boardId}
+                onRefresh={refreshDashboard}
+            />
 
-            <div style={{ display: "flex", justifyContent: 'flex-end' }}>
-                <Button variant="contained" onClick={() => {
-                    toggleModal();
-                    setNewData(dashData);
-                }}
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                <Button
+                    variant="contained"
+                    onClick={() => {
+                        toggleModal();
+                        setNewData(dashData);
+                    }}
                     style={{
-                        display: 'flex', justifyContent: 'flex-end', marginBottom: "1rem",
-                        fontWeight: "bold"
-                    }}>
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        marginBottom: "1rem",
+                        fontWeight: "bold",
+                    }}
+                >
                     Edit Dashboard
                 </Button>
             </div>
@@ -81,7 +91,15 @@ function ReportOverview() {
                         <Card sx={{ maxWidth: 500, maxHeight: 450 }}>
                             <CardActionArea>
                                 <CardContent>
-                                    {item.type && <ReportChart type={item.type} data={item} locked={true} height={250} width={350} />}
+                                    {item.type && (
+                                        <ReportChart
+                                            type={item.type}
+                                            data={item}
+                                            locked={true}
+                                            height={250}
+                                            width={350}
+                                        />
+                                    )}
                                 </CardContent>
                             </CardActionArea>
                         </Card>
@@ -93,7 +111,9 @@ function ReportOverview() {
 
     return (
         <div>
-            <center><h1>Dashboard</h1></center>
+            <center>
+                <h1>Dashboard</h1>
+            </center>
             {!loading && dashData.length !== 0 && boardFn}
             <Fab
                 color="primary"

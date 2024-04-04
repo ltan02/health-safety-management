@@ -29,7 +29,7 @@ export function AuthProvider({ children }) {
         const unsubscribe = auth.onAuthStateChanged(async (user) => {
             if (user) {
                 try {
-                    const token = await user.getIdToken();
+                    const token = await user.getIdToken(true);
                     sessionStorage.setItem("token", token);
                     const backendResponse = await sendRequest({
                         url: `/users/${user.uid}`,

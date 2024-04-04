@@ -1,21 +1,5 @@
 import { useState } from "react";
-import {
-    Box,
-    Modal,
-    Typography,
-    TextField,
-    Button,
-    Stack,
-    FormControl,
-    MenuItem,
-    Select,
-    InputLabel,
-    OutlinedInput,
-    Chip,
-    Checkbox,
-    Grid,
-} from "@mui/material";
-import PreviewForm from "../form/PreviewForm";
+import { Box, Modal, Typography, Button, MenuItem, Select } from "@mui/material";
 import ReportChart from "./ReportChart";
 import useDashboard from "../../hooks/useDashboard";
 
@@ -35,21 +19,20 @@ const modalStyle = {
     flexDirection: "column",
 };
 
-
 function ReportModal({ open, onClose, newData, setNewData, boardId, onRefresh }) {
-    const {updateBoard} = useDashboard();
-    
+    const { updateBoard } = useDashboard();
+
     const handleSubmit = (field, start, end) => {
         const changedData = newData.map((c, i) => {
             if (i === selectedVal) {
-              return {
-                type: newData[i].type, 
-                field: field,
-                start: start,
-                end: end
-              };
+                return {
+                    type: newData[i].type,
+                    field: field,
+                    start: start,
+                    end: end,
+                };
             } else {
-              return c;
+                return c;
             }
         });
         setNewData(changedData);
@@ -61,35 +44,34 @@ function ReportModal({ open, onClose, newData, setNewData, boardId, onRefresh })
         setGraphType(newData[event.target.value].type);
     };
 
-    const [graphType, setGraphType] = useState(newData[0].type)
+    const [graphType, setGraphType] = useState(newData[0].type);
     const handleGraphChange = (event) => {
         setGraphType(event.target.value);
         const changedData = newData.map((c, i) => {
             if (i === selectedVal) {
-              return {
-                type: event.target.value, 
-                field: newData[i].field,
-                start: newData[i].start,
-                end: newData[i].end
-              };
+                return {
+                    type: event.target.value,
+                    field: newData[i].field,
+                    start: newData[i].start,
+                    end: newData[i].end,
+                };
             } else {
-              return c;
+                return c;
             }
         });
         setNewData(changedData);
-    }
+    };
 
     const pushCloseButton = () => {
         onClose();
-    }
+    };
 
     const pushSubmitButton = () => {
         updateBoard(boardId, newData);
         onRefresh();
         onClose();
-    }
+    };
 
-    
     return (
         <Modal
             open={open}
@@ -99,16 +81,11 @@ function ReportModal({ open, onClose, newData, setNewData, boardId, onRefresh })
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >
-
             <Box sx={modalStyle}>
                 <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ mb: 2 }}>
                     Edit Dashboard
                 </Typography>
-                <Select
-                    value={selectedVal}
-                    label="Select Widget"
-                    onChange={handleChange}
-                >
+                <Select value={selectedVal} label="Select Widget" onChange={handleChange}>
                     <MenuItem value={0}>Top Left</MenuItem>
                     <MenuItem value={1}>Top Right</MenuItem>
                     <MenuItem value={2}>Bottom Left</MenuItem>
@@ -120,24 +97,27 @@ function ReportModal({ open, onClose, newData, setNewData, boardId, onRefresh })
                 <Typography variant="h8" sx={{ mb: 2 }}>
                     Select Graph Type
                 </Typography>
-                <Select
-                    value={graphType}
-                    label="Select Graph Type"
-                    onChange={handleGraphChange}
-                >
+                <Select value={graphType} label="Select Graph Type" onChange={handleGraphChange}>
                     <MenuItem value={"Bar"}>Bar</MenuItem>
                     <MenuItem value={"Line"}>Line</MenuItem>
                     <MenuItem value={"Scatter"}>Scatter</MenuItem>
                     <MenuItem value={"Pie"}>Pie</MenuItem>
                 </Select>
-                <ReportChart type={newData[selectedVal].type} data={newData[selectedVal]} locked={false} height={300} width={400} handleSubmit={handleSubmit}/>  
-                <Button  
+                <ReportChart
+                    type={newData[selectedVal].type}
+                    data={newData[selectedVal]}
+                    locked={false}
+                    height={300}
+                    width={400}
+                    handleSubmit={handleSubmit}
+                />
+                <Button
                     type="submit"
                     variant="contained"
                     color="primary"
-                    sx={{ mt: 3, position: "fixed", bottom: "0px", right: "10px" }} 
+                    sx={{ mt: 3, position: "fixed", bottom: "0px", right: "10px" }}
                     onClick={pushSubmitButton}
-                > 
+                >
                     Submit
                 </Button>
                 <Button

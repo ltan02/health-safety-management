@@ -38,7 +38,6 @@ export default function useAxios() {
                 headers,
                 data: body,
             };
-
             const response = await axios(config);
             if (response.status === 401 || response.status === 403) {
                 const newToken = await refreshToken();
@@ -52,12 +51,6 @@ export default function useAxios() {
 
             return response.data;
         } catch (err) {
-            if (err.response && err.response.status === 401) {
-                const newToken = await refreshToken();
-                if (newToken) {
-                    return sendRequest({ url, method, body });
-                }
-            }
             setError(err);
         } finally {
             setLoading(false);

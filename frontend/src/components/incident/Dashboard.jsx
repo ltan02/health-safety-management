@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import {Container, Box, Button} from "@mui/material";
+import { Container, Box, Button, Input } from "@mui/material";
 import {
     DndContext,
     PointerSensor,
@@ -11,7 +11,6 @@ import {
 } from "@dnd-kit/core";
 import { v4 as uuidv4 } from "uuid";
 import Column from "./Column";
-import IncidentSearchInput from "./IncidentSearchInput";
 import Task from "./Task";
 import useTasks from "../../hooks/useTasks";
 import useDragBehavior from "../../hooks/useDragBehavior";
@@ -19,20 +18,17 @@ import { useAuthContext } from "../../context/AuthContext";
 import { isPrivileged } from "../../utils/permissions";
 import useAxios from "../../hooks/useAxios";
 import { useBoard } from "../../context/BoardContext";
-import IncidentDetailModal from "./IncidentDetailModal";
 import useForm from "../../hooks/useForm";
 import AddTaskModal from "./AddTaskModal.jsx";
 
 function Dashboard() {
-    const { tasks, filterTasks, setTasks, fetchTasks } = useTasks();
+    const { filteredTasks, filterTasks, setFilteredTasks, fetchTasks } = useTasks();
 
     const { forms, fetchForms, groupedByRows, sortedRows, activeForm } = useForm();
-    const { activeId, handleDragStart, handleDragOver, handleDragEnd } = useDragBehavior(tasks, setTasks);
+    const { activeId, handleDragStart, handleDragOver, handleDragEnd } = useDragBehavior(filteredTasks, setFilteredTasks);
     const { user } = useAuthContext();
     const { sendRequest } = useAxios();
     const { adminColumns, employeeColumns, statuses } = useBoard();
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedTask, setSelectedTask] = useState(null);
     const [fields, setFields] = useState({});
     const [commentData, setCommentData] = useState({});
 
@@ -43,7 +39,7 @@ function Dashboard() {
     const columns = unsortedColumns.filter((column) => column.id !== "UNASSIGNED").sort((a, b) => a.order - b.order);
 
     const activeTask = activeId
-        ? Object.values(tasks)
+        ? Object.values(filteredTasks)
               .flat()
               .find((task) => task.id === activeId)
         : null;
@@ -81,17 +77,12 @@ function Dashboard() {
         fetchTasks();
     };
 
-    const handleOpenModal = (task) => {
-        setIsModalOpen(true);
-        setSelectedTask(task);
-    };
-
     const handleSort = () => {
         return sortedRows(groupedByRows(fields));
     };
 
     const handleComment = () => {
-        const flatTasks = Object.values(tasks).flat();
+        const flatTasks = Object.values(filteredTasks).flat();
         const initialCommentData = { ...commentData }; // shallow copy
         if (flatTasks) {
             flatTasks.map((task) => {
@@ -150,7 +141,7 @@ function Dashboard() {
 
     useEffect(() => {
         handleComment();
-    }, [tasks]);
+    }, [filteredTasks]);
 
     return (
         <Container maxWidth="false" disableGutters>
@@ -162,11 +153,24 @@ function Dashboard() {
                 sortedRows={handleSort}
                 formName={activeForm?.name}
             />
-            <IncidentSearchInput onSearch={filterTasks} handleOpenModal={handleOpenModal} />
-            <div style={{display: "flex", justifyContent: 'flex-end', marginTop: "1rem", marginRight: "1rem",}}>
-                <Button variant="contained" onClick={toggleAddModal}
-                        style={{display: 'flex', justifyContent: 'flex-end',
-                            fontWeight: "bold"}}>
+            <div
+                style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    marginTop: "1rem",
+                    marginLeft: "1rem",
+                    marginRight: "1rem",
+                    alignItems: "center",
+                }}
+            >
+                <div>
+                    <Input variant="outlined" placeholder="Search..." onChange={(e) => filterTasks(e.target.value)} />
+                </div>
+                <Button
+                    variant="contained"
+                    onClick={toggleAddModal}
+                    style={{ display: "flex", justifyContent: "flex-end", fontWeight: "bold" }}
+                >
                     Add Incident
                 </Button>
             </div>
@@ -205,7 +209,7 @@ function Dashboard() {
                             <Column
                                 id={column.id}
                                 title={column.name}
-                                tasks={tasks[column.id] || []}
+                                tasks={filteredTasks[column.id] || []}
                                 activeId={activeId}
                                 handleAddTask={handleAddTask}
                                 employees={employees}
@@ -223,20 +227,6 @@ function Dashboard() {
                     {activeTask && <Task id={activeId} task={activeTask} onRefresh={refreshDashboard} />}
                 </DragOverlay>
             </DndContext>
-            {isModalOpen && selectedTask && (
-                <IncidentDetailModal
-                    incidentId={selectedTask.id}
-                    open={isModalOpen}
-                    onClose={() => {
-                        setIsModalOpen(false);
-                        refreshDashboard;
-                    }}
-                    commentData={commentData}
-                    setCommentData={setCommentData}
-                    onRefresh={refreshDashboard}
-                    selectedIncident={selectedTask}
-                />
-            )}
         </Container>
     );
 }

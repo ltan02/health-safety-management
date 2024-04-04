@@ -55,7 +55,7 @@ export default function CommentSection({ commentData = [], incidentId }) {
     <Box
       ref={containerRef}
       sx={{
-        overflowY: "auto",
+
         maxHeight: "300px",
         position: "relative",
         "&::after": {

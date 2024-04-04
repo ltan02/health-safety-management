@@ -18,7 +18,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+
 
 @RestController
 @RequestMapping("/incidents")
@@ -56,12 +61,17 @@ public class IncidentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BasicIncidentResponse>> getIncidents() {
+    public ResponseEntity<List<BasicIncidentResponse>> getIncidents(@RequestParam Optional<String> all) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = (String) authentication.getPrincipal();
 
         try {
-            List<Incident> incidents = incidentService.getIncidents(uid);
+            List<Incident> incidents;
+            if (all.orElse("false").equals("true")) {
+                incidents = incidentService.getIncidents();
+            } else {
+                incidents = incidentService.getIncidents(uid);
+            }
 
             List<BasicIncidentResponse> response = new ArrayList<>();
             for (Incident incident : incidents) {
@@ -135,6 +145,17 @@ public class IncidentController {
         }
     }
 
+    @PutMapping("/{incidentId}/fields")
+    public ResponseEntity<Incident> updateCustomFields(@PathVariable String incidentId, @RequestBody IncidentRequest request ) {
+        try {
+            List<CustomFieldRequest> customFieldsRequest = request.getCustomFields();
+            Incident updatedIncident = incidentService.updateCustomFields(incidentId, customFieldsRequest);
+            return ResponseEntity.ok(updatedIncident);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     @PostMapping("/{incidentId}/comments")
     public ResponseEntity<Incident> addComment(@PathVariable String incidentId, @RequestBody CommentRequest commentReq) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -191,4 +212,34 @@ public class IncidentController {
         }
     }
 
+    @PostMapping("/{incidentId}/reporter/{reporterId}")
+    public ResponseEntity<Incident> updateReporter(@PathVariable String incidentId, @PathVariable String reporterId) {
+        try {
+            System.out.println("Updating reporter");
+            Incident incident = incidentService.updateReporter(incidentId, reporterId);
+            return ResponseEntity.ok(incident);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PutMapping("/{incidentId}/category")
+    public ResponseEntity<Incident> updateCategory(@PathVariable String incidentId, @RequestBody IncidentRequest request) {
+        try {
+            Incident incident = incidentService.updateCategory(incidentId, request.getIncidentCategory());
+            return ResponseEntity.ok(incident);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PutMapping("/{incidentId}/employees_involved")
+    public ResponseEntity<Incident> updateEmployeesInvolved(@PathVariable String incidentId, @RequestBody IncidentRequest request) {
+        try {
+            Incident incident = incidentService.updateEmployeesInvolved(incidentId, request.getEmployeesInvolved());
+            return ResponseEntity.ok(incident);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 }

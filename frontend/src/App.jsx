@@ -11,6 +11,7 @@ import { BoardProvider } from "./context/BoardContext.jsx";
 import Sidebar from "./components/global/Sidebar";
 import { useState } from "react";
 import EmployeeInvolvement from "./pages/report/EmployeeInvolvement.jsx";
+import { WorkflowProvider } from "./context/WorkflowContext.jsx";
 
 const ReportOverview = lazy(() => import("./pages/report/index.jsx"));
 const Incident = lazy(() => import("./pages/incident"));
@@ -64,39 +65,41 @@ function App() {
                 </Routes>
             ) : (
                 <BoardProvider>
-                    <Suspense fallback={<div>Loading...</div>}>
-                        <Routes>
-                            {isPrivileged(user?.role) ? (
-                                <>
-                                    <Route path="admin">
-                                        <Route path="workflow" element={<AdminWorkflow />} />
-                                        <Route path="form" element={<AdminForm />} />
-                                        <Route path="status" element={<AdminStatus />} />
-                                    </Route>
-                                    <Route path="/">
+                    <WorkflowProvider>
+                        <Suspense fallback={<div>Loading...</div>}>
+                            <Routes>
+                                {isPrivileged(user?.role) ? (
+                                    <>
+                                        <Route path="admin">
+                                            <Route path="workflow" element={<AdminWorkflow />} />
+                                            <Route path="form" element={<AdminForm />} />
+                                            <Route path="status" element={<AdminStatus />} />
+                                        </Route>
+                                        <Route path="/">
+                                            <Route index element={<Incident />} />
+                                            <Route path="incidents" element={<IncidentReport />} />
+                                        </Route>
+                                        <Route path="report">
+                                            <Route index element={<ReportOverview />} />
+                                            <Route path="bar" element={<BarReport />} />
+                                            <Route path="scatter" element={<ScatterReport />} />
+                                            <Route path="line" element={<LineReport />} />
+                                            <Route path="pie" element={<PieReport />} />
+                                            <Route path="status-insights" element={<StatusInsights />} />
+                                            <Route path="category-analysis" element={<CategoryAnalysis />} />
+                                            <Route path="employee-involvement" element={<EmployeeInvolvement />} />
+                                        </Route>
+                                    </>
+                                ) : (
+                                    <>
                                         <Route index element={<Incident />} />
-                                        <Route path="incidents" element={<IncidentReport />} />
-                                    </Route>
-                                    <Route path="report">
-                                        <Route index element={<ReportOverview />} />
-                                        <Route path="bar" element={<BarReport />} />
-                                        <Route path="scatter" element={<ScatterReport />} />
-                                        <Route path="line" element={<LineReport />} />
-                                        <Route path="pie" element={<PieReport />} />
-                                        <Route path="status-insights" element={<StatusInsights />} />
-                                        <Route path="category-analysis" element={<CategoryAnalysis />} />
-                                        <Route path="employee-involvement" element={<EmployeeInvolvement />} />
-                                    </Route>
-                                </>
-                            ) : (
-                                <>
-                                    <Route index element={<Incident />} />
-                                    <Route path="/incidents" element={<IncidentReport />} />
-                                </>
-                            )}
-                            <Route path="*" element={<Navigate to="/" replace />} />
-                        </Routes>
-                    </Suspense>
+                                        <Route path="/incidents" element={<IncidentReport />} />
+                                    </>
+                                )}
+                                <Route path="*" element={<Navigate to="/" replace />} />
+                            </Routes>
+                        </Suspense>
+                    </WorkflowProvider>
                 </BoardProvider>
             );
 
