@@ -6,60 +6,39 @@ import {
   Typography,
   TextField,
   Button,
-  Box,
+  Alert,
+  FormControl,
+  InputLabel,
+  OutlinedInput,
+  InputAdornment,
+  IconButton,
   Grid,
-  Link,
+    Link,
 } from "@mui/material";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import InputAdornment from "@mui/material/InputAdornment";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import IconButton from "@mui/material/IconButton";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import Alert from "@mui/material/Alert";
-import { useAuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useAuthContext } from "../../context/AuthContext";
 import pwcLogo from "../../assets/pwcLogo.svg";
 
-function Login() {
+function SignUp() {
   const navigate = useNavigate();
-  const { user, signIn } = useAuthContext();
+  const { signUp } = useAuthContext();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [showMissingEmail, setShowMissingEmail] = useState(false);
-  const [showMissingPassword, setShowMissingPassword] = useState(false);
-  const [showInvalidDetails, setShowInvalidDetails] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [errors, setErrors] = useState({
+    missingEmail: false,
+    missingPassword: false,
+    passwordsDontMatch: false,
+    general: "",
+  });
 
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
-
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault();
-  };
-
-  useEffect(() => {
-    if (user !== null) {
-      navigate("/");
-    }
-  }, [navigate, user]);
-
-  const handleSubmit = () => {
-    setShowMissingEmail(false);
-    setShowMissingPassword(false);
-    setShowInvalidDetails(false);
-
-    if (email === "") {
-      setShowMissingEmail(true);
-    } else if (password === "") {
-      setShowMissingPassword(true);
-    } else {
-      signIn(email, password).catch((e) => {
-        console.error("Login error: ", e);
-        setShowInvalidDetails(true);
-      });
-    }
-  };
+  const toggleShowPassword = () => setShowPassword(!showPassword);
+  const toggleShowConfirmPassword = () =>
+    setShowConfirmPassword(!showConfirmPassword);
 
   useEffect(() => {
     document.body.style.backgroundColor = "#EB8C00";
@@ -67,6 +46,34 @@ function Login() {
       document.body.style.backgroundColor = "";
     };
   }, []);
+
+  const handleSubmit = async () => {
+    setErrors({
+      missingEmail: false,
+      missingPassword: false,
+      passwordsDontMatch: false,
+      general: "",
+    });
+
+    if (!email) {
+      setErrors((errors) => ({ ...errors, missingEmail: true }));
+      return;
+    } else if (!password) {
+      setErrors((errors) => ({ ...errors, missingPassword: true }));
+      return;
+    } else if (password !== confirmPassword) {
+      setErrors((errors) => ({ ...errors, passwordsDontMatch: true }));
+      return;
+    }
+
+    try {
+      await signUp(email, password);
+      navigate("/");
+    } catch (error) {
+      console.error("Sign up error: ", error);
+      setErrors((errors) => ({ ...errors, general: error.message }));
+    }
+  };
 
   return (
     <Container
@@ -85,7 +92,7 @@ function Login() {
           style={{
             paddingRight: "1.5rem",
             paddingLeft: "1.5rem",
-            marginBottom: "100px",
+            paddingBottom: "2rem",
           }}
         >
           <div
@@ -105,13 +112,13 @@ function Login() {
                 width: "auto",
                 alignSelf: "center",
               }}
-            ></img>
+            />
             <Typography
-              variant="h6"
-              component="h6"
+              variant="h5"
+              component="h2"
               style={{ marginBottom: "20px" }}
             >
-              Login to continue
+              Sign Up
             </Typography>
           </div>
           <form noValidate autoComplete="off">
@@ -125,19 +132,22 @@ function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-            <FormControl fullWidth sx={{ marginTop: 1 }} variant="outlined">
-              <InputLabel htmlFor="outlined-adornment-password">
-                Password*
-              </InputLabel>
+            {errors.missingEmail && (
+              <Alert severity="error">Email is required</Alert>
+            )}
+
+            <FormControl fullWidth variant="outlined" sx={{ mt: 2 }}>
+              <InputLabel htmlFor="password">Password</InputLabel>
               <OutlinedInput
-                id="outlined-adornment-password"
+                id="password"
                 type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 endAdornment={
                   <InputAdornment position="end">
                     <IconButton
                       aria-label="toggle password visibility"
-                      onClick={handleClickShowPassword}
-                      onMouseDown={handleMouseDownPassword}
+                      onClick={toggleShowPassword}
                       edge="end"
                     >
                       {showPassword ? <VisibilityOff /> : <Visibility />}
@@ -145,35 +155,48 @@ function Login() {
                   </InputAdornment>
                 }
                 label="Password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
               />
             </FormControl>
+            {errors.missingPassword && (
+              <Alert severity="error">Password is required</Alert>
+            )}
 
-            {showMissingEmail && (
-              <Alert severity="error" sx={{ marginTop: 1 }}>
-                Email field must not be left blank
-              </Alert>
+            <FormControl fullWidth variant="outlined" sx={{ mt: 2 }}>
+              <InputLabel htmlFor="confirm-password">
+                Confirm Password
+              </InputLabel>
+              <OutlinedInput
+                id="confirm-password"
+                type={showConfirmPassword ? "text" : "password"}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle confirm password visibility"
+                      onClick={toggleShowConfirmPassword}
+                      edge="end"
+                    >
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                }
+                label="Confirm Password"
+              />
+            </FormControl>
+            {errors.passwordsDontMatch && (
+              <Alert severity="error">Passwords do not match</Alert>
             )}
-            {showMissingPassword && (
-              <Alert severity="error" sx={{ marginTop: 1 }}>
-                Password field must not be left blank
-              </Alert>
-            )}
-            {showInvalidDetails && (
-              <Alert severity="error" sx={{ marginTop: 1 }}>
-                Your email or password are incorrect. Please try again!
-              </Alert>
-            )}
+            {errors.general && <Alert severity="error">{errors.general}</Alert>}
 
             <Button
               onClick={handleSubmit}
               color="primary"
               variant="contained"
               fullWidth
-              style={{ marginTop: "20px", height: "45px" }}
+              sx={{ mt: 3, height: 45 }}
             >
-              Login
+              Sign Up
             </Button>
           </form>
           <Grid
@@ -181,7 +204,7 @@ function Login() {
             alignItems="center"
             style={{ justifyContent: "start" }}
           >
-            <Link href="/signup" style={{ marginTop: "20px", display: "flex" }}>
+            <Link href="/" style={{ marginTop: "20px", display: "flex" }}>
               <Typography
                 color="secondary"
                 fontSize={14}
@@ -195,10 +218,9 @@ function Login() {
               <Typography
                 color="primary"
                 fontSize={14}
-                href="/signup"
                 style={{ paddingLeft: "5px" }}
               >
-                Sign Up
+                Sign In
               </Typography>
             </Link>
           </Grid>
@@ -208,4 +230,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default SignUp;
