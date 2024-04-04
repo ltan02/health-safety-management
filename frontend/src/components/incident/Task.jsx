@@ -1,12 +1,25 @@
 import { Card, CardContent, Typography, CardActionArea } from "@mui/material";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import Profile from "../users/Profile";
 
 function Task({ task, handleOpenModal }) {
     const ProfileAvatar = ({ user }) => <Profile user={user} />;
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: task?.id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        boxShadow: 3,
+        borderRadius: 2,
+        opacity: isDragging ? 0 : 1,
+        cursor: "pointer",
+    };
 
     return (
         <Card
             sx={{
+                ...style,
                 boxShadow: 3,
                 "&:hover": {
                     boxShadow: "0 4px 20px rgba(0, 0, 0, 0.12)",
@@ -14,6 +27,9 @@ function Task({ task, handleOpenModal }) {
                 transition: "0.3s",
             }}
             id={task.id}
+            ref={setNodeRef}
+            {...attributes}
+            {...listeners}
             onClick={() => handleOpenModal(task)}
         >
             <CardActionArea onClick={handleOpenModal} sx={{ p: 0 }}>
