@@ -9,6 +9,7 @@ import AddTaskModal from "../../../components/incident/AddTaskModal";
 import useForm from "../../../hooks/useForm";
 import useAxios from "../../../hooks/useAxios";
 import { useAuthContext } from "../../../context/AuthContext";
+import {v4 as uuidv4} from "uuid";
 
 function IncidentReport() {
     const { filteredTasks, fetchTasks } = useTasks();
@@ -18,6 +19,9 @@ function IncidentReport() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { statuses } = useBoard();
     const { sendRequest } = useAxios();
+    const [commentData, setCommentData] = useState({});
+    const [employees, setEmployees] = useState([]);
+
 
     const styles = {
         styleHeader: {
@@ -110,6 +114,61 @@ function IncidentReport() {
         return sortedRows(groupedByRows(fields));
     };
 
+    const handleComment = () => {
+        const flatTasks = Object.values(filteredTasks).flat();
+        const initialCommentData = { ...commentData }; // shallow copy
+        if (flatTasks) {
+            flatTasks.map((task) => {
+                const newCommentData = initialCommentData;
+                task.comments.map((comment) => {
+                    if (!newCommentData[comment.id]) {
+                        newCommentData[comment.id] = [];
+                    }
+                    const data = {
+                        id: uuidv4(),
+                        comment,
+                        user: employees.filter((employee) => employee.id === comment.userId)[0],
+                    };
+                    const tempId = hasTempComment(newCommentData[comment.id], data);
+                    // this is to prevent duplicate temp comments
+                    if (tempId) {
+                        newCommentData[comment.id][tempId] = data;
+                    } else {
+                        newCommentData[comment.id].push(data);
+                    }
+                });
+
+                initialCommentData[task.id] = newCommentData[task.id];
+            });
+        }
+        setCommentData(initialCommentData);
+    };
+
+    const hasTempComment = (commentData, newComment) => {
+        const commentDataCopy = [...commentData];
+        let tempId = null;
+        commentDataCopy.map((data) => {
+            if (data.id.includes("temp") && data.comment.content === newComment.comment.content) {
+                tempId = data.id;
+                return;
+            }
+        });
+        return tempId;
+    };
+
+    useEffect(() => {
+        const fetchEmployees = async () => {
+            const res = await sendRequest({ url: "/users" });
+            setEmployees(res);
+        };
+        fetchForms();
+        fetchEmployees();
+    }, []);
+
+    useEffect(() => {
+        handleComment();
+    }, [filteredTasks]);
+
     return (
         <>
             <AddTaskModal
@@ -155,6 +214,8 @@ function IncidentReport() {
                         selectedIncident={selectedIncident}
                         incidentId={selectedIncident.id}
                         onClose={handleCloseModal}
+                        commentData={commentData}
+                        setCommentData={setCommentData}
                     />
                 )}
             </div>
