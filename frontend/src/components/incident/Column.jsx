@@ -33,6 +33,8 @@ function Column({
     formName,
     columnMap,
     handleOpenModal,
+    employees,
+    onRefresh
 }) {
     const [openModal, setOpenModal] = useState(false);
 
@@ -73,7 +75,7 @@ function Column({
                 <SortableContext id={id} items={tasks.map((task) => task.id)} strategy={rectSortingStrategy}>
                     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                         {tasks.map((task) => (
-                            <Task key={task.id} task={task} handleOpenModal={handleOpenModal} />
+                            <Task key={task.id} task={task} handleOpenModal={handleOpenModal} employees={employees} onRefresh={onRefresh} />
                         ))}
                     </Box>
                 </SortableContext>
