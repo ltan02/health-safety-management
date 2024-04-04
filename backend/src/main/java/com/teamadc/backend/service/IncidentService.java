@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class IncidentService {
-    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+    private static final Logger logger = LoggerFactory.getLogger(IncidentService.class);
     private final GenericRepository<Incident> incidentRepository;
     private static final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
 

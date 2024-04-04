@@ -88,14 +88,14 @@ export default function IncidentDetailModal({ incidentId, selectedIncident, open
         try {
             console.log(reviewerId);
             await sendRequest({
-                url: `/incidents/${incidentId}/reporter/${reviewerId}`,
+                url: `/incidents/${incidentId}/reviewer/${reviewerId}`,
                 method: "POST",
             });
 
             setIncident((prevIncident) => {
                 const newIncident = {
                     ...prevIncident,
-                    reviewerId: reviewerId,
+                    reviewer: employees.find((employee) => employee.id === reviewerId),
                 };
                 return newIncident;
             });
@@ -116,15 +116,17 @@ export default function IncidentDetailModal({ incidentId, selectedIncident, open
         try {
             await sendRequest({
                 url: `/incidents/${incidentId}/reporter/${reporterId}`,
-                method: "`POST`",
+                method: "POST",
             });
-            // setIncident((prevIncident) => {
-            //   const newIncident = {
-            //     ...prevIncident,
-            //     reporterId: reporterId,
-            //   };
-            //   return newIncident;
-            // });
+            setIncident((prevIncident) => {
+                console.log(prevIncident);
+              const newIncident = {
+                ...prevIncident,
+                reporter: employees.find((employee) => employee.id === reporterId),
+              };
+              console.log(newIncident);
+              return newIncident;
+            });
             if (onRefresh) {
                 onRefresh();
             }
