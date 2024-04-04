@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -56,12 +57,17 @@ public class IncidentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BasicIncidentResponse>> getIncidents() {
+    public ResponseEntity<List<BasicIncidentResponse>> getIncidents(@RequestParam Optional<String> all) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = (String) authentication.getPrincipal();
 
         try {
-            List<Incident> incidents = incidentService.getIncidents(uid);
+            List<Incident> incidents;
+            if (all.orElse("false").equals("true")) {
+                incidents = incidentService.getIncidents();
+            } else {
+                incidents = incidentService.getIncidents(uid);
+            }
 
             List<BasicIncidentResponse> response = new ArrayList<>();
             for (Incident incident : incidents) {

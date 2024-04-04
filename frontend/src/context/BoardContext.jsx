@@ -17,10 +17,12 @@ export const BoardProvider = ({ children }) => {
         const boardResponse = boards[0];
 
         const columnIds = [...boardResponse.adminColumnIds, ...boardResponse.employeeColumnIds];
-        const columnPromises = columnIds.map(id => sendRequest({ url: `/columns/${id}`, method: "GET" }));
+        const columnPromises = columnIds.map((id) => sendRequest({ url: `/columns/${id}`, method: "GET" }));
         const columns = await Promise.all(columnPromises);
 
-        const statusPromises = boardResponse.statusIds.map(id => sendRequest({ url: `/status/${id}`, method: "GET" }));
+        const statusPromises = boardResponse.statusIds.map((id) =>
+            sendRequest({ url: `/status/${id}`, method: "GET" }),
+        );
         const statuses = await Promise.all(statusPromises);
         setStatuses(statuses);
 
@@ -31,11 +33,13 @@ export const BoardProvider = ({ children }) => {
 
         const mapColumns = (column) => ({
             ...column,
-            statuses: column.statusIds.map(id => statusMap[id]),
+            statuses: column.statusIds.map((id) => statusMap[id]),
         });
 
-        let adminColumns = columns.filter(column => boardResponse.adminColumnIds.includes(column.id)).map(mapColumns);
-        let employeeColumns = columns.filter(column => boardResponse.employeeColumnIds.includes(column.id)).map(mapColumns);
+        let adminColumns = columns.filter((column) => boardResponse.adminColumnIds.includes(column.id)).map(mapColumns);
+        let employeeColumns = columns
+            .filter((column) => boardResponse.employeeColumnIds.includes(column.id))
+            .map(mapColumns);
 
         adminColumns.push({
             id: "UNASSIGNED",

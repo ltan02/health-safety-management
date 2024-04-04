@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 public class IncidentService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final GenericRepository<Incident> incidentRepository;
+    private static final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
 
     @Autowired
     public IncidentService(GenericRepository<Incident> incidentRepository) {
@@ -42,6 +45,10 @@ public class IncidentService {
     public List<Incident> getIncidents(String uid) throws InterruptedException, ExecutionException {
         List<Incident> incidents = incidentRepository.findAll();
         return incidents.stream().filter(incident -> incident.getReporter().equals(uid) || incident.getEmployeesInvolved().contains(uid)).toList();
+    }
+
+    public List<Incident> getIncidents() throws InterruptedException, ExecutionException {
+         return incidentRepository.findAll();
     }
 
     public List<Incident> getIncidentsByStatusId(String uid, String statusId) throws InterruptedException, ExecutionException {
@@ -138,8 +145,17 @@ public class IncidentService {
 
         // Find the earliest date among all incidents
         return allIncidents.stream()
-                .map(Incident::getCreatedAt)
+                .map(Incident::getIncidentDate)
                 .filter(Objects::nonNull) // Ensure the date is not null
+                .map(dateStr -> {
+                    try {
+                        return dateTimeFormatter.parse(dateStr);
+                    } catch (Exception e) {
+                        logger.error("Error parsing date: " + dateStr, e);
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
                 .min(Comparator.naturalOrder())
                 .orElse(null); // Return null if no incidents are found or all dates are null
     }

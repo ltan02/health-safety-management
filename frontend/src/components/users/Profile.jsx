@@ -1,4 +1,5 @@
 import { Avatar } from "@mui/material";
+import PersonIcon from '@mui/icons-material/Person';
 
 export default function Profile({ user }) {
   function stringToColor(string) {
@@ -22,10 +23,13 @@ export default function Profile({ user }) {
     return {
       sx: {
         bgcolor: stringToColor(name),
-        width: 32,
-        height: 32,
-        fontSize: 14,
+        width: 26,
+        height: 26,
+        fontSize: 12,
         margin: 0,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
       },
       children: `${name.split(" ")[0][0]}${name.split(" ")[1][0]}`,
     };
@@ -37,13 +41,16 @@ export default function Profile({ user }) {
     <Avatar
       sx={{
         bgcolor: "grey",
-        width: 32,
-        height: 32,
-        fontSize: 14,
+        width: 26,
+        height: 26,
+        fontSize: 12,
         margin: 0,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
       }}
     >
-      {"U"}
+      <PersonIcon />
     </Avatar>
   );
 }

@@ -33,7 +33,7 @@ public class BoardController {
 
     @PostMapping
     public ResponseEntity<Board> createBoard(@RequestBody Board req) {
-        Board board = new Board(null, req.getName(), req.isActive(), req.getAdminColumnIds(), req.getEmployeeColumnIds(), req.getStatusIds(), req.getWorkflowIds());
+        Board board = new Board(null, req.getName(), req.isActive(), req.getAdminColumnIds(), req.getEmployeeColumnIds(), req.getStatusIds(), req.getActiveWorkflowId(), req.getWorkflowIds());
         try {
             Board newBoard = boardService.createOrUpdateBoard(board);
             return ResponseEntity.ok(newBoard);
