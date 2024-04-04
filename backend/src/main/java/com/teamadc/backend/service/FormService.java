@@ -112,9 +112,12 @@ public class FormService {
                 .filter(f -> f.getId().equals(fieldId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Field not found with id: " + fieldId));
+        AiField aiField = field.getAiField();
+        fieldToUpdate.setAiField(aiField);
         fieldToUpdate.setProps(field.getProps());
         fields.removeIf(f -> f.getId().equals(fieldId));
         fields.add(fieldToUpdate);
+
 
         fieldRepository.save(fieldToUpdate);
         form.setFields(fields);

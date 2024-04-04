@@ -66,7 +66,6 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate, currentFields }) {
         lastCoordinate.x = 0;
         lastCoordinate.y += 1;
       }
-
       const newField = {
         name: fieldTitle,
         type: select,

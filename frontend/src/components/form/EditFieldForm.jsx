@@ -123,6 +123,7 @@ function EditFieldForm({
     });
 
     newEditingField.props = newFieldData;
+    newEditingField.aiField = fieldData.aiField;
 
     updateField(newEditingField);
   };
