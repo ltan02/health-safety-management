@@ -9,7 +9,6 @@ import {
   Box,
   Tooltip,
   Button,
-  Icon,
 } from "@mui/material";
 
 import styled from "@emotion/styled";
@@ -350,4 +349,41 @@ export const FIELD_ELEMENT = {
       </FormControl>
     );
   },
+  [FIELD_TYPES.AI_TEXT]: ({
+    label,
+    name,
+    required,
+    placeholder,
+    description,
+    onChange,
+    onClick,
+    loading,
+    rows = 3,
+    value,
+    ...props
+  }) => (
+    <FormControl fullWidth {...props}>
+      <Typography fontWeight={600} variant={VARIANT_TYPES.LABEL}>
+        {label}
+        {required ? "*" : ""}
+      </Typography>
+      <Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>
+      <Tooltip title={`Prompt: "${value.prompt}"`}>
+        <TextField
+          // onChange={onChange}
+          name={name}
+          required={required}
+          placeholder={`The AI will generate the text for you base on "${value.referenceField.name}"`}
+          multiline
+          value={value.generated}
+          rows={rows}
+          variant={VARIANT_TYPES.OUTLINED}
+          disabled
+        />
+      </Tooltip>
+      <Button variant="contained" color="primary" sx={{ mt: 1 }} onClick={onClick}>
+        Generate
+      </Button>
+    </FormControl>
+  ),
 };

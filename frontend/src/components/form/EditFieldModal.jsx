@@ -14,7 +14,13 @@ import {
 import { useState } from "react";
 import { FIELD_TYPES, VARIANT_TYPES } from "./form_data";
 import { FIELD_ADD_FORM } from "./add_elements";
-function EditFieldModal({ open, setOpen, onHandleEdit, fieldData }) {
+function EditFieldModal({
+  open,
+  setOpen,
+  onHandleEdit,
+  fieldData,
+  fieldsData,
+}) {
   const [title, setTitle] = useState(
     fieldData.props.label ? fieldData.props.label : ""
   );
@@ -32,6 +38,10 @@ function EditFieldModal({ open, setOpen, onHandleEdit, fieldData }) {
     fieldData.props.placeholder ? fieldData.props.placeholder : ""
   );
 
+  const [aiField, setAiField] = useState(
+    fieldData.type === FIELD_TYPES.AI_TEXT ? fieldData.aiField : null
+  );
+
   useEffect(() => {
     setTitle(fieldData.props.label);
     setDescription(fieldData.props.description);
@@ -39,6 +49,9 @@ function EditFieldModal({ open, setOpen, onHandleEdit, fieldData }) {
     setRequired(fieldData.props.required);
     setOptions(fieldData.props.options);
     setPlaceholder(fieldData.props.placeholder);
+    setAiField(
+      fieldData.type === FIELD_TYPES.AI_TEXT ? fieldData.aiField : null
+    );
   }, [fieldData]);
 
   const handleEdit = () => {
@@ -53,6 +66,10 @@ function EditFieldModal({ open, setOpen, onHandleEdit, fieldData }) {
       required: required,
       options: options,
       placeholder: placeholder,
+      aiField:
+        fieldData.type === FIELD_TYPES.AI_TEXT
+          ? { prompt: aiField.prompt, referenceId: aiField.referenceId }
+          : null,
     });
     setOpen(false);
   };
@@ -64,6 +81,9 @@ function EditFieldModal({ open, setOpen, onHandleEdit, fieldData }) {
     setRequired(fieldData.props.required);
     setOptions(fieldData.props.options);
     setPlaceholder(fieldData.props.placeholder);
+    setAiField(
+      fieldData.type === FIELD_TYPES.AI_TEXT ? fieldData.aiField : null
+    );
   };
 
   const handleClose = () => {
@@ -96,15 +116,31 @@ function EditFieldModal({ open, setOpen, onHandleEdit, fieldData }) {
               onOptionChange: (option) => setOptions(option),
               onRequiredChange: (e) => setRequired(e.target.value),
               onPlaceHolderChange: (e) => setPlaceholder(e.target.value),
+              onPromptChange: (e) =>
+                setAiField({ ...aiField, prompt: e.target.value }),
+              onReferenceFieldChange: (e) =>
+                setAiField({ ...aiField, referenceId: e.target.value }),
               initialDescription: description,
               initialTitle: title,
               initialOptions: options,
               initialRequired: required,
               initialPlaceholder: placeholder,
+              initialPrompt:
+                fieldData.type === FIELD_TYPES.AI_TEXT ? aiField.prompt : "",
+              initialReferenceField:
+                fieldData.type === FIELD_TYPES.AI_TEXT
+                  ? aiField.referenceId
+                  : "",
+              currentFields: fieldsData,
             })}
           </>
         ) : (
-          <Typography variant="h6" align="center" fontWeight={600} sx={{ my: 5 }}>
+          <Typography
+            variant="h6"
+            align="center"
+            fontWeight={600}
+            sx={{ my: 5 }}
+          >
             Select Field Type
           </Typography>
         )}

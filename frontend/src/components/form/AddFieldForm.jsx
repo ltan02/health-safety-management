@@ -9,7 +9,8 @@ import {
   Typography,
   Container,
   Grid,
-  FormControl, IconButton,
+  FormControl,
+  IconButton,
 } from "@mui/material";
 import { FIELD_DATA, FIELD_TYPES, VARIANT_TYPES } from "./form_data";
 import { CircularProgress } from "@mui/material";
@@ -18,7 +19,7 @@ import { FIELD_ADD_FORM } from "./add_elements";
 import { set } from "lodash";
 import CloseIcon from "@mui/icons-material/Close";
 
-function AddFieldForm({ handleAddNewField, getLastCoordinate }) {
+function AddFieldForm({ handleAddNewField, getLastCoordinate, currentFields }) {
   const [fieldType, setFieldType] = useState([]);
   const [placeholder, setPlaceholder] = useState("");
   const [fieldTitle, setFieldTitle] = useState("");
@@ -26,6 +27,8 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate }) {
   const [options, setOptions] = useState([]);
   const [required, setRequired] = useState(true);
   const [select, setSelect] = useState("text");
+  const [referenceField, setReferenceField] = useState("");
+  const [prompt, setPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isStatusModalOpen, setStatusModalOpen] = useState(false);
 
@@ -63,10 +66,15 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate }) {
         lastCoordinate.x = 0;
         lastCoordinate.y += 1;
       }
-
       const newField = {
         name: fieldTitle,
         type: select,
+        isAi:
+          select === FIELD_TYPES.AI_TEXT || select === FIELD_TYPES.AI_NUMBER,
+        aiField: {
+          referenceId: referenceField,
+          prompt: prompt,
+        },
         props: {
           label: fieldTitle,
           name: fieldTitle.toLowerCase().replace(" ", "_"),
@@ -87,8 +95,8 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate }) {
   };
 
   const toggleStatusModal = () => {
-    setStatusModalOpen(!isStatusModalOpen)
-  }
+    setStatusModalOpen(!isStatusModalOpen);
+  };
 
   return (
     <Container style={{ height: "80vh", width: "80vh", overflow: "auto" }}>
@@ -108,41 +116,64 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate }) {
         ))}
       </Select>
       {FIELD_ADD_FORM[select] && (
-        <Typography variant="h6" fontWeight={600} align="left" sx={{ marginTop: 5 }}>
+        <Typography
+          variant="h6"
+          fontWeight={600}
+          align="left"
+          sx={{ marginTop: 5 }}
+        >
           Customize Field
         </Typography>
       )}
       <Modal
-          open={isStatusModalOpen}
-          onClose={toggleStatusModal}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description">
-        <Box sx = {{position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: 400,
-          height: 150,
-          bgcolor: "white",}}>
+        open={isStatusModalOpen}
+        onClose={toggleStatusModal}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            height: 150,
+            bgcolor: "white",
+          }}
+        >
           <Box
-              sx={{
-                display: "flex",
-                width: "100%",
-                justifyContent: "flex-end",
-                bgcolor: "#FFB600"
-              }}
+            sx={{
+              display: "flex",
+              width: "100%",
+              justifyContent: "flex-end",
+              bgcolor: "#FFB600",
+            }}
           >
             <IconButton onClick={toggleStatusModal}>
               <CloseIcon />
             </IconButton>
           </Box>
-          <Box sx={ {display: "flex",
-            flexDirection: "column", justifyContent: "center", padding: 2,alignItems: "center"}}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              padding: 2,
+              alignItems: "center",
+            }}
+          >
             <Typography variant="body1" align="center">
               Field was added successfully!
             </Typography>
-            <Box sx = {{ display: 'inline-block', mt: 2, alignItems: "center"}}>
-              <Button variant="contained" onClick={toggleStatusModal} sx={{borderRadius: 10,}}>Close</Button>
+            <Box sx={{ display: "inline-block", mt: 2, alignItems: "center" }}>
+              <Button
+                variant="contained"
+                onClick={toggleStatusModal}
+                sx={{ borderRadius: 10 }}
+              >
+                Close
+              </Button>
             </Box>
           </Box>
         </Box>
@@ -164,18 +195,38 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate }) {
               onOptionChange: (option) => setOptions(option),
               onRequiredChange: (e) => setRequired(e.target.value),
               onPlaceHolderChange: (e) => setPlaceholder(e.target.value),
+              onReferenceFieldChange: (fieldId) => setReferenceField(fieldId),
+              onPromptChange: (e) => setPrompt(e.target.value),
+              currentFields: currentFields,
+              initialDescription: fieldDescription,
+              initialTitle: fieldTitle,
+              initialOptions: options,
+              initialRequired: required,
+              initialPlaceholder: placeholder,
+              initialPrompt: prompt,
             })}
           </>
         ) : (
           <></>
         )}
         {FIELD_ADD_FORM[select] && (
-          <Typography variant="h6" fontWeight={600} align="left" sx={{ marginTop: 5 }}>
+          <Typography
+            variant="h6"
+            fontWeight={600}
+            align="left"
+            sx={{ marginTop: 5 }}
+          >
             Preview Field
           </Typography>
         )}
         {FIELD_ADD_FORM[select] && (
-          <Box border={1} borderColor="grey.500" borderRadius={2} p={5} marginTop={2}>
+          <Box
+            border={1}
+            borderColor="grey.500"
+            borderRadius={2}
+            p={5}
+            marginTop={2}
+          >
             <FormControl fullWidth>
               <Typography variant={VARIANT_TYPES.LABEL} fontWeight={600}>
                 {fieldTitle} {required ? "*" : ""}
@@ -200,11 +251,36 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate }) {
                   InputProps={{
                     readOnly: true,
                   }}
+                  placeholder={placeholder}
                   multiline
                   rows={3}
                   disabled
                   helperText={`This is a preview of a ${select} field.`}
                 />
+              ) : select === FIELD_TYPES.AI_TEXT ? (
+                <Box sx={{ display: "flex", flexDirection: "column" }}>
+                  <TextField
+                    variant={VARIANT_TYPES.OUTLINED}
+                    margin="dense"
+                    fullWidth
+                    rows={3}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                    placeholder={placeholder}
+                    multiline
+                    disabled
+                    helperText={`This is a preview of a ${select} field.`}
+                  />
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    sx={{ mt: 1 }}
+                    disabled
+                  >
+                    Generate
+                  </Button>
+                </Box>
               ) : (
                 <TextField
                   placeholder={placeholder}

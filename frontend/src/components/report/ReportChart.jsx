@@ -163,6 +163,15 @@ function ReportChart({ type, locked, data, height, width, handleSubmit }) {
 
         // Send the request and handle the response
         const response = Promise.all([sendRequest({ url })]);
+        response.then((e) => {
+            if (e[0].length === 0) {
+                setReport([{ id: 0, label: "No Data", value: 0 }]);
+            } else {
+                setReport(e[0]);
+            }
+        }).catch((e) => {
+            console.error(e[0]);
+        });
         response
             .then((e) => {
                 if (e[0].length === 0) {

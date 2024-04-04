@@ -13,6 +13,8 @@ public class Field {
     private String type;
     private FieldProp props;
     private Coordinate coordinate;
+    private boolean isAi = false;
+    private AiField aiField;
 
     public Field() {
     }
@@ -26,6 +28,15 @@ public class Field {
         this.type = type;
         this.props = props;
         this.coordinate = coordinate;
+    }
+
+    public Field(String name, String type, FieldProp props, Coordinate coordinate, boolean isAi, AiField aiField) {
+        this.name = name;
+        this.type = type;
+        this.props = props;
+        this.coordinate = coordinate;
+        this.isAi = isAi;
+        this.aiField = aiField;
     }
 
     public Field(Coordinate coordinate) {

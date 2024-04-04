@@ -32,7 +32,6 @@ function FormCustomizationModal({
           boxShadow: 24,
           p: 4,
           borderRadius: 2,
-          overflow: "auto",
         }}
       >
         <Paper elevation={0}>
@@ -56,6 +55,7 @@ function FormCustomizationModal({
             <AddFieldForm
               handleAddNewField={handleAddNewField}
               getLastCoordinate={getLastCoordinate}
+              currentFields={fields}
             />
           </FormTab>
         </Paper>
