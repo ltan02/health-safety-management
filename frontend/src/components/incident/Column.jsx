@@ -32,6 +32,7 @@ function Column({
     formName,
     commentData,
     setCommentData,
+    employees,
 }) {
     const { setNodeRef } = useDroppable({ id });
     const [openModal, setOpenModal] = useState(false);
@@ -101,6 +102,7 @@ function Column({
                         handleSubmit={handleSubmit}
                         onClose={onClose}
                         formName={formName}
+                        employees={employees}
                     />
                 </Box>
             </Modal>

@@ -11,6 +11,7 @@ function PreviewForm({
   onClose,
   formName,
   formHeight,
+  disableSubmit,
 }) {
   const [fieldsData, setFieldsData] = useState({});
   const { sendAIRequest, aiLoading } = useAxios();
@@ -45,6 +46,7 @@ function PreviewForm({
       }));
     }
   };
+  
 
   const onCategorySearch = async () => {
     const res = await sendAIRequest({
@@ -211,7 +213,7 @@ function PreviewForm({
             </Grid>
           ))}
         </Grid>
-        <Grid container spacing={2} alignItems="top">
+        <Grid container spacing={2} alignItems="top" display={disableSubmit ? "none" : "flex"}>
           <Button
             type="submit"
             variant="contained"

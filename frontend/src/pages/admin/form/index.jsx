@@ -25,6 +25,7 @@ import AddFormModal from "../../../components/form/AddFormModal";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteFormModal from "../../../components/form/DeleteFormModal";
 import ActivateFormModal from "../../../components/form/ActivateFormModal";
+import useAxios from "../../../hooks/useAxios";
 
 function AdminForm() {
   const {
@@ -43,6 +44,8 @@ function AdminForm() {
     deleteForm,
     toggleForm,
   } = useForm();
+
+  const {sendAiRequest} = useAxios();
   const [fields, setFields] = useState({});
   const [selectingForm, setSelectingForm] = useState({});
 
@@ -103,6 +106,13 @@ function AdminForm() {
 
   const handleCreateForm = async (form) => {
     await createNewForm(form);
+    // await sendAiRequest({
+    //   url: "/categorize/",
+    //   method: "POST",
+    //   body: {
+    //     prompt: "base on the following description, pick the " + form.description,
+    //   }
+    // });
     await fetchForms();
   };
 
@@ -145,6 +155,7 @@ function AdminForm() {
         handleClose={() => setOpenCreateForm(false)}
         createNewForm={handleCreateForm}
       />
+
       <DeleteFormModal
         open={openDeleteForm}
         handleClose={() => setOpenDeleteForm(false)}
@@ -226,7 +237,10 @@ function AdminForm() {
                     </Tooltip>
                   ) : (
                     <Tooltip title="Inactive Form" arrow>
-                      <IconButton size="small" onClick={() => handleActivateModalOpen(forms[formId])}>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleActivateModalOpen(forms[formId])}
+                      >
                         <CancelIcon color="error" />
                       </IconButton>
                     </Tooltip>
@@ -256,6 +270,14 @@ function AdminForm() {
           </TableBody>
         </Table>
       </TableContainer>
+      <CircularProgress
+        sx={{
+          display: loading ? "flex" : "none",
+          mr: "auto",
+          ml: "auto",
+          mt: 5,
+        }}
+      />
 
       <FormCustomizationModal
         open={open}

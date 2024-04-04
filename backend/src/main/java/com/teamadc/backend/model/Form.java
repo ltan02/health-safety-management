@@ -17,6 +17,7 @@ public class Form {
     private String dateModified;
     private List<Field> fields;
     private Boolean active = false;
+    private String description;
 
     public Form() {
     }
@@ -28,9 +29,10 @@ public class Form {
         this.dateModified = dateModified;
     }
 
-    public Form(String name, User author) {
+    public Form(String name, String description, User author) {
         this.name = name;
         this.author = author;
+        this.description = description;
     }
 
     public Form(List<Field> fields) {
