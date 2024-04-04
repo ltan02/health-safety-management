@@ -281,9 +281,7 @@ export const FIELD_ELEMENT = {
         {...props}
         sx={{
           padding: "16px",
-          border: "1px solid #E0E0E0",
           borderRadius: "8px",
-          boxShadow: "0px 2px 4px rgba(0,0,0,0.1)",
         }}
       >
         <Typography
@@ -294,7 +292,9 @@ export const FIELD_ELEMENT = {
           {label}*
         </Typography>
         <Typography variant={VARIANT_TYPES.BODY} sx={{ marginBottom: "16px" }}>
-          {description}
+          Categorizing the specific type of incident, such as a workplace injury
+          or equipment failure, based on the incident description provided by
+          AI.
         </Typography>
         <Box
           sx={{
@@ -316,7 +316,6 @@ export const FIELD_ELEMENT = {
               flexGrow: 1,
             }}
           >
-            <SmartToyIcon color="primary" />
             {loading?.toString() === "false" ? (
               <Tooltip title="AI Selected Category" placement="top">
                 <Typography
@@ -325,13 +324,21 @@ export const FIELD_ELEMENT = {
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
+                    py: 2,
                   }}
+                  fontWeight={600}
                 >
                   {value}
                 </Typography>
               </Tooltip>
             ) : (
-              <Typography variant={VARIANT_TYPES.BODY}>Loading...</Typography>
+              <Typography
+                sx={{ py: 2 }}
+                variant={VARIANT_TYPES.BODY}
+                fontWeight={600}
+              >
+                Loading...
+              </Typography>
             )}
           </Box>
           <Tooltip title="Search and Select Category by AI" placement="top">
@@ -373,7 +380,9 @@ export const FIELD_ELEMENT = {
           // onChange={onChange}
           name={name}
           required={required}
-          placeholder={`The AI will generate the text for you base on "${value.referenceField.map((referenceId) => referenceId.name).join(", ")}"`}
+          placeholder={`The AI will generate the text for you base on "${value.referenceField
+            .map((referenceId) => referenceId.name)
+            .join(", ")}"`}
           multiline
           value={value.generated}
           rows={rows}
@@ -381,7 +390,12 @@ export const FIELD_ELEMENT = {
           disabled
         />
       </Tooltip>
-      <Button variant="contained" color="primary" sx={{ mt: 1 }} onClick={onClick}>
+      <Button
+        variant="contained"
+        color="primary"
+        sx={{ mt: 1 }}
+        onClick={onClick}
+      >
         Generate
       </Button>
     </FormControl>
