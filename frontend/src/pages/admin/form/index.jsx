@@ -106,25 +106,15 @@ function AdminForm() {
   };
 
   const handleCreateForm = async (form, isAiChecked) => {
+    try {
     const newForm = await createNewForm(form);
     if (isAiChecked) {
-      const newField =
-        '\n\n{\n  "fields": [\n    {\n      "name": null,\n      "type": "description",\n      "props": {\n        "label": "Description of the incident",\n        "name": "description",\n        "required": false,\n        "description": "A brief summary outlining the key events and outcomes of the incident.",\n        "options": null\n      }\n    },\n    {\n      "name": null,\n      "type": "datetime-local",\n      "props": {\n        "label": "Time Of Incident",\n        "name": "incidentDate",\n        "required": true,\n        "description": "The precise date and time when the incident took place, in YYYY/MM/DD HH:MM format.",\n        "options": null\n      }\n    },\n    \n    {\n      "name": null,\n      "type": "text-box",\n      "props": {\n        "label": "Actions Taken",\n        "name": "actions_taken",\n        "required": false,\n        "placeholder": "First aid was applied etc.",\n        "description": "Immediate response actions taken following the incident, including first aid or emergency services contacted.",\n        "options": null\n      }\n    },\n    {\n      "name": "Preventive Measures",\n      "type": "text-box",\n      "props": {\n        "label": "Preventive Measures",\n        "name": "preventive_measures",\n        "required": true,\n        "description": "Proposed steps and strategies to prevent similar incidents in the future.",\n        "options": []\n      }\n    },\n    {\n      "name": "Existing Barriers",\n      "type": "text-box",\n      "props": {\n        "label": "Existing Barriers",\n        "name": "existing_barriers",\n        "required": true,\n        "description": "Pre-existing safety measures or protocols in place at the time of the incident.",\n        "options": []\n      }\n    },\n    {\n      "name": null,\n      "type": "selection-single",\n      "props": {\n        "label": "Category",\n        "required": true,\n        "description": "The specific type of incident, such as a workplace injury or equipment failure.",\n        "options": [\n          {\n            "label": "test",\n            "value": "test"\n          },\n          {\n            "label": "Minor",\n            "value": "minor"\n          },\n          {\n            "label": "Major",\n            "value": "major"\n          }\n        ]\n      }\n    }\n  ]\n}\n';
-      const res = await sendAIRequest({
-        url: "/generate",
-        method: "POST",
-        body: {
-          prompt:
-            "Create a list of JSON for Incident Report for the following: [" +
-            form.description +
-            "]. Generate the VALID JSON by following the data format given. But do not generate the JSON for date, description, and category. Data Format:" +
-            newField,
-        },
-      });
-      console.log(res);
 
-      // console.log(extractAndParseJson(res.response));
-      const newFields = JSON.parse(res.response)?.fields
+      const newFields = await generateFields(0, newForm);
+      if(newFields.length === 0){
+        return;
+      }
+      
       let x = 0;
       let y = 2;
       newFields.forEach((field, index) => {
@@ -139,13 +129,51 @@ function AdminForm() {
           y++;
         }
       })
-      console.log(newFields);
+
       newForm.fields = [...newForm.fields, ...newFields]
-      console.log(newForm);
-      const fields = await updateForm(newForm)
-      console.log(fields);
+      await updateForm(newForm)
+    } 
+    } catch (error) {
+      console.error("Error creating new form:", error);
+    } finally {
+      await fetchForms();
     }
-    await fetchForms();
+  };
+
+  const generateFields = async (count=0, form) => {
+    if(count > 3) {
+      return [];
+    }
+    try{
+      const newField =
+        '\n\n{\n  "fields": [\n    {\n      "name": null,\n      "type": "description",\n      "props": {\n        "label": "Description of the incident",\n        "name": "description",\n        "required": false,\n        "description": "A brief summary outlining the key events and outcomes of the incident.",\n        "options": null\n      }\n    },\n    {\n      "name": null,\n      "type": "datetime-local",\n      "props": {\n        "label": "Time Of Incident",\n        "name": "incidentDate",\n        "required": true,\n        "description": "The precise date and time when the incident took place, in YYYY/MM/DD HH:MM format.",\n        "options": null\n      }\n    },\n    \n    {\n      "name": null,\n      "type": "text-box",\n      "props": {\n        "label": "Actions Taken",\n        "name": "actions_taken",\n        "required": false,\n        "placeholder": "First aid was applied etc.",\n        "description": "Immediate response actions taken following the incident, including first aid or emergency services contacted.",\n        "options": null\n      }\n    },\n    {\n      "name": "Preventive Measures",\n      "type": "text-box",\n      "props": {\n        "label": "Preventive Measures",\n        "name": "preventive_measures",\n        "required": true,\n        "description": "Proposed steps and strategies to prevent similar incidents in the future.",\n        "options": []\n      }\n    },\n    {\n      "name": "Existing Barriers",\n      "type": "text-box",\n      "props": {\n        "label": "Existing Barriers",\n        "name": "existing_barriers",\n        "required": true,\n        "description": "Pre-existing safety measures or protocols in place at the time of the incident.",\n        "options": []\n      }\n    },\n    {\n      "name": null,\n      "type": "selection-single",\n      "props": {\n        "label": "Category",\n        "required": true,\n        "description": "The specific type of incident, such as a workplace injury or equipment failure.",\n        "options": [\n          {\n            "label": "test",\n            "value": "test"\n          },\n          {\n            "label": "Minor",\n            "value": "minor"\n          },\n          {\n            "label": "Major",\n            "value": "major"\n          }\n        ]\n      }\n    }\n  ]\n}\n';
+      const res = await sendAIRequest({
+        url: "/generate",
+        method: "POST",
+        body: {
+          prompt:
+            "Create a list of JSON for Incident Report for the following: [" +
+            form.description +
+            "]. Generate the VALID JSON by following the data format given. REPLACE the value of name, label, options, description:" +
+            newField,
+        },
+      });
+      console.log(res);
+
+      // console.log(extractAndParseJson(res.response));
+      const newFields = JSON.parse(res.response)?.fields
+      return checkTypeValidity(newFields)
+    } catch (error) {
+      console.error("Error generating fields:", error);
+      return generateFields(count + 1, form);
+    }
+  };
+
+  const checkTypeValidity = (newFields) => {
+    const validType = ["text-box", "selection-single", "selection-multi"];
+    const validFields = newFields.filter((field) => validType.includes(field.type));
+    return validFields;
+
   };
 
   const extractAndParseJson = (inputString) => {

@@ -70,7 +70,7 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate, currentFields }) {
         name: fieldTitle,
         type: select,
         isAi:
-          select === FIELD_TYPES.AI_TEXT || select === FIELD_TYPES.AI_NUMBER,
+          select === FIELD_TYPES.AI_TEXT,
         aiField: {
           referenceId: referenceField,
           prompt: prompt,
