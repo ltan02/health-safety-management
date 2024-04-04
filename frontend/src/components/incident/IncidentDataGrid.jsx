@@ -46,9 +46,9 @@ const IncidentDataGrid = ({ rows, columns, onRowClick }) => {
     const handleSearchChange = (event) => setSearchText(event.target.value);
     const clearSearch = () => setSearchText("");
 
-
     return (
         <DataGrid
+            disableColumnFilter={true}
             rows={filteredRows}
             columns={columns}
             slots={{ Toolbar: CustomToolbar }}
@@ -63,7 +63,7 @@ const IncidentDataGrid = ({ rows, columns, onRowClick }) => {
             autoHeight
             disableSelectionOnClick
             onRowClick={onRowClick}
-            sx = {{borderTopWidth : "3px", fontSize: "14px"}}
+            sx={{ borderTopWidth: "3px", fontSize: "14px" }}
         />
     );
 };

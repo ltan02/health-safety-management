@@ -10,7 +10,7 @@ import json
 from vertexai.generative_models import ChatSession, GenerativeModel
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
-from uuid import uuid4
+# import pandas as pd
 
 load_dotenv()
 google_credentials_json = os.getenv("GOOGLE_CREDENTIALS_JSON")
@@ -18,10 +18,10 @@ if google_credentials_json:
     parsed_credentials = json.loads(google_credentials_json)
     credentials = service_account.Credentials.from_service_account_info(parsed_credentials)
     db = firestore.Client(credentials=credentials)
-    aiplatform.init(project="pwc-project-b3778", location="us-central1", credentials=credentials)
+    aiplatform.init(project="pwc-project-b3778", location="us-west1", credentials=credentials)
 else:
     db = firestore.Client()
-    aiplatform.init(project="pwc-project-b3778", location="us-central1")
+    aiplatform.init(project="pwc-project-b3778", location="us-west1")
 
 doc_ref = db.collection('categories').document('categories')
 doc = doc_ref.get()
@@ -39,8 +39,9 @@ app.add_middleware(
 )
 
 
-class IncidentModel(BaseModel):
-    incident: str
+@app.post("/getCategories")
+async def get_categories():
+    return {"categories": str(categories)}
 
 
 @app.delete("/purge")
@@ -49,20 +50,24 @@ async def purge():
     for incident in incidents:
         incident_dict = incident.to_dict()
         if incident_dict['employeesInvolved'] is None and incident_dict['incidentCategory'] is None and incident_dict['incidentDate'] is None and incident_dict['reviewer'] is None and incident_dict['statusId'] is None:
-            print("Deleting incident: ", incident.id)
+            # print("Deleting incident: ", incident.id)
             db.collection('incidents').document(incident.id).delete()
     return {"message": "Incidents purged"}
 
-@app.post("/getCategories")
-async def get_categories():
-    return {"categories": str(categories)}
+
+class IncidentModel(BaseModel):
+    incident: str
+
+
+class Prompt(BaseModel):
+    prompt: str
 
 
 @app.post("/categorize/")
 async def generate_text(incident_model: IncidentModel):
     incident = incident_model.incident
     prompt = f"Classify the following incident: '{incident}' into one of the following categories: {categories}. " \
-             f"Return only the category, nothing else."
+             f"Only return the category. Do not return a sentence, just the category classification."
 
     try:
         response = model.predict(
@@ -84,12 +89,24 @@ class ChatPrompt(BaseModel):
 model2 = GenerativeModel("gemini-1.0-pro")
 
 
+@app.post("/generate")
+async def talk(prompt_model: Prompt):
+    try:
+        response = model2.generate_content(prompt_model.prompt)
+        return {"response": response.text}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 def newChat(chatsession):
     users_ref = db.collection('incidents')
     docs = users_ref.stream()
     texts = []
     for doc1 in docs:
         texts.append(str(doc1.to_dict()))
+
+    # a = pd.DataFrame(texts)
+    # print(a)
 
     prompt = """
     You are now acting as a querying assistant for PricewaterhouseCoopers (PwC), a global leader in professional services, specializing in Assurance, Tax, and Advisory services. With the post-pandemic return to office, there is a renewed focus on Health and Safety, critical for PwC's rapidly growing cloud engineering consulting practice in Canada.
@@ -124,7 +141,7 @@ def newChat(chatsession):
 
     for chunk in r:
         t.append(chunk.text)
-    print("".join(t))
+    # print("".join(t))
 
 
 ids = {}
@@ -133,7 +150,7 @@ ids = {}
 @app.post("/chat/")
 async def get_chat_response(chat_prompt: ChatPrompt, uuid: str = Header(None)) -> dict:
     text_response = []
-    print("uuid", uuid)
+    # print("uuid", uuid)
 
     if uuid not in ids:
         ids[uuid] = model2.start_chat(response_validation=False)

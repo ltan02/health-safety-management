@@ -1,9 +1,4 @@
-import { useState } from "react";
-import {
-    Box,
-    Modal,
-    Typography,
-} from "@mui/material";
+import { Box, Modal, Typography } from "@mui/material";
 import PreviewForm from "../form/PreviewForm";
 
 const modalStyle = {
@@ -22,14 +17,7 @@ const modalStyle = {
     flexDirection: "column",
 };
 
-const largeTextFieldStyle = {
-    "& .MuiOutlinedInput-root": {
-        height: "5em",
-    },
-};
-
-function AddTaskModal({ open, onClose, handleAddTask, allEmployees, field, sortedRows, formName }) {
-
+function AddTaskModal({ open, onClose, handleAddTask, field, sortedRows, formName }) {
     const handleSubmit = (field) => {
         handleAddTask(field);
         onClose();
@@ -47,7 +35,13 @@ function AddTaskModal({ open, onClose, handleAddTask, allEmployees, field, sorte
                 <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ mb: 2 }}>
                     Report New Incident
                 </Typography>
-                <PreviewForm fields={field} sortedRows={sortedRows} handleSubmit={handleSubmit} onClose={onClose} formName={formName} />
+                <PreviewForm
+                    fields={field}
+                    sortedRows={sortedRows}
+                    handleSubmit={handleSubmit}
+                    onClose={onClose}
+                    formName={formName}
+                />
             </Box>
         </Modal>
     );

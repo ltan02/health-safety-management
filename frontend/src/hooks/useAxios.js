@@ -38,7 +38,6 @@ export default function useAxios() {
                 headers,
                 data: body,
             };
-
             const response = await axios(config);
             if (response.status === 401 || response.status === 403) {
                 const newToken = await refreshToken();

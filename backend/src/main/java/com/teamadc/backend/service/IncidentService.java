@@ -1,5 +1,6 @@
 package com.teamadc.backend.service;
 
+import com.teamadc.backend.dto.request.CustomFieldRequest;
 import com.teamadc.backend.model.Comment;
 import com.teamadc.backend.model.Incident;
 import com.teamadc.backend.repository.GenericRepository;
@@ -10,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -56,6 +59,16 @@ public class IncidentService {
         return incidents.stream().filter(incident -> incident.getStatusId().equals(statusId)).toList();
     }
 
+    public Incident updateCustomFields(String incidentId, List<CustomFieldRequest> customFields) throws InterruptedException, ExecutionException {
+        Incident incident = incidentRepository.findById(incidentId);
+
+        for (CustomFieldRequest customField : customFields) {
+            incident.setCustomField(customField.getFieldName(), customField.getValue());
+        }
+
+        return updateModifiedAt(incident);
+    }
+
     public Incident addComment(String incidentId, Comment comment) throws InterruptedException, ExecutionException {
         Incident incident = incidentRepository.findById(incidentId);
 
@@ -85,17 +98,40 @@ public class IncidentService {
     public Incident assignReviewer(String incidentId, String reviewerId) throws InterruptedException, ExecutionException {
         Incident incident = incidentRepository.findById(incidentId);
         incident.setReviewer(reviewerId);
-        return incidentRepository.save(incident);
+        return updateModifiedAt(incident);
     }
 
     public Incident removeReviewer(String incidentId) throws InterruptedException, ExecutionException {
         Incident incident = incidentRepository.findById(incidentId);
         incident.setReviewer(null);
-        return incidentRepository.save(incident);
+        return updateModifiedAt(incident);
     }
     
     public List<Incident> getIncidentsByReviewer(String reviewerId) throws InterruptedException, ExecutionException {
         return incidentRepository.findAll().stream().filter(incident -> incident.getReviewer().equals(reviewerId)).toList();
+    }
+
+    public Incident updateModifiedAt(Incident incident) throws InterruptedException, ExecutionException {
+        incident.setLastUpdatedAt(new Date());
+        return incidentRepository.save(incident);
+    }
+
+    public Incident updateReporter(String incidentId, String userId) throws InterruptedException, ExecutionException {
+        Incident incident = incidentRepository.findById(incidentId);
+        incident.setReporter(userId);
+        return updateModifiedAt(incident);
+    }
+
+    public Incident updateCategory(String incidentId, String category) throws InterruptedException, ExecutionException {
+        Incident incident = incidentRepository.findById(incidentId);
+        incident.setIncidentCategory(category);
+        return updateModifiedAt(incident);
+    }
+
+    public Incident updateEmployeesInvolved(String incidentId, List<String> employeesInvolved) throws InterruptedException, ExecutionException {
+        Incident incident = incidentRepository.findById(incidentId);
+        incident.setEmployeesInvolved(employeesInvolved);
+        return updateModifiedAt(incident);
     }
 
     public List<Incident> findIncidentsBetween(Date start, Date end) {
