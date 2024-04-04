@@ -25,6 +25,7 @@ import AddFormModal from "../../../components/form/AddFormModal";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteFormModal from "../../../components/form/DeleteFormModal";
 import ActivateFormModal from "../../../components/form/ActivateFormModal";
+import useAxios from "../../../hooks/useAxios";
 
 function AdminForm() {
   const {
@@ -42,7 +43,10 @@ function AdminForm() {
     createNewForm,
     deleteForm,
     toggleForm,
+    updateForm
   } = useForm();
+
+  const { sendAIRequest } = useAxios();
   const [fields, setFields] = useState({});
   const [selectingForm, setSelectingForm] = useState({});
 
@@ -101,9 +105,98 @@ function AdminForm() {
     await fetchForms();
   };
 
-  const handleCreateForm = async (form) => {
-    await createNewForm(form);
-    await fetchForms();
+  const handleCreateForm = async (form, isAiChecked) => {
+    try {
+    const newForm = await createNewForm(form);
+    if (isAiChecked) {
+
+      const newFields = await generateFields(0, newForm);
+      if(newFields.length === 0){
+        return;
+      }
+      
+      let x = 0;
+      let y = 2;
+      newFields.forEach((field, index) => {
+        newFields[index]["coordinate"] = {
+          x: x,
+          y: y,
+        };
+        if(x === 0){
+          x = 1;
+        } else {
+          x = 0;
+          y++;
+        }
+      })
+
+      newForm.fields = [...newForm.fields, ...newFields]
+      await updateForm(newForm)
+    } 
+    } catch (error) {
+      console.error("Error creating new form:", error);
+    } finally {
+      await fetchForms();
+    }
+  };
+
+  const generateFields = async (count=0, form) => {
+    if(count > 3) {
+      return [];
+    }
+    try{
+      const newField =
+        '\n\n{\n  "fields": [\n    {\n      "name": null,\n      "type": "description",\n      "props": {\n        "label": "Description of the incident",\n        "name": "description",\n        "required": false,\n        "description": "A brief summary outlining the key events and outcomes of the incident.",\n        "options": null\n      }\n    },\n    {\n      "name": null,\n      "type": "datetime-local",\n      "props": {\n        "label": "Time Of Incident",\n        "name": "incidentDate",\n        "required": true,\n        "description": "The precise date and time when the incident took place, in YYYY/MM/DD HH:MM format.",\n        "options": null\n      }\n    },\n    \n    {\n      "name": null,\n      "type": "text-box",\n      "props": {\n        "label": "Actions Taken",\n        "name": "actions_taken",\n        "required": false,\n        "placeholder": "First aid was applied etc.",\n        "description": "Immediate response actions taken following the incident, including first aid or emergency services contacted.",\n        "options": null\n      }\n    },\n    {\n      "name": "Preventive Measures",\n      "type": "text-box",\n      "props": {\n        "label": "Preventive Measures",\n        "name": "preventive_measures",\n        "required": true,\n        "description": "Proposed steps and strategies to prevent similar incidents in the future.",\n        "options": []\n      }\n    },\n    {\n      "name": "Existing Barriers",\n      "type": "text-box",\n      "props": {\n        "label": "Existing Barriers",\n        "name": "existing_barriers",\n        "required": true,\n        "description": "Pre-existing safety measures or protocols in place at the time of the incident.",\n        "options": []\n      }\n    },\n    {\n      "name": null,\n      "type": "selection-single",\n      "props": {\n        "label": "Category",\n        "required": true,\n        "description": "The specific type of incident, such as a workplace injury or equipment failure.",\n        "options": [\n          {\n            "label": "test",\n            "value": "test"\n          },\n          {\n            "label": "Minor",\n            "value": "minor"\n          },\n          {\n            "label": "Major",\n            "value": "major"\n          }\n        ]\n      }\n    }\n  ]\n}\n';
+      const res = await sendAIRequest({
+        url: "/generate",
+        method: "POST",
+        body: {
+          prompt:
+            "Create a list of JSON for Incident Report for the following: [" +
+            form.description +
+            "]. Generate the VALID JSON by following the data format given. REPLACE the value of name, label, options, description:" +
+            newField,
+        },
+      });
+      console.log(res);
+
+      // console.log(extractAndParseJson(res.response));
+      const newFields = JSON.parse(res.response)?.fields
+      return checkTypeValidity(newFields)
+    } catch (error) {
+      console.error("Error generating fields:", error);
+      return generateFields(count + 1, form);
+    }
+  };
+
+  const checkTypeValidity = (newFields) => {
+    const validType = ["text-box", "selection-single", "selection-multi"];
+    const validFields = newFields.filter((field) => validType.includes(field.type));
+    return validFields;
+
+  };
+
+  const extractAndParseJson = (inputString) => {
+    // Regular expression to find code block with optional 'json' language identifier
+    const codeBlockRegex = /```json\s*([\s\S]*?)```/g;
+
+    // Attempt to find and extract JSON string from the input
+    const matches = codeBlockRegex.exec(inputString);
+
+    if (matches && matches[1]) {
+      // Attempt to parse the extracted JSON string
+      try {
+        const parsedJson = JSON.parse(matches[1]);
+        console.log("Parsed JSON:", parsedJson);
+        return parsedJson;
+      } catch (error) {
+        console.error("Failed to parse JSON:", error);
+        return null;
+      }
+    } else {
+      console.error("No JSON found in input string.");
+      return null;
+    }
   };
 
   const openCreateFormModal = () => {
@@ -145,6 +238,7 @@ function AdminForm() {
         handleClose={() => setOpenCreateForm(false)}
         createNewForm={handleCreateForm}
       />
+
       <DeleteFormModal
         open={openDeleteForm}
         handleClose={() => setOpenDeleteForm(false)}
@@ -226,7 +320,10 @@ function AdminForm() {
                     </Tooltip>
                   ) : (
                     <Tooltip title="Inactive Form" arrow>
-                      <IconButton size="small" onClick={() => handleActivateModalOpen(forms[formId])}>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleActivateModalOpen(forms[formId])}
+                      >
                         <CancelIcon color="error" />
                       </IconButton>
                     </Tooltip>
@@ -256,6 +353,14 @@ function AdminForm() {
           </TableBody>
         </Table>
       </TableContainer>
+      <CircularProgress
+        sx={{
+          display: loading ? "flex" : "none",
+          mr: "auto",
+          ml: "auto",
+          mt: 5,
+        }}
+      />
 
       <FormCustomizationModal
         open={open}

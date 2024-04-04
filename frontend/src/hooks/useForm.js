@@ -13,9 +13,25 @@ export default function useForm() {
     const response = await sendRequest({
       url: "/forms",
     });
+    const employees = await sendRequest({
+      url: "/users",
+      method: "GET",
+    });
+    
     const newForm = {};
     response.map((form) => {
       newForm[form.id] = form;
+    });
+    Object.keys(newForm).map((key) => {
+      newForm[key].fields = newForm[key].fields.map((field) => {
+        if (field.props.name === "employees_involved") {
+          field.props.options = employees.map((employee) => ({
+            value: employee.id,
+            label: employee.firstName + " " + employee.lastName,
+          }));
+        }
+        return field;
+      });
     });
     response.map((form) => {
       if (form.active) {
@@ -42,6 +58,22 @@ export default function useForm() {
       console.error(error);
     }
     
+  };
+
+  const addDefaultFields = async (formId) => {
+    try {
+      if (!formId) {
+        console.error("Invalid input");
+        return;
+      }
+      const response = await sendRequest({
+        url: `/forms/${formId}/default`,
+        method: "PUT",
+      });
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const deleteForm = async (formId) => {
@@ -106,6 +138,23 @@ export default function useForm() {
       const response = await sendRequest({
         url: `/forms/${formId}/field/${fieldId}`,
         method: "DELETE",
+      });
+      return response;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const updateForm = async (form) => {
+    try {
+      if (!form) {
+        console.error("Invalid input");
+        return;
+      }
+      const response = await sendRequest({
+        url: `/forms/${form.id}`,
+        method: "PUT",
+        body: form,
       });
       return response;
     } catch (error) {
@@ -188,6 +237,7 @@ export default function useForm() {
 
   const groupedByRows = (fields, cols) => {
     if(fields.length <= 0) return {};
+    console.log(fields);
     const newFields = fields.reduce((acc, field) => {
       const { y } = field.coordinate;
       if (!acc[y]) {
@@ -202,6 +252,7 @@ export default function useForm() {
         newFields[i] = [];
       }
     }
+
 
     Object.keys(newFields).map((key) => {
       if (newFields[key].length < cols) {
@@ -300,6 +351,7 @@ export default function useForm() {
     getLastCoordinate,
     deleteField,
     loading,
-    updateFormName
+    updateFormName,
+    updateForm
   };
 }

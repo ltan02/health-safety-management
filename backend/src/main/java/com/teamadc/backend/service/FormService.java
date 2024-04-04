@@ -1,12 +1,13 @@
 package com.teamadc.backend.service;
 
 import com.teamadc.backend.model.Form;
+import com.teamadc.backend.model.Field;
+import com.teamadc.backend.model.FieldProp;
+import com.teamadc.backend.model.FieldOption;
 import com.teamadc.backend.dto.request.FieldCoordinateRequest;
 import com.teamadc.backend.dto.request.FormNameRequest;
 import com.teamadc.backend.model.AiField;
 import com.teamadc.backend.model.Coordinate;
-import com.teamadc.backend.model.Field;
-import com.teamadc.backend.model.FieldProp;
 import com.teamadc.backend.repository.GenericRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,9 +42,55 @@ public class FormService {
             form.setDateModified(currentDateStr);
         }
         if (form.getFields() == null) {
-            form.setFields(List.of());
+            form.setFields(createDefaultField());
         }
         return formRepository.save(form);
+    }
+
+    public List<Field> createDefaultField() throws InterruptedException, ExecutionException {
+
+        FieldProp employeeInvolvedFieldProp = new FieldProp("Employees Involved", "employees_involved", true,
+                "Employees Involved", "The employee involved in the incident", null);
+        fieldPropRepository.save(employeeInvolvedFieldProp);
+        Field employeeInvolvedField = new Field();
+        employeeInvolvedField.setProps(employeeInvolvedFieldProp);
+        employeeInvolvedField.setName("Employees Involved");
+        employeeInvolvedField.setCoordinate(new Coordinate(0, 0));
+        employeeInvolvedField.setType("selection-multi");
+        fieldRepository.save(employeeInvolvedField);
+
+        FieldProp descriptionFieldProp = new FieldProp("Description", "description", true, "Description",
+                "The description of the incident", null);
+        fieldPropRepository.save(descriptionFieldProp);
+        Field descriptionField = new Field();
+        descriptionField.setProps(descriptionFieldProp);
+        descriptionField.setName("Description");
+        descriptionField.setCoordinate(new Coordinate(1, 0));
+        descriptionField.setType("description");
+        fieldRepository.save(descriptionField);
+
+        FieldProp categoryFieldProp = new FieldProp("Category", "category", true, "Category",
+                "The category of the incident", null);
+        fieldPropRepository.save(categoryFieldProp);
+        Field categoryField = new Field();
+        categoryField.setProps(categoryFieldProp);
+        categoryField.setName("Category");
+        categoryField.setCoordinate(new Coordinate(0, 1));
+        categoryField.setType("category");
+        fieldRepository.save(categoryField);
+
+        FieldProp dateFieldProp = new FieldProp("Time Of Incident", "incidentDate", true, "Date", "The precise date and time when the incident took place, in YYYY/MM/DD HH:MM format.", null);
+        fieldPropRepository.save(dateFieldProp);
+        Field dateField = new Field();
+        dateField.setProps(dateFieldProp);
+        dateField.setName("Date");
+        dateField.setCoordinate(new Coordinate(1, 1));
+        dateField.setType("datetime-local");
+        fieldRepository.save(dateField);
+
+        List<Field> fields = List.of(employeeInvolvedField, descriptionField, categoryField, dateField);
+
+        return fields;
     }
 
     public Form updateForm(String formId, Form newForm) throws InterruptedException, ExecutionException {
@@ -68,18 +115,7 @@ public class FormService {
     public Form addField(String formId, Field field) throws InterruptedException, ExecutionException {
         Form form = formRepository.findById(formId);
         FieldProp fieldProp = field.getProps();
-        AiField aiField = field.getAiField();
-        System.out.println(aiField.getPrompt());
-        System.out.println(aiField.getReferenceId());
-        
-        if(field.isAi()){
-            // fieldProp.setLabel("AI");
-            // fieldProp.setName("ai");
-            // fieldProp.setRequired(false);
-            // fieldProp.setPlaceholder("");
-            // fieldProp.setDescription("");
-            // field.setAiField(
-        }
+
         fieldPropRepository.save(fieldProp);
         fieldRepository.save(field);
         List<Field> fields = form.getFields();
@@ -117,7 +153,6 @@ public class FormService {
         fieldToUpdate.setProps(field.getProps());
         fields.removeIf(f -> f.getId().equals(fieldId));
         fields.add(fieldToUpdate);
-
 
         fieldRepository.save(fieldToUpdate);
         form.setFields(fields);

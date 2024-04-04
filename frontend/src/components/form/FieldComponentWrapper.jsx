@@ -8,6 +8,7 @@ import { FIELD_ELEMENT } from "./form_elements";
 import { useSortable } from "@dnd-kit/sortable";
 
 const FieldComponentWrapper = ({ fieldData, onEdit, onDelete,fields }) => {
+  if(!FIELD_ELEMENT[fieldData.type]) return (<></>)
   const FieldComponent = FIELD_ELEMENT[fieldData.type];
   const {
     attributes,
@@ -29,8 +30,8 @@ const FieldComponentWrapper = ({ fieldData, onEdit, onDelete,fields }) => {
     cursor: "grab",
   };
 
-  const findFieldById = (id) => {
-    return fields.find((field) => field.id === id);
+  const findFieldById = (references) => {
+    return fields.filter((field) => references.includes(field.id))
   };
   return (
     <Container
@@ -52,7 +53,7 @@ const FieldComponentWrapper = ({ fieldData, onEdit, onDelete,fields }) => {
             value={fieldData.type === FIELD_TYPES.SELECTION_MULTI ? [] : fieldData.type === FIELD_TYPES.AI_TEXT ? {
               referenceField: findFieldById(fieldData.aiField.referenceId),
               prompt: fieldData.aiField.prompt,
-              generated: "AI generated text will appear here",
+              generated: "",
             } : ""}
             style={{ padding: "10px 10px", flexGrow: 1 }}
           />
