@@ -23,7 +23,6 @@ function PreviewForm({
     overflow: "auto",
   };
 
-
   const handleChange = (event, field) => {
     const { name, value } = event.target;
     const isMultiSelect = field.type === FIELD_TYPES.SELECTION_MULTI;
@@ -96,40 +95,42 @@ function PreviewForm({
 
   const isRequiredFieldFilled = () => {
     const allRequiredPresent = fields.every((obj) =>
-      obj.props.required ? obj.props.name in fieldsData && fieldsData[obj.props.name] !== "" : true
+      obj.props.required
+        ? obj.props.name in fieldsData && fieldsData[obj.props.name] !== ""
+        : true
     );
     return allRequiredPresent;
   };
 
   const findFieldDetails = (fieldId) => {
     return fields.find((field) => field.id === fieldId);
-  }  
+  };
 
   const fillFieldBaseOnPrompt = async (fieldData, referenceField) => {
     try {
-      if(!referenceField) return;
-      // const res = await sendAIRequest({
-      //   url: "/generate",
-      //   method: "POST",
-      //   body: {
-      //     prompt: fieldData.aiField.prompt + ". PLEASE GENERATE THE RESPONSE BASE ON:" + fieldsData[referenceField.props.name],
-      //   },
-      // });
-      console.log(fieldData)
+      const res = await sendAIRequest({
+        url: "/generate",
+        method: "POST",
+        body: {
+          prompt:
+            " **THE RESPONSE WILL BE PLANE TEXT. DO NOT WRITE IN MARKDOWN. DO NOT BE REPETITIVE* " +
+            fieldData.aiField.prompt +
+            ". GENERATE THE RESPONSE BASE ON: '" +
+            fieldsData[referenceField.props.name],
+        },
+      });
       setFieldsData((prevData) => ({
         ...prevData,
-        [fieldData.props.name]: "something",
+        [fieldData.props.name]: res.response,
       }));
       // console.log("AI response:", res);
-      } catch (error) {
-        console.error("Error filling field based on prompt:", error);
+    } catch (error) {
+      console.error("Error filling field based on prompt:", error);
     }
   };
   useEffect(() => {
     setFilledRequired(isRequiredFieldFilled());
-    console.log("fieldsData", fieldsData);
   }, [fieldsData]);
-
 
   return (
     <Container style={formHeightStyle}>
@@ -166,7 +167,6 @@ function PreviewForm({
                         justifyContent: "start",
                       }}
                     >
-                      
                       <FieldComponent
                         {...fieldData.props}
                         value={
@@ -177,15 +177,31 @@ function PreviewForm({
                             : fieldData.type === FIELD_TYPES.CATEGORY
                             ? aiCategrory
                             : fieldData.type === FIELD_TYPES.AI_TEXT
-                            ?  {
-                              referenceField: findFieldDetails(fieldData.aiField.referenceId),
-                              prompt: fieldData.aiField.prompt,
-                              generated: fieldsData[fieldData.props.name] ? fieldsData[fieldData.props.name] : "AI generated text will appear here"
-                            }
-                            :  fieldsData[fieldData.props.name]
+                            ? {
+                                referenceField: findFieldDetails(
+                                  fieldData.aiField.referenceId
+                                ),
+                                prompt: fieldData.aiField.prompt,
+                                generated: fieldsData[fieldData.props.name]
+                                  ? fieldsData[fieldData.props.name]
+                                  : "AI generated text will appear here",
+                              }
+                            : fieldsData[fieldData.props.name]
                         }
                         onChange={(e) => handleChange(e, fieldData)}
-                        onClick={ fieldData.type === FIELD_TYPES.AI_TEXT ? () => fillFieldBaseOnPrompt(fieldData, findFieldDetails(fieldData.aiField.referenceId)) : fieldData.type === FIELD_TYPES.CATEGORY ? onCategorySearch : null}
+                        onClick={
+                          fieldData.type === FIELD_TYPES.AI_TEXT
+                            ? () =>
+                                fillFieldBaseOnPrompt(
+                                  fieldData,
+                                  findFieldDetails(
+                                    fieldData.aiField.referenceId
+                                  )
+                                )
+                            : fieldData.type === FIELD_TYPES.CATEGORY
+                            ? onCategorySearch
+                            : null
+                        }
                         loading={aiLoading + ""}
                       />
                     </Container>

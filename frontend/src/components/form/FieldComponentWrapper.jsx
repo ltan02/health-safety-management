@@ -52,7 +52,7 @@ const FieldComponentWrapper = ({ fieldData, onEdit, onDelete,fields }) => {
             value={fieldData.type === FIELD_TYPES.SELECTION_MULTI ? [] : fieldData.type === FIELD_TYPES.AI_TEXT ? {
               referenceField: findFieldById(fieldData.aiField.referenceId),
               prompt: fieldData.aiField.prompt,
-              generated: "somethingggg"
+              generated: "AI generated text will appear here",
             } : ""}
             style={{ padding: "10px 10px", flexGrow: 1 }}
           />

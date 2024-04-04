@@ -199,6 +199,12 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate, currentFields }) {
               onReferenceFieldChange: (fieldId) => setReferenceField(fieldId),
               onPromptChange: (e) => setPrompt(e.target.value),
               currentFields: currentFields,
+              initialDescription: fieldDescription,
+              initialTitle: fieldTitle,
+              initialOptions: options,
+              initialRequired: required,
+              initialPlaceholder: placeholder,
+              initialPrompt: prompt,
             })}
           </>
         ) : (

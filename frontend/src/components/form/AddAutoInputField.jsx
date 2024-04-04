@@ -21,6 +21,8 @@ function AddInputField({
   onPromptChange,
   initialRequired,
   currentFields,
+  initialPrompt,
+  initialReferenceField,
 }) {
   let textFields = [];
   textFields = currentFields.filter((field) => field.type === "text-box");
@@ -64,14 +66,11 @@ function AddInputField({
           sx={{ marginTop: 2 }}
           id="reference-field"
           onChange={(e) => onReferenceFieldChange(e.target.value)}
-          
+          defaultValue={initialReferenceField}
           required
         >
           {textFields.map((field) => (
-            <MenuItem
-              key={field.id}
-              value={field.id}
-            >
+            <MenuItem key={field.id} value={field.id}>
               <Typography variant={VARIANT_TYPES.LABEL} fontWeight={600}>
                 {field.props.label}
               </Typography>
@@ -92,6 +91,7 @@ function AddInputField({
         onChange={onPromptChange}
         fullWidth
         required
+        defaultValue={initialPrompt}
       />
       <Select
         fullWidth
