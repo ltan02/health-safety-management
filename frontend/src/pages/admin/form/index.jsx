@@ -145,6 +145,7 @@ function AdminForm() {
         handleClose={() => setOpenCreateForm(false)}
         createNewForm={handleCreateForm}
       />
+
       <DeleteFormModal
         open={openDeleteForm}
         handleClose={() => setOpenDeleteForm(false)}
@@ -226,7 +227,10 @@ function AdminForm() {
                     </Tooltip>
                   ) : (
                     <Tooltip title="Inactive Form" arrow>
-                      <IconButton size="small" onClick={() => handleActivateModalOpen(forms[formId])}>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleActivateModalOpen(forms[formId])}
+                      >
                         <CancelIcon color="error" />
                       </IconButton>
                     </Tooltip>
@@ -256,6 +260,14 @@ function AdminForm() {
           </TableBody>
         </Table>
       </TableContainer>
+      <CircularProgress
+        sx={{
+          display: loading ? "flex" : "none",
+          mr: "auto",
+          ml: "auto",
+          mt: 5,
+        }}
+      />
 
       <FormCustomizationModal
         open={open}
