@@ -8,6 +8,8 @@ import { isPrivileged } from "../../utils/permissions";
 import StatusModal from "./StatusModal";
 import IncidentDetailField from "./IncidentDetailField";
 import IncidentDetailBasicField from "./IncidentDetailBasicField";
+import { set } from "lodash";
+import { v4 as uuid } from "uuid";
 
 const modalStyle = {
   position: "absolute",
@@ -30,6 +32,7 @@ export default function IncidentDetailModal({
   onClose,
   onRefresh,
   commentData,
+  setCommentData,
   setTasks,
 }) {
   const { sendRequest, loading, sendAIRequest } = useAxios();
@@ -237,7 +240,6 @@ export default function IncidentDetailModal({
     const newInvolvedEmployees = employees.filter((employee) =>
       involvedEmployees.includes(employee.id)
     );
-    console.log(newInvolvedEmployees);
 
     const newIncident = {
       ...incident,
@@ -296,6 +298,25 @@ export default function IncidentDetailModal({
         content: comment,
       },
     });
+
+    const tempComment = {
+      id: "temp-" + uuid(),
+      comment: {
+        content: comment,
+        timestamp: new Date().toISOString(),
+        userId: user.id,
+      },
+      user: user,
+    };
+    const newCommentData = { ...commentData };
+    if (!newCommentData[incident.id]) {
+      newCommentData[incident.id] = [];
+    }
+    newCommentData[incident.id].push(tempComment);
+    setCommentData(newCommentData);
+    if (onRefresh) {
+      onRefresh();
+    }
 
     const newIncident = {
       ...incident,

@@ -9,7 +9,7 @@ export default function CommentSection({ commentData = [], incidentId }) {
   const sortComments = (comments) => {
     if (!comments) return [];
     return comments.sort(
-      (a, b) => new Date(a.comment.timestamp) - new Date(b.comment.timestamp)
+      (a, b) =>  new Date(b.comment.timestamp) - new Date(a.comment.timestamp),
     );
   };
   const [comments, setComments] = useState(sortComments(commentData[incidentId]));
@@ -59,7 +59,7 @@ export default function CommentSection({ commentData = [], incidentId }) {
         maxHeight: "300px",
         position: "relative",
         "&::after": {
-          content: isOverflow ? '"Scroll for more ↓"' : '""',
+          // content: isOverflow ? '"Scroll for more ↓"' : '""',
           position: "absolute",
           bottom: 0,
           right: 0,

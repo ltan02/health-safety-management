@@ -103,6 +103,11 @@ function Dashboard() {
         if (flatTasks) {
             flatTasks.map((task) => {
                 const newCommentData = initialCommentData;
+                //since we do not have comment edit logic, if the size of the comments array is the same, we do not need to push the comment data
+                //this prevent us from pushing the same comment data multiple times
+                if(task.comments.length === newCommentData[task.id]?.length){
+                    return;
+                }
                 task.comments.map((comment) => {
                     if (!newCommentData[comment.id]) {
                         newCommentData[comment.id] = [];
@@ -280,7 +285,6 @@ function Dashboard() {
                                 sortedRows={handleSort}
                                 formName={activeForm?.name}
                                 commentData={commentData}
-                                setCommentData={setCommentData}
                                 columnMap={columnFlowMap[column.id]}
                                 setFilteredTasks={setFilteredTasks}
                                 handleOpenModal={handleOpenModal}
