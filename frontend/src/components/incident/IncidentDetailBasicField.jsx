@@ -342,19 +342,13 @@ export default function IncidentDetailBasicField({
             <Grid
               item
               xs={6}
-              sx={{
-                "&:hover": {
-                  background: isPrivileged(user.role) && "#f1f2f4",
-                  cursor: "pointer",
-                },
-              }}
               onClick={(e) => handleOpenReviewer(e)}
             >
               <Grid container spacing={1} alignItems="center">
                 <Grid item>
                   <Profile user={currentField[FIELD.REVIEWER]} />
                 </Grid>
-                <Grid item sx={{ fontSize: "14px" }}>
+                <Grid item sx={{ fontSize: "14px", "&:hover": { cursor: "pointer", color: isPrivileged(user.role) ? "#EB8C00" : "#000" }}}>
                   {currentField[FIELD.REVIEWER]?.firstName ?? "Unassigned"}
                   {currentField[FIELD.REVIEWER]?.lastName ?? ""}
                 </Grid>
