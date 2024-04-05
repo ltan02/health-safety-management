@@ -28,15 +28,25 @@ function ReportChart({ type, locked, data, height, width, handleSubmit }) {
         getReportAPI(event.target.value, startDate, endDate);
     };
     const handleStartChange = (event) => {
-        if (typeof handleSubmit === "function") handleSubmit(field, event.target.value, endDate);
-        setStartDate(event.target.value);
-        getReportAPI(field, event.target.value, endDate);
+        const newStartDate = event.target.value;
+        if (endDate && new Date(newStartDate) >= new Date(endDate)) {
+            alert("Start date must be before end date.");
+            return;
+        }
+        if (typeof handleSubmit === "function") handleSubmit(field, newStartDate, endDate);
+        setStartDate(newStartDate);
+        getReportAPI(field, newStartDate, endDate);
     };
-
+    
     const handleEndChange = (event) => {
-        if (typeof handleSubmit === "function") handleSubmit(field, startDate, event.target.value);
-        setEndDate(event.target.value);
-        getReportAPI(field, startDate, event.target.value);
+        const newEndDate = event.target.value;
+        if (startDate && new Date(newEndDate) <= new Date(startDate)) {
+            alert("End date must be after start date.");
+            return;
+        }
+        if (typeof handleSubmit === "function") handleSubmit(field, startDate, newEndDate);
+        setEndDate(newEndDate);
+        getReportAPI(field, startDate, newEndDate);
     };
 
     const BarChartCard = (
