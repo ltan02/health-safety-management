@@ -271,6 +271,7 @@ function Dashboard() {
                                 id={column.id}
                                 title={column.name}
                                 tasks={filteredTasks[column.id] || []}
+                                filteredTasks={filteredTasks}
                                 activeId={activeId}
                                 handleAddTask={handleAddTask}
                                 employees={employees}
@@ -281,7 +282,7 @@ function Dashboard() {
                                 commentData={commentData}
                                 setCommentData={setCommentData}
                                 columnMap={columnFlowMap[column.id]}
-                                setTasks={setFilteredTasks}
+                                setFilteredTasks={setFilteredTasks}
                                 handleOpenModal={handleOpenModal}
                             />
                         </Box>

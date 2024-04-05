@@ -16,7 +16,7 @@ import useAxios from "../../hooks/useAxios";
 
 import CircularProgress from "@mui/material/CircularProgress";
 import { set } from "lodash";
-function Task({ task, handleOpenModal, employees = [], onRefresh }) {
+function Task({ task, handleOpenModal, employees = [], onRefresh ,handleIncidentUpdateFromTask,columnId }) {
   const { sendRequest, loading } = useAxios();
 
   const [openReviewModal, setOpenReviewModal] = useState(false);
@@ -46,6 +46,14 @@ function Task({ task, handleOpenModal, employees = [], onRefresh }) {
     setSearchEmployee(e.target.value);
   };
 
+  const handleOpen = () => {
+    if(openReviewModal){
+      return;
+    }
+    handleOpenModal(task)
+
+  }
+
   useEffect(() => {
     setFilteredEmployees(
       employees.filter(
@@ -72,6 +80,7 @@ function Task({ task, handleOpenModal, employees = [], onRefresh }) {
       setOpenReviewModal(false);
       setSearchEmployee("");
       setAnchorEl(null);
+      handleIncidentUpdateFromTask({ ...task, reviewer: employee }, columnId);
       await sendRequest({
         url: `/incidents/${task.id}/reviewer/${employee.id}`,
         method: "POST",
@@ -107,7 +116,7 @@ function Task({ task, handleOpenModal, employees = [], onRefresh }) {
             justifyContent: "space-between",
             height: "100%",
           }}
-          onClick={() => !openReviewModal && handleOpenModal(task)}
+          onClick={handleOpen}
         >
           <Typography
             gutterBottom

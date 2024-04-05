@@ -253,7 +253,6 @@ export default function IncidentDetailModal({
       const columnId = columns.find((column) =>
         column.statusIds.includes(incidentState)
       ).id;
-console.log(updatedTasks[columnId]);
       updatedTasks[columnId] = updatedTasks[columnId].filter(
         (task) => task.id !== incident.id
       );
