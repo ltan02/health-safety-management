@@ -59,7 +59,6 @@ export default function EmployeesInvolveEditModal({
   };
 
   const handleClose = () => {
-    console.log(involvedEmployees);
     setSelectedEmployees(involvedEmployees);
     onClose();
   };

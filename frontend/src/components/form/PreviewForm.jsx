@@ -127,7 +127,6 @@ function PreviewForm({
         ...prevData,
         [fieldData.props.name]: res.response,
       }));
-      console.log("AI response:", res);
     } catch (error) {
       console.error("Error filling field based on prompt:", error);
     }

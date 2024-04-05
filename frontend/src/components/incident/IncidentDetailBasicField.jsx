@@ -15,6 +15,8 @@ import Profile from "../users/Profile";
 import EmployeesInvolveEditModal from "./EmployeesInvolveEditModal";
 import { useWorkflowNew } from "../../context/WorkflowContext";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import IncidentDateChangeModal from "./IncidentDateChangeModal";
+import { set } from "lodash";
 
 const FIELD = {
   DATE: "date",
@@ -44,12 +46,14 @@ export default function IncidentDetailBasicField({
   setOpenReviewer,
   setOpenReporter,
   handleUpdateEmployeesInvolved,
+  handleDateUpdate,
 }) {
   const [editingField, setEditingField] = useState(null);
   const [searchEmployee, setSearchEmployee] = useState("");
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [openEmployeesInolveModal, setOpenEmployeesInvolveModal] =
     useState(false);
+  const [openDateChangeModal, setOpenDateChangeModal] = useState(false);
   const [currentField, setCurrentField] = useState({
     [FIELD.DATE]: incident?.incidentDate,
     [FIELD.CATEGORY]: incident?.incidentCategory,
@@ -89,7 +93,6 @@ export default function IncidentDetailBasicField({
   };
 
   const handleOpenReporter = (e) => {
-    if (!isPrivileged(user.role)) return;
     setOpenReviewer(false);
     setOpenReporter(true);
     setEditingField(FIELD.REPORTER);
@@ -102,6 +105,11 @@ export default function IncidentDetailBasicField({
     setOpenReviewer(true);
     setEditingField(FIELD.REVIEWER);
     handleOpenEmployeesListModal({ e, privileged: true });
+  };
+
+  const handleOpenDateChange = () => {
+    setEditingField(FIELD.DATE);
+    setOpenDateChangeModal(true);
   };
 
   const handleSelectEmployee = (id) => {
@@ -245,7 +253,13 @@ export default function IncidentDetailBasicField({
             </Grid>
             <Grid item xs={6}>
               {incident && (
-                <Typography sx={{ fontSize: "14px" }}>
+                <Typography
+                  fontSize={15}
+                  sx={{ "&:hover": { cursor: "pointer", color: "#EB8C00" } }}
+                  fontFamily="Helvetica"
+                  fontWeight={500}
+                  onClick={handleOpenDateChange}
+                >
                   {incident.incidentDate}
                 </Typography>
               )}
@@ -268,17 +282,18 @@ export default function IncidentDetailBasicField({
               </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Grid
-                container
-                spacing={1}
-                alignItems="center"
-                sx={{ "&:hover": { background: "#f1f2f4", cursor: "pointer" } }}
-                onClick={(e) => handleOpenReporter(e)}
-              >
+              <Grid container spacing={1} alignItems="center">
                 <Grid item>
                   <Profile user={currentField[FIELD.REPORTER]} />
                 </Grid>
-                <Grid item sx={{ fontSize: "14px" }}>
+                <Grid
+                  item
+                  sx={{
+                    fontSize: "14px",
+                    "&:hover": { cursor: "pointer", color: "#EB8C00" },
+                  }}
+                  onClick={(e) => handleOpenReporter(e)}
+                >
                   {currentField[FIELD.REPORTER].firstName}{" "}
                   {currentField[FIELD.REPORTER].lastName}
                 </Grid>
@@ -289,12 +304,7 @@ export default function IncidentDetailBasicField({
                 Employees Involved
               </Typography>
             </Grid>
-            <Grid
-              item
-              xs={6}
-              onClick={(e) => handleOpenInvolvedEmployees(e)}
-              sx={{ "&:hover": { background: "#f1f2f4", cursor: "pointer" } }}
-            >
+            <Grid item xs={6} onClick={(e) => handleOpenInvolvedEmployees(e)}>
               {incident &&
                 currentField[FIELD.EMPLOYEES_INVOLVED]
                   //   .filter(
@@ -309,6 +319,10 @@ export default function IncidentDetailBasicField({
                         alignItems="center"
                         key={employee.id}
                         paddingBottom={1}
+                        sx={{
+                          fontSize: "14px",
+                          "&:hover": { cursor: "pointer", color: "#EB8C00" },
+                        }}
                       >
                         <Grid item>
                           <Profile user={employee} />
@@ -419,6 +433,13 @@ export default function IncidentDetailBasicField({
         search={searchEmployee}
         handleAddEmployee={handleAddEmployee}
         loading={loading}
+      />
+      <IncidentDateChangeModal
+        open={openDateChangeModal}
+        onClose={() => setOpenDateChangeModal(false)}
+        loading={loading}
+        updateDate={handleDateUpdate}
+        date={currentField[FIELD.DATE]}
       />
     </Box>
   );

@@ -53,6 +53,7 @@ export default function IncidentDetailModal({
   const [oldField, setOldField] = useState({});
   const [reviewer, setReviewer] = useState(null);
   const [openReporter, setOpenReporter] = useState(false);
+  const [openDateChangeModal, setOpenDateChangeModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -162,6 +163,51 @@ export default function IncidentDetailModal({
     }
     setOpenReviewer(false);
     // onClose();
+  };
+
+  const handleDateUpdate = async (date) => {
+    try {
+      await sendRequest({
+        url: `/incidents/${incident.id}/date`,
+        method: "PUT",
+        body: {
+          incidentDate: date,
+        },
+      });
+
+      const newIncident = {
+        ...incident,
+        incidentDate: date,
+      };
+
+      setIncident(newIncident);
+
+      onRefresh();
+
+      setTasks((prevTasks) => {
+        const updatedTasks = { ...prevTasks };
+        const columns = isPrivileged(user.role) ? adminColumns : employeeColumns;
+
+        const columnId = columns.find((column) =>
+          column.statusIds.includes(incidentState)
+        ).id;
+
+        updatedTasks[columnId] = updatedTasks[columnId].filter(
+          (task) => task.id !== incident.id
+        );
+        updatedTasks[columnId].push(newIncident);
+
+        Object.keys(updatedTasks).forEach((key) => {
+          updatedTasks[key] = updatedTasks[key].sort(
+            (a, b) => new Date(a.incidentDate) - new Date(b.incidentDate)
+          );
+        });
+
+        return updatedTasks;
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleSwitchReporter = async (reporterId) => {
@@ -505,9 +551,11 @@ export default function IncidentDetailModal({
             handleSwitchReporter={handleSwitchReporter}
             setOpenReporter={setOpenReporter}
             setOpenReviewer={setOpenReviewer}
+            setOpenDateChangeModal={setOpenDateChangeModal}
             handleUpdateEmployeesInvolved={handleUpdateEmployeesInvolved}
             openReporter={openReporter}
             loading={loading}
+            handleDateUpdate={handleDateUpdate}
           />
           <CircularProgress
             sx={{

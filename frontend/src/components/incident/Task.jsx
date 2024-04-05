@@ -165,7 +165,7 @@ function Task({
               color="secondary.dark"
               fontWeight={700}
             >
-              {new Date(task.incidentDate).toLocaleDateString()}
+              {task.incidentDate.split("T")[0]}
             </Typography>
             <Box
               sx={{

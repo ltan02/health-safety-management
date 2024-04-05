@@ -158,7 +158,6 @@ function AdminForm() {
             newField,
         },
       });
-      console.log(res);
 
       // console.log(extractAndParseJson(res.response));
       const newFields = JSON.parse(res.response)?.fields
@@ -187,7 +186,6 @@ function AdminForm() {
       // Attempt to parse the extracted JSON string
       try {
         const parsedJson = JSON.parse(matches[1]);
-        console.log("Parsed JSON:", parsedJson);
         return parsedJson;
       } catch (error) {
         console.error("Failed to parse JSON:", error);
