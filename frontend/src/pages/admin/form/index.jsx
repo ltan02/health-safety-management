@@ -342,6 +342,7 @@ function AdminForm() {
                   <IconButton
                     size="small"
                     onClick={() => handleDeleteModalOpen(forms[formId])}
+                    disabled={forms[formId].active}
                   >
                     <Tooltip title="Delete Form" arrow>
                       <DeleteIcon />
