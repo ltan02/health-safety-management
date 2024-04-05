@@ -19,7 +19,7 @@ export default function useTasks() {
 
         const incidents = await sendRequest({ url });
 
-        const userIds = [...new Set(incidents.flatMap((incident) => [incident.reporter]))];
+        const userIds = [...new Set(incidents.flatMap((incident) => [incident?.reporter]))].filter(Boolean);
         const users = await Promise.all(userIds.map((id) => sendRequest({ url: `/users/${id}` })));
 
         const reviewerIds = [...new Set(incidents.flatMap((incident) => [incident?.reviewer]))].filter(Boolean); // filter(Boolean) removes null and undefined
