@@ -13,16 +13,26 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import Profile from "../users/Profile";
 import useAxios from "../../hooks/useAxios";
+import { useAuthContext } from "../../context/AuthContext";
+import { isPrivileged } from "../../utils/permissions";
 
 import CircularProgress from "@mui/material/CircularProgress";
 import { set } from "lodash";
-function Task({ task, handleOpenModal, employees = [], onRefresh ,handleIncidentUpdateFromTask,columnId }) {
+function Task({
+  task,
+  handleOpenModal,
+  employees = [],
+  onRefresh,
+  handleIncidentUpdateFromTask,
+  columnId,
+}) {
   const { sendRequest, loading } = useAxios();
 
   const [openReviewModal, setOpenReviewModal] = useState(false);
   const [searchEmployee, setSearchEmployee] = useState("");
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [reviewer, setReviewer] = useState(task.reviewer);
+  const { user } = useAuthContext();
 
   const [anchorEl, setAnchorEl] = useState(null);
   const ProfileAvatar = ({ user }) => <Profile user={user} />;
@@ -36,7 +46,9 @@ function Task({ task, handleOpenModal, employees = [], onRefresh ,handleIncident
   } = useSortable({ id: task?.id });
 
   const handleOpenReviewModal = (e) => {
-    console.log(e);
+    if (!isPrivileged(user.role)) {
+      return;
+    }
     e.stopPropagation();
     setAnchorEl(e.currentTarget);
     setOpenReviewModal(true);
@@ -47,12 +59,11 @@ function Task({ task, handleOpenModal, employees = [], onRefresh ,handleIncident
   };
 
   const handleOpen = () => {
-    if(openReviewModal){
+    if (openReviewModal) {
       return;
     }
-    handleOpenModal(task)
-
-  }
+    handleOpenModal(task);
+  };
 
   useEffect(() => {
     setFilteredEmployees(
@@ -161,7 +172,7 @@ function Task({ task, handleOpenModal, employees = [], onRefresh ,handleIncident
                 display: "flex",
                 alignItems: "center",
                 "&:hover": {
-                  boxShadow: 5,
+                  boxShadow: isPrivileged(user.role) ? 5 : 0,
                   transition: "0.3s",
                 },
               }}

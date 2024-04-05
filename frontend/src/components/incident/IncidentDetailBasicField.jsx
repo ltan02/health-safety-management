@@ -57,6 +57,7 @@ export default function IncidentDetailBasicField({
     [FIELD.EMPLOYEES_INVOLVED]: incident?.employeesInvolved,
     [FIELD.REVIEWER]: reviewer,
   });
+
   const { flowMap, activeStateMap, activeTransitionMap } = useWorkflowNew();
 
   const handleClickField = (fieldName) => {
@@ -296,10 +297,10 @@ export default function IncidentDetailBasicField({
             >
               {incident &&
                 currentField[FIELD.EMPLOYEES_INVOLVED]
-                //   .filter(
-                //     (employee) =>
-                //       employee.id !== currentField[FIELD.REPORTER].id
-                //   )
+                  //   .filter(
+                  //     (employee) =>
+                  //       employee.id !== currentField[FIELD.REPORTER].id
+                  //   )
                   .map((employee) => {
                     return (
                       <Grid
@@ -327,7 +328,12 @@ export default function IncidentDetailBasicField({
             <Grid
               item
               xs={6}
-              sx={{ "&:hover": { background: "#f1f2f4", cursor: "pointer" } }}
+              sx={{
+                "&:hover": {
+                  background: isPrivileged(user.role) && "#f1f2f4",
+                  cursor: "pointer",
+                },
+              }}
               onClick={(e) => handleOpenReviewer(e)}
             >
               <Grid container spacing={1} alignItems="center">
