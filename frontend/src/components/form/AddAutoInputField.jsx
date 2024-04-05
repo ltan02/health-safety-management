@@ -26,7 +26,8 @@ function AddInputField({
   initialReferenceField,
 }) {
   let textFields = [];
-  textFields = currentFields.filter((field) => field.type === "text-box");
+  textFields = currentFields.filter((field) => field.type === "text-box" || field.type === "description");
+  console.log(currentFields)
   return (
     <Box margin="normal" sx={{ gap: 1 }}>
       <TextField
