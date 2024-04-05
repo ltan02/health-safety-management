@@ -47,7 +47,7 @@ function PreviewForm({
     }
   };
 
-  
+
   const onCategorySearch = async () => {
     const res = await sendAIRequest({
       url: "/categorize/",
@@ -135,6 +135,22 @@ function PreviewForm({
   useEffect(() => {
     setFilledRequired(isRequiredFieldFilled());
   }, [fieldsData]);
+
+  useEffect(() => {
+    const dateFields = fields.filter(
+      (field) => field.type === FIELD_TYPES.DATETIME_LOCAL
+    );
+    setFieldsData((prevData) => {
+      const newData = { ...prevData };
+      dateFields.forEach((field) => {
+        if (field.props.name in prevData) {
+          return;
+        }
+        newData[field.props.name] = new Date().toISOString().slice(0, 16);
+      });
+      return newData;
+    });
+  }, []);
 
   return (
     <Container style={formHeightStyle}>
