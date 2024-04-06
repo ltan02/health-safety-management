@@ -18,6 +18,11 @@ export default function PreviewFormTab({ labels, children }) {
         textColor="secondary"
         indicatorColor="secondary"
         aria-label="workflow tabs"
+        TabIndicatorProps={{
+            style: {
+                height:"3px",
+            }
+        }}
       >
         {labels.map((label, index) => (
           <Tab key={index} label={label} value={index} />
