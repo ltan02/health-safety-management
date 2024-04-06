@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Modal, Typography, Button, MenuItem, Select } from "@mui/material";
+import {Box, Modal, Typography, Button, MenuItem, Select, TextField} from "@mui/material";
 import ReportChart from "./ReportChart";
 import useDashboard from "../../hooks/useDashboard";
 
@@ -19,9 +19,11 @@ const modalStyle = {
     flexDirection: "column",
 };
 
-function ReportModal({ open, onClose, newData, setNewData, boardId, onRefresh }) {
+function ReportModal({ open, onClose, newData, setNewData, GraphName, setGName, boardId, onRefresh }) {
     const { updateBoard } = useDashboard();
 
+    console.log(newData);
+    console.log(boardId);
     const handleSubmit = (field, start, end) => {
         const changedData = newData.map((c, i) => {
             if (i === selectedVal) {
@@ -30,6 +32,7 @@ function ReportModal({ open, onClose, newData, setNewData, boardId, onRefresh })
                     field: field,
                     start: start,
                     end: end,
+                    name: GraphName,
                 };
             } else {
                 return c;
@@ -54,6 +57,7 @@ function ReportModal({ open, onClose, newData, setNewData, boardId, onRefresh })
                     field: newData[i].field,
                     start: newData[i].start,
                     end: newData[i].end,
+                    name: setGName,
                 };
             } else {
                 return c;
@@ -70,6 +74,12 @@ function ReportModal({ open, onClose, newData, setNewData, boardId, onRefresh })
         updateBoard(boardId, newData);
         onRefresh();
         onClose();
+    };
+
+    // const [GraphName, setGName] = useState("");
+
+    const GraphNameHandler = (event) => {
+        setGName(event.target.value);
     };
 
     return (
@@ -103,12 +113,20 @@ function ReportModal({ open, onClose, newData, setNewData, boardId, onRefresh })
                     <MenuItem value={"Scatter"}>Scatter</MenuItem>
                     <MenuItem value={"Pie"}>Pie</MenuItem>
                 </Select>
+                <Typography variant="h8" sx={{ mb: 2 }}>
+                    Graph Name
+                </Typography>
+                <TextField
+                    value={GraphName}
+                    onChange={GraphNameHandler}
+                />
                 <ReportChart
                     type={newData[selectedVal].type}
                     data={newData[selectedVal]}
                     locked={false}
                     height={300}
                     width={400}
+                    graphName={GraphName}
                     handleSubmit={handleSubmit}
                 />
                 <Button

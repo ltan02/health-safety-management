@@ -4,12 +4,14 @@ import { useEffect, useState } from "react";
 import useAxios from "../../hooks/useAxios.js";
 import { categoryReports } from "../../pages/report/initialData.js";
 
-function ReportChart({ type, locked, data, height, width, handleSubmit }) {
+function ReportChart({ type, locked, data, height, width, handleSubmit, graphName }) {
     const { sendRequest } = useAxios();
     const [report, setReport] = useState(categoryReports);
     const [field, setField] = useState(data.field);
     const [startDate, setStartDate] = useState(data.start);
     const [endDate, setEndDate] = useState(data.end);
+
+    // const [GraphName, setGName] = useState("");
 
     useEffect(() => {
         setEndDate(data.end);
@@ -51,11 +53,12 @@ function ReportChart({ type, locked, data, height, width, handleSubmit }) {
 
     const BarChartCard = (
         <>
-            <h1>Bar Chart</h1>
+            {/*<h1>Bar Chart</h1>*/}
+            <h1>{data.name}</h1>
             <BarChart
                 dataset={report}
-                xAxis={[{ scaleType: "band", dataKey: "label" }]}
-                series={[{ dataKey: "value" }]}
+                xAxis={[{scaleType: "band", dataKey: "label"}]}
+                series={[{dataKey: "value"}]}
                 height={height}
                 width={width}
             />
@@ -64,9 +67,10 @@ function ReportChart({ type, locked, data, height, width, handleSubmit }) {
 
     const LineChartCard = (
         <>
-            <h1>Line Chart</h1>
+            {/*<h1>Line Chart</h1>*/}
+            <h1>{graphName}</h1>
             <LineChart
-                xAxis={[{ data: report.map((v) => v.label), scaleType: "point" }]}
+                xAxis={[{data: report.map((v) => v.label), scaleType: "point"}]}
                 series={[
                     {
                         data: report.map((v) => v.value),
@@ -80,13 +84,14 @@ function ReportChart({ type, locked, data, height, width, handleSubmit }) {
 
     const ScatterChartCard = (
         <>
-            <h1>Scatter Chart</h1>
+            {/*<h1>Scatter Chart</h1>*/}
+            <h1>{graphName}</h1>
             <ScatterChart
                 height={height}
                 width={width}
                 series={[
                     {
-                        data: report.map((v) => ({ x: v.id, y: v.value, id: v.id })),
+                        data: report.map((v) => ({x: v.id, y: v.value, id: v.id})),
                     },
                 ]}
             />
@@ -95,11 +100,12 @@ function ReportChart({ type, locked, data, height, width, handleSubmit }) {
 
     const PieChartCard = (
         <>
-            <h1>Pie Chart</h1>
+            {/*<h1>Pie Chart</h1>*/}
+            <h1>{graphName}</h1>
             <PieChart
                 series={[
                     {
-                        data: report.map((v) => ({ id: v.id, value: v.value, label: v.label })),
+                        data: report.map((v) => ({id: v.id, value: v.value, label: v.label})),
                     },
                 ]}
                 height={height}
@@ -140,6 +146,7 @@ function ReportChart({ type, locked, data, height, width, handleSubmit }) {
             </Grid>
         </>
     );
+
     return (
         <div>
             <Container

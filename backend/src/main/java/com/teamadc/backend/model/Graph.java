@@ -12,6 +12,7 @@ public class Graph {
     private String end;
     private String start;
     private String type;
+    private String name;
 
     public Graph() {
         this.field = "category";
@@ -24,10 +25,11 @@ public class Graph {
         this.type = type;
     }
 
-    public Graph(String field, String type, String start, String end) {
+    public Graph(String field, String type, String start, String end, String name) {
         this.field = field;
         this.type = type;
         this.end = end;
         this.start = start;
+        this.name = name;
     }
 }
