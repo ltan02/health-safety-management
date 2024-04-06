@@ -237,7 +237,6 @@ export default function useForm() {
 
   const groupedByRows = (fields, cols) => {
     if(fields.length <= 0) return {};
-    console.log(fields);
     const newFields = fields.reduce((acc, field) => {
       const { y } = field.coordinate;
       if (!acc[y]) {

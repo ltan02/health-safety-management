@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Container, Box, Button, Input } from "@mui/material";
+import { Container, Box, Button, Input, CircularProgress } from "@mui/material";
 import {
     DndContext,
     PointerSensor,
@@ -25,7 +25,7 @@ import IncidentDetailModal from "./IncidentDetailModal";
 import useAutoScroll from "../../hooks/useAutoScroll";
 
 function Dashboard() {
-    const { filteredTasks, filterTasks, setFilteredTasks, fetchTasks } = useTasks();
+    const { filteredTasks, filterTasks, setFilteredTasks, fetchTasks, loading } = useTasks();
 
     const { forms, fetchForms, groupedByRows, sortedRows, activeForm } = useForm();
     const { activeId, handleDragStart, handleDragEnd } = useDragBehavior(filteredTasks, setFilteredTasks);
@@ -48,7 +48,6 @@ function Dashboard() {
     const containerRef = useRef(null);
 
     useAutoScroll(containerRef, Boolean(activeId));
-
     const activeTask = activeId
         ? Object.values(filteredTasks)
               .flat()
@@ -103,6 +102,11 @@ function Dashboard() {
         if (flatTasks) {
             flatTasks.map((task) => {
                 const newCommentData = initialCommentData;
+                //since we do not have comment edit logic, if the size of the comments array is the same, we do not need to push the comment data
+                //this prevent us from pushing the same comment data multiple times
+                if (task.comments.length === newCommentData[task.id]?.length) {
+                    return;
+                }
                 task.comments.map((comment) => {
                     if (!newCommentData[comment.id]) {
                         newCommentData[comment.id] = [];
@@ -174,10 +178,6 @@ function Dashboard() {
                         column.statusIds.includes(activeStateMap[item.toStateId].statusId),
                     );
 
-                    if (!toColumn) {
-                        return;
-                    }
-
                     if (!newMap[toColumn.id]) {
                         newMap[toColumn.id] = [];
                     }
@@ -231,13 +231,19 @@ function Dashboard() {
                 <div>
                     <Input variant="outlined" placeholder="Search..." onChange={(e) => filterTasks(e.target.value)} />
                 </div>
-                <Button
-                    variant="contained"
-                    onClick={toggleAddModal}
-                    style={{ display: "flex", justifyContent: "flex-end", fontWeight: "bold" }}
-                >
-                    Add Incident
-                </Button>
+                {!loading && (
+                    <Button
+                        variant="contained"
+                        onClick={toggleAddModal}
+                        style={{
+                            display: "flex",
+                            justifyContent: "flex-end",
+                            fontWeight: "bold",
+                        }}
+                    >
+                        Add Incident
+                    </Button>
+                )}
             </div>
             <DndContext
                 sensors={useSensors(
@@ -275,6 +281,7 @@ function Dashboard() {
                                 id={column.id}
                                 title={column.name}
                                 tasks={filteredTasks[column.id] || []}
+                                filteredTasks={filteredTasks}
                                 activeId={activeId}
                                 handleAddTask={handleAddTask}
                                 employees={employees}
@@ -283,10 +290,11 @@ function Dashboard() {
                                 sortedRows={handleSort}
                                 formName={activeForm?.name}
                                 commentData={commentData}
-                                setCommentData={setCommentData}
                                 columnMap={columnFlowMap[column.id]}
-                                setTasks={setFilteredTasks}
+                                setFilteredTasks={setFilteredTasks}
                                 handleOpenModal={handleOpenModal}
+                                loading={loading}
+                                sendRequest={sendRequest}
                             />
                         </Box>
                     ))}
@@ -316,6 +324,25 @@ function Dashboard() {
                     setCommentData={setCommentData}
                     setTasks={setFilteredTasks}
                 />
+            )}
+            {loading && (
+                <Box
+                    sx={{
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: "rgba(0, 0, 0, 0.5)",
+                        zIndex: 1500,
+                        pointerEvents: "none",
+                    }}
+                >
+                    <CircularProgress />
+                </Box>
             )}
         </Container>
     );

@@ -9,7 +9,7 @@ const modalStyle = {
     width: "auto",
     bgcolor: "background.paper",
     boxShadow: 24,
-    p: 4,
+    p: 7,
     borderRadius: 2,
     overflow: "auto",
     maxHeight: "90%",
@@ -32,9 +32,9 @@ function AddTaskModal({ open, onClose, handleAddTask, field, sortedRows, formNam
             aria-describedby="modal-modal-description"
         >
             <Box sx={modalStyle}>
-                <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ mb: 2 }}>
-                    Report New Incident
-                </Typography>
+                {/*<Typography id="modal-modal-title" variant="h6" component="h2" sx={{ mb: 2 }}>*/}
+                {/*    Report New Incident*/}
+                {/*</Typography>*/}
                 <PreviewForm
                     fields={field}
                     sortedRows={sortedRows}

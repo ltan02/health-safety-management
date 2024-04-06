@@ -10,16 +10,17 @@ export default function useTasks() {
     const { user } = useAuthContext();
     const { sendRequest } = useAxios();
     const { adminColumns, employeeColumns } = useBoard();
-
+    const [loading, setLoading] = useState(true);
     const fetchTasks = useCallback(async () => {
         let url = "/incidents";
         if (isPrivileged(user.role)) {
             url = "/incidents?all=true";
         }
-
+        setLoading(true);
         const incidents = await sendRequest({ url });
+        
 
-        const userIds = [...new Set(incidents.flatMap((incident) => [incident.reporter]))];
+        const userIds = [...new Set(incidents.flatMap((incident) => [incident?.reporter]))].filter(Boolean);
         const users = await Promise.all(userIds.map((id) => sendRequest({ url: `/users/${id}` })));
 
         const reviewerIds = [...new Set(incidents.flatMap((incident) => [incident?.reviewer]))].filter(Boolean); // filter(Boolean) removes null and undefined
@@ -70,6 +71,7 @@ export default function useTasks() {
 
         setTasks(newTasks);
         setFilteredTasks(newTasks);
+        setLoading(false);
     }, [adminColumns, employeeColumns]);
 
     useEffect(() => {
@@ -79,23 +81,31 @@ export default function useTasks() {
     const filterTasks = useCallback(
         (query) => {
             if (!query) return setFilteredTasks(tasks);
-
+    
             const lowerCaseQuery = query.toLowerCase();
             const filtered = Object.keys(tasks).reduce((acc, status) => {
                 acc[status] = tasks[status].filter((task) => {
-                    if (task.customFields?.description) {
-                        return task.customFields?.description?.toLowerCase().includes(lowerCaseQuery);
-                    } else {
-                        return task.incidentCategory.toLowerCase().includes(lowerCaseQuery);
+                    // Check if the description includes the query
+                    if (task.customFields?.description?.toLowerCase().includes(lowerCaseQuery)) {
+                        return true;
                     }
+                    // Check if the category includes the query
+                    if (task.incidentCategory?.toLowerCase().includes(lowerCaseQuery)) {
+                        return true;
+                    }
+                    // Check if the date includes the query (assuming date is in a format that can be converted to a string)
+                    if (task.incidentDate?.toLowerCase().includes(lowerCaseQuery)) {
+                        return true;
+                    }
+                    // If none of the above conditions are met, exclude the task
+                    return false;
                 });
                 return acc;
             }, {});
-
+    
             setFilteredTasks(filtered);
         },
         [tasks],
     );
-
-    return { tasks, filteredTasks, filterTasks, setTasks, fetchTasks, setFilteredTasks };
+    return { tasks, filteredTasks, filterTasks, setTasks, fetchTasks, setFilteredTasks, loading };
 }

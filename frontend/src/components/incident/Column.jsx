@@ -33,6 +33,9 @@ function Column({
     formName,
     columnMap,
     handleOpenModal,
+    employees,
+    onRefresh,
+    setFilteredTasks,
 }) {
     const [openModal, setOpenModal] = useState(false);
 
@@ -42,6 +45,21 @@ function Column({
     };
     const onClose = () => {
         setOpenModal(false);
+    };
+
+    const handleIncidentUpdateFromTask = (task, colId) => {
+        const updatedTasks = tasks.map((t) => {
+            if (t.id === task.id) {
+                return task;
+            }
+            return t;
+        });
+        setFilteredTasks((prev) => {
+            return {
+                ...prev,
+                [colId]: updatedTasks,
+            };
+        });
     };
 
     return (
@@ -73,7 +91,15 @@ function Column({
                 <SortableContext id={id} items={tasks.map((task) => task.id)} strategy={rectSortingStrategy}>
                     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                         {tasks.map((task) => (
-                            <Task key={task.id} task={task} handleOpenModal={handleOpenModal} />
+                            <Task
+                                key={task.id}
+                                task={task}
+                                handleOpenModal={handleOpenModal}
+                                employees={employees}
+                                onRefresh={onRefresh}
+                                handleIncidentUpdateFromTask={handleIncidentUpdateFromTask}
+                                columnId={id}
+                            />
                         ))}
                     </Box>
                 </SortableContext>
@@ -111,8 +137,7 @@ function Column({
                         >
                             <DoNotDisturbIcon />
                             <p style={{ fontSize: 12, marginTop: 5 }}>
-                                You can&apos;t move this incident to this column due to workflow configuration or
-                                permission.
+                                You can&apos;t move this incident to this column due to workflow configuration.
                             </p>
                         </Box>
                     )}

@@ -22,6 +22,7 @@ function PreviewForm({
     height: formHeight ? formHeight + "vh" : "80vh",
     width: "80vh",
     overflow: "auto",
+    border: "solid 2px #7D7D7D"
   };
 
   const handleChange = (event, field) => {
@@ -47,7 +48,7 @@ function PreviewForm({
     }
   };
 
-  
+
   const onCategorySearch = async () => {
     const res = await sendAIRequest({
       url: "/categorize/",
@@ -127,7 +128,6 @@ function PreviewForm({
         ...prevData,
         [fieldData.props.name]: res.response,
       }));
-      console.log("AI response:", res);
     } catch (error) {
       console.error("Error filling field based on prompt:", error);
     }
@@ -136,17 +136,34 @@ function PreviewForm({
     setFilledRequired(isRequiredFieldFilled());
   }, [fieldsData]);
 
+  useEffect(() => {
+    const dateFields = fields.filter(
+      (field) => field.type === FIELD_TYPES.DATETIME_LOCAL
+    );
+    setFieldsData((prevData) => {
+      const newData = { ...prevData };
+      dateFields.forEach((field) => {
+        if (field.props.name in prevData) {
+          return;
+        }
+        newData[field.props.name] = new Date().toISOString().slice(0, 16);
+      });
+      return newData;
+    });
+  }, []);
+
   return (
     <Container style={formHeightStyle}>
-      <Typography
-        variant="h4"
-        align="left"
-        fontWeight={500}
-        sx={{ marginTop: 5 }}
-      >
-        {formName}
-      </Typography>
-      <Divider sx={{ my: 2 }} color="primary" />
+      <Container sx={{ width: "100%", bgcolor:"#EB8C00", alignItems: "center",}}>
+        <Typography
+          variant="h5"
+          align="left"
+          fontWeight={600}
+          sx={{ marginTop: 2, textAlign: "center", p: 1}}
+        >
+          {formName}
+        </Typography>
+      </Container>
       <form onSubmit={pushSubmitButton}>
         <Grid container alignItems="top">
           {sortedRows().map((row, rowIndex) => (
@@ -228,12 +245,12 @@ function PreviewForm({
             sx={{ mt: 3, position: "fixed", bottom: "10px", right: "10px" }}
             disabled={!filledRequired}
           >
-            Submit
+            Generate
           </Button>
           <Button
             variant="contained"
             color="secondary"
-            sx={{ mt: 3, position: "fixed", bottom: "10px", right: "100px" }}
+            sx={{ mt: 3, position: "fixed", bottom: "10px", right: "115px" }}
             onClick={pushCloseButton}
           >
             Cancel

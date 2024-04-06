@@ -11,8 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -104,6 +102,12 @@ public class IncidentService {
     public Incident removeReviewer(String incidentId) throws InterruptedException, ExecutionException {
         Incident incident = incidentRepository.findById(incidentId);
         incident.setReviewer(null);
+        return updateModifiedAt(incident);
+    }
+
+    public Incident updateDate (String incidentId, String date) throws InterruptedException, ExecutionException {
+        Incident incident = incidentRepository.findById(incidentId);
+        incident.setIncidentDate(date);
         return updateModifiedAt(incident);
     }
     

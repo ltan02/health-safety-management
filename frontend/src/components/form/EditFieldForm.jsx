@@ -134,10 +134,10 @@ function EditFieldForm({
   };
 
   return (
-    <Container style={{ height: "80vh", width: "80vh", overflow: "auto" }}>
+    <Container style={{ height: "80vh", width: "80vh", overflow: "auto", border: "solid 2px #7D7D7D"}}>
       {isEdited && (
-        <Container sx={{ position: "fixed", top: 10, right: 10 }}>
-          <Box sx={{ display: "flex", justifyContent: "end" }}>
+        <Container sx={{ position: "fixed", bottom: "10px", right: "10px"}}>
+          <Box sx={{ display: "flex", justifyContent: "end", gap: 2 }}>
             <Button onClick={handleClose} variant="contained" color="secondary">
               Cancel
             </Button>
@@ -155,11 +155,11 @@ function EditFieldForm({
       <TextField
         onChange={(e) => handleFormNameChange(e.target.value)}
         variant="standard"
+        textAlign={'center'}
         defaultValue={currentFormName}
-        InputProps={{ style: { fontSize: 36 } }}
-        sx={{ marginTop: 5 }}
+        InputProps={{ style: { fontSize: 28, fontWeight:600} }}
+        sx={{ marginTop: 1,  width: "100%", p: 2}}
       />
-      <Divider sx={{ my: 2 }} color="primary" />
       <form onSubmit={(e) => e.preventDefault()}>
         <DndContext
           sensors={sensors}

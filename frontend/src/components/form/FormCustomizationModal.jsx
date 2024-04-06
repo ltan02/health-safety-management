@@ -31,7 +31,7 @@ function FormCustomizationModal({
           bgcolor: "background.paper",
           boxShadow: 24,
           p: 4,
-          borderRadius: 2,
+          borderRadius: 2, paddingBottom: 7
         }}
       >
         <Paper elevation={0}>

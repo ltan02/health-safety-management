@@ -239,6 +239,16 @@ public class IncidentController {
         }
     }
 
+    @PutMapping("/{incidentId}/date")
+    public ResponseEntity<Incident> updateDate(@PathVariable String incidentId, @RequestBody IncidentRequest request) {
+        try {
+            Incident incident = incidentService.updateDate(incidentId, request.getIncidentDate());
+            return ResponseEntity.ok(incident);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     @PutMapping("/{incidentId}/employees_involved")
     public ResponseEntity<Incident> updateEmployeesInvolved(@PathVariable String incidentId, @RequestBody IncidentRequest request) {
         try {
