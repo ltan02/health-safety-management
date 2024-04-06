@@ -4,7 +4,7 @@ import Avatar from "@mui/material/Avatar";
 
 export default function CommentSection({ commentData = [], incidentId }) {
   const containerRef = useRef(null);
-  // const [isOverflow, setIsOverflow] = useState(false);
+  const [isOverflow, setIsOverflow] = useState(false);
   const [scrollIndicatorOpacity, setScrollIndicatorOpacity] = useState(1);
   const sortComments = (comments) => {
     if (!comments) return [];
@@ -59,7 +59,7 @@ export default function CommentSection({ commentData = [], incidentId }) {
         maxHeight: "300px",
         position: "relative",
         "&::after": {
-          // content: isOverflow ? '"Scroll for more ↓"' : '""',
+          content: isOverflow ? '"Scroll for more ↓"' : '""',
           position: "absolute",
           bottom: 0,
           right: 0,
