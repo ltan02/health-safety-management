@@ -174,6 +174,10 @@ function Dashboard() {
                         column.statusIds.includes(activeStateMap[item.toStateId].statusId),
                     );
 
+                    if (!toColumn) {
+                        return;
+                    }
+
                     if (!newMap[toColumn.id]) {
                         newMap[toColumn.id] = [];
                     }

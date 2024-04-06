@@ -111,7 +111,8 @@ function Column({
                         >
                             <DoNotDisturbIcon />
                             <p style={{ fontSize: 12, marginTop: 5 }}>
-                                You can&apos;t move this incident to this column due to workflow configuration.
+                                You can&apos;t move this incident to this column due to workflow configuration or
+                                permission.
                             </p>
                         </Box>
                     )}
