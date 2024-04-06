@@ -136,7 +136,7 @@ function IncidentReport() {
             </Typography>
             <div style={{ marginRight: "3rem", marginLeft: "3rem" }}>
                 <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                    <Button
+                    {!loading && (<Button
                         variant="contained"
                         onClick={toggleAddModal}
                         style={{
@@ -147,7 +147,7 @@ function IncidentReport() {
                         }}
                     >
                         Add Incident
-                    </Button>
+                    </Button>)}
                 </div>
                 {loading && (
                     <Box
@@ -162,6 +162,7 @@ function IncidentReport() {
                             justifyContent: "center",
                             backgroundColor: "rgba(0, 0, 0, 0.5)",
                             zIndex: 1500,
+                            pointerEvents: "none",
                         }}
                     >
                         <CircularProgress />

@@ -256,7 +256,7 @@ function Dashboard() {
             onChange={(e) => filterTasks(e.target.value)}
           />
         </div>
-        <Button
+        {!loading && (<Button
           variant="contained"
           onClick={toggleAddModal}
           style={{
@@ -266,7 +266,7 @@ function Dashboard() {
           }}
         >
           Add Incident
-        </Button>
+        </Button>)}
       </div>
       <DndContext
         sensors={useSensors(
@@ -361,6 +361,7 @@ function Dashboard() {
                             justifyContent: "center",
                             backgroundColor: "rgba(0, 0, 0, 0.5)",
                             zIndex: 1500,
+                            pointerEvents: "none",
                         }}
                     >
                         <CircularProgress />
