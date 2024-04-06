@@ -16,13 +16,16 @@ import re
 load_dotenv()
 google_credentials_json = os.getenv("GOOGLE_CREDENTIALS_JSON")
 
-
-parsed_credentials = json.loads(google_credentials_json)
-credentials = service_account.Credentials.from_service_account_info(parsed_credentials)
-aiplatform.init(project="pwc-project-b3778", location="us-west1", credentials=credentials)
-db = firestore.Client(credentials=credentials)
-client = bigquery.Client(credentials=credentials)
-
+if google_credentials_json:
+    parsed_credentials = json.loads(google_credentials_json)
+    credentials = service_account.Credentials.from_service_account_info(parsed_credentials)
+    db = firestore.Client(credentials=credentials)
+    aiplatform.init(project="pwc-project-b3778", location="us-west1", credentials=credentials)
+    client = bigquery.Client(credentials=credentials)
+else:
+    db = firestore.Client()
+    aiplatform.init(project="pwc-project-b3778", location="us-west1")
+    client = bigquery.Client()
 
 app = FastAPI()
 doc_ref = db.collection('categories').document('categories')
