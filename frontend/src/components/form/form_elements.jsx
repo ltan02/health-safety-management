@@ -1,21 +1,23 @@
 import React from "react";
 import {
-  FormControl,
-  TextField,
-  Typography,
-  Select,
-  MenuItem,
-  Chip,
-  Box,
-  Tooltip,
-  Button,
+    FormControl,
+    TextField,
+    Typography,
+    Select,
+    MenuItem,
+    Chip,
+    Box,
+    Tooltip,
+    Button, IconButton,
 } from "@mui/material";
 
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import styled from "@emotion/styled";
 
 import { useDropzone } from "react-dropzone";
 import { FIELD_TYPES, VARIANT_TYPES } from "./form_data";
 import SmartToyIcon from "@mui/icons-material/SmartToy";
+import InfoIcon from "@mui/icons-material/Info";
 
 const FileDropzone = (props) => {
   const { getRootProps, getInputProps } = useDropzone({
@@ -63,11 +65,18 @@ export const FIELD_ELEMENT = {
     ...props
   }) => (
     <FormControl fullWidth {...props}>
+        <Box sx = {{display: "flex", alignItems: "center"}}>
       <Typography fontWeight={600} variant={VARIANT_TYPES.LABEL}>
         {label}
         {required ? "*" : ""}
       </Typography>
-      <Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>
+            {(description.length>0)? <Tooltip title={description}>
+                <IconButton sx={{color: "#FFB600", fontSize: "small"}}>
+                    <InfoOutlinedIcon />
+                </IconButton>
+            </Tooltip>:<></>}
+        </Box>
+      {/*<Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>*/}
       <TextField
         onChange={onChange}
         name={name}
@@ -77,6 +86,7 @@ export const FIELD_ELEMENT = {
         rows={rows}
         variant={VARIANT_TYPES.STANDARD}
         disabled={props.disabled}
+        InputProps={{ sx: { backgroundColor: "rgba(211, 211, 211, 0.5)", color: "black", p: 1 } }}
       />
     </FormControl>
   ),
@@ -90,11 +100,18 @@ export const FIELD_ELEMENT = {
     ...props
   }) => (
     <FormControl fullWidth {...props}>
+        <Box sx = {{display: "flex", alignItems: "center"}}>
       <Typography fontWeight={600} variant={VARIANT_TYPES.LABEL}>
         {label}
         {required ? "*" : ""}
       </Typography>
-      <Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>
+            {(description.length>0)? <Tooltip title={description}>
+                <IconButton sx={{color: "#FFB600", fontSize: "small"}}>
+                    <InfoOutlinedIcon />
+                </IconButton>
+            </Tooltip>:<></>}
+        </Box>
+      {/*<Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>*/}
       <TextField
         {...props}
         type="number"
@@ -103,6 +120,7 @@ export const FIELD_ELEMENT = {
         onChange={onChange}
         variant={VARIANT_TYPES.STANDARD}
         disabled={props.disabled}
+        InputProps={{ sx: { backgroundColor: "rgba(211, 211, 211, 0.5)", color: "black", p: 1 } }}
       />
     </FormControl>
   ),
@@ -116,11 +134,18 @@ export const FIELD_ELEMENT = {
     ...props
   }) => (
     <FormControl fullWidth {...props}>
+        <Box sx = {{display: "flex", alignItems: "center"}}>
       <Typography fontWeight={600} variant={VARIANT_TYPES.LABEL}>
         {label}
         {required ? "*" : ""}
       </Typography>
-      <Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>
+            {(description.length>0)? <Tooltip title={description}>
+            <IconButton sx={{color: "#FFB600", fontSize: "small"}}>
+                <InfoOutlinedIcon />
+            </IconButton>
+        </Tooltip>:<></>}
+        </Box>
+      {/*<Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>*/}
       <TextField
         {...props}
         type="datetime-local"
@@ -131,7 +156,7 @@ export const FIELD_ELEMENT = {
         disabled={props.disabled}
         style={{
           paddingLeft: 0,
-          marginTop: 35,
+          marginTop: 5
         }}
       />
     </FormControl>
@@ -153,13 +178,20 @@ export const FIELD_ELEMENT = {
       variant={VARIANT_TYPES.STANDARD}
       margin="normal"
     >
+        <Box sx = {{display: "flex", alignItems: "center"}}>
       <Typography fontWeight={600} variant={VARIANT_TYPES.LABEL} gutterBottom>
         {label}
         {required ? "*" : ""}
       </Typography>
-      <Typography variant={VARIANT_TYPES.BODY} gutterBottom>
-        {description}
-      </Typography>
+            {(description.length>0)? <Tooltip title={description}>
+                <IconButton sx={{color: "#FFB600", fontSize: "small"}}>
+                    <InfoOutlinedIcon />
+                </IconButton>
+            </Tooltip>:<></>}
+        </Box>
+      {/*<Typography variant={VARIANT_TYPES.BODY} gutterBottom>*/}
+      {/*  {description}*/}
+      {/*</Typography>*/}
       <Select
         labelId="multi-select-label"
         name={name}
@@ -215,11 +247,18 @@ export const FIELD_ELEMENT = {
       variant={VARIANT_TYPES.STANDARD}
       margin="normal"
     >
+        <Box sx = {{display: "flex", alignItems: "center"}}>
       <Typography fontWeight={600} variant={VARIANT_TYPES.LABEL}>
         {label}
         {required ? "*" : ""}
       </Typography>
-      <Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>
+            {(description.length>0)? <Tooltip title={description}>
+                <IconButton sx={{color: "#FFB600", fontSize: "small"}}>
+                    <InfoOutlinedIcon />
+                </IconButton>
+            </Tooltip>:<></>}
+        </Box>
+      {/*<Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>*/}
       <Select
         labelId="single-select-label"
         value={value}
@@ -249,11 +288,18 @@ export const FIELD_ELEMENT = {
     ...props
   }) => (
     <FormControl fullWidth {...props}>
+        <Box sx = {{display: "flex", alignItems: "center"}}>
       <Typography fontWeight={600} variant={VARIANT_TYPES.LABEL}>
         {label}
         {"*"}
       </Typography>
-      <Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>
+            {(description.length>0)? <Tooltip title={description}>
+                <IconButton sx={{color: "#FFB600", fontSize: "small"}}>
+                    <InfoOutlinedIcon />
+                </IconButton>
+            </Tooltip>:<></>}
+        </Box>
+      {/*<Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>*/}
       <TextField
         onChange={onChange}
         name={name}
@@ -263,6 +309,7 @@ export const FIELD_ELEMENT = {
         rows={rows}
         variant={VARIANT_TYPES.STANDARD}
         disabled={props.disabled}
+        InputProps={{ sx: { backgroundColor: "rgba(211, 211, 211, 0.5)", color: "black", p: 1 } }}
       />
     </FormControl>
   ),
@@ -281,9 +328,7 @@ export const FIELD_ELEMENT = {
         {...props}
         sx={{
           padding: "16px",
-          border: "1px solid #E0E0E0",
           borderRadius: "8px",
-          boxShadow: "0px 2px 4px rgba(0,0,0,0.1)",
         }}
       >
         <Typography
@@ -294,7 +339,8 @@ export const FIELD_ELEMENT = {
           {label}*
         </Typography>
         <Typography variant={VARIANT_TYPES.BODY} sx={{ marginBottom: "16px" }}>
-          {description}
+            AI categorizes incident types, such as workplace injuries or equipment failures, using the incident
+            descriptions provided by users
         </Typography>
         <Box
           sx={{
@@ -316,7 +362,6 @@ export const FIELD_ELEMENT = {
               flexGrow: 1,
             }}
           >
-            <SmartToyIcon color="primary" />
             {loading?.toString() === "false" ? (
               <Tooltip title="AI Selected Category" placement="top">
                 <Typography
@@ -325,13 +370,21 @@ export const FIELD_ELEMENT = {
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
+                    py: 2,
                   }}
+                  fontWeight={600}
                 >
                   {value}
                 </Typography>
               </Tooltip>
             ) : (
-              <Typography variant={VARIANT_TYPES.BODY}>Loading...</Typography>
+              <Typography
+                sx={{ py: 2 }}
+                variant={VARIANT_TYPES.BODY}
+                fontWeight={600}
+              >
+                Loading...
+              </Typography>
             )}
           </Box>
           <Tooltip title="Search and Select Category by AI" placement="top">
@@ -363,25 +416,40 @@ export const FIELD_ELEMENT = {
     ...props
   }) => (
     <FormControl fullWidth {...props}>
+        <Box sx = {{display: "flex", alignItems: "center"}}>
       <Typography fontWeight={600} variant={VARIANT_TYPES.LABEL}>
         {label}
         {required ? "*" : ""}
       </Typography>
-      <Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>
+            {(description.length>0)? <Tooltip title={description}>
+                <IconButton sx={{color: "#FFB600", fontSize: "small"}}>
+                    <InfoOutlinedIcon />
+                </IconButton>
+            </Tooltip>:<></>}
+        </Box>
+      {/*<Typography variant={VARIANT_TYPES.BODY}>{description}</Typography>*/}
       <Tooltip title={`Prompt: "${value.prompt}"`}>
         <TextField
           // onChange={onChange}
           name={name}
           required={required}
-          placeholder={`The AI will generate the text for you base on "${value.referenceField.name}"`}
+          placeholder={`The AI will generate the text for you base on "${value.referenceField
+            .map((referenceId) => referenceId.name)
+            .join(", ")}"`}
           multiline
           value={value.generated}
           rows={rows}
           variant={VARIANT_TYPES.OUTLINED}
           disabled
+          InputProps={{ sx: { backgroundColor: "rgba(211, 211, 211, 0.5)", color: "black", p: 1 } }}
         />
       </Tooltip>
-      <Button variant="contained" color="primary" sx={{ mt: 1 }} onClick={onClick}>
+      <Button
+        variant="contained"
+        color="primary"
+        sx={{ mt: 1 }}
+        onClick={onClick}
+      >
         Generate
       </Button>
     </FormControl>

@@ -11,6 +11,7 @@ function PreviewForm({
   onClose,
   formName,
   formHeight,
+  disableSubmit,
 }) {
   const [fieldsData, setFieldsData] = useState({});
   const { sendAIRequest, aiLoading } = useAxios();
@@ -21,6 +22,7 @@ function PreviewForm({
     height: formHeight ? formHeight + "vh" : "80vh",
     width: "80vh",
     overflow: "auto",
+    border: "solid 2px #7D7D7D"
   };
 
   const handleChange = (event, field) => {
@@ -45,6 +47,7 @@ function PreviewForm({
       }));
     }
   };
+
 
   const onCategorySearch = async () => {
     const res = await sendAIRequest({
@@ -103,7 +106,7 @@ function PreviewForm({
   };
 
   const findFieldDetails = (fieldId) => {
-    return fields.find((field) => field.id === fieldId);
+    return fields.filter((field) => fieldId.includes(field.id));
   };
 
   const fillFieldBaseOnPrompt = async (fieldData, referenceField) => {
@@ -113,17 +116,18 @@ function PreviewForm({
         method: "POST",
         body: {
           prompt:
-            " **THE RESPONSE WILL BE PLANE TEXT. DO NOT WRITE IN MARKDOWN. DO NOT BE REPETITIVE* " +
+            "THE RESPONSE WILL BE PLANE TEXT. DO NOT WRITE IN MARKDOWN. DO NOT BE REPETITIVE" +
             fieldData.aiField.prompt +
-            ". GENERATE THE RESPONSE BASE ON: '" +
-            fieldsData[referenceField.props.name],
+            ". GENERATE THE RESPONSE BASE ON: " +
+            referenceField.map((field) => "[" + fieldsData[field.props.name]) +
+            "], " +
+            "'",
         },
       });
       setFieldsData((prevData) => ({
         ...prevData,
         [fieldData.props.name]: res.response,
       }));
-      // console.log("AI response:", res);
     } catch (error) {
       console.error("Error filling field based on prompt:", error);
     }
@@ -132,17 +136,34 @@ function PreviewForm({
     setFilledRequired(isRequiredFieldFilled());
   }, [fieldsData]);
 
+  useEffect(() => {
+    const dateFields = fields.filter(
+      (field) => field.type === FIELD_TYPES.DATETIME_LOCAL
+    );
+    setFieldsData((prevData) => {
+      const newData = { ...prevData };
+      dateFields.forEach((field) => {
+        if (field.props.name in prevData) {
+          return;
+        }
+        newData[field.props.name] = new Date().toISOString().slice(0, 16);
+      });
+      return newData;
+    });
+  }, []);
+
   return (
     <Container style={formHeightStyle}>
-      <Typography
-        variant="h4"
-        align="left"
-        fontWeight={500}
-        sx={{ marginTop: 5 }}
-      >
-        {formName}
-      </Typography>
-      <Divider sx={{ my: 2 }} color="primary" />
+      <Container sx={{ width: "100%", bgcolor:"#EB8C00", alignItems: "center",}}>
+        <Typography
+          variant="h5"
+          align="left"
+          fontWeight={600}
+          sx={{ marginTop: 2, textAlign: "center", p: 1}}
+        >
+          {formName}
+        </Typography>
+      </Container>
       <form onSubmit={pushSubmitButton}>
         <Grid container alignItems="top">
           {sortedRows().map((row, rowIndex) => (
@@ -151,7 +172,7 @@ function PreviewForm({
                 const FieldComponent = FIELD_ELEMENT[fieldData.type];
                 if (!FieldComponent) {
                   console.error("Missing FieldComponent:", fieldData);
-                  return null;
+                  return <></>;
                 }
                 return (
                   <Grid
@@ -184,7 +205,7 @@ function PreviewForm({
                                 prompt: fieldData.aiField.prompt,
                                 generated: fieldsData[fieldData.props.name]
                                   ? fieldsData[fieldData.props.name]
-                                  : "AI generated text will appear here",
+                                  : "",
                               }
                             : fieldsData[fieldData.props.name]
                         }
@@ -211,7 +232,12 @@ function PreviewForm({
             </Grid>
           ))}
         </Grid>
-        <Grid container spacing={2} alignItems="top">
+        <Grid
+          container
+          spacing={2}
+          alignItems="top"
+          display={disableSubmit ? "none" : "flex"}
+        >
           <Button
             type="submit"
             variant="contained"
@@ -219,12 +245,12 @@ function PreviewForm({
             sx={{ mt: 3, position: "fixed", bottom: "10px", right: "10px" }}
             disabled={!filledRequired}
           >
-            Submit
+            Generate
           </Button>
           <Button
             variant="contained"
             color="secondary"
-            sx={{ mt: 3, position: "fixed", bottom: "10px", right: "100px" }}
+            sx={{ mt: 3, position: "fixed", bottom: "10px", right: "115px" }}
             onClick={pushCloseButton}
           >
             Cancel

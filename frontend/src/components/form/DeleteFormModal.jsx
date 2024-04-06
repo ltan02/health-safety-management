@@ -71,6 +71,7 @@ export default function DeleteFormModal({
             sortedRows={() => sortedRows(groupedByRows(form.fields))}
             formName={form.name}
             formHeight={50}
+            disableSubmit={true}
           />
         </Box>
         <Typography variant="subtitle1" color="textSecondary">

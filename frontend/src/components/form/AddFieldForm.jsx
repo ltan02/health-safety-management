@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import {
-  Button,
-  Modal,
-  Box,
-  TextField,
-  Select,
-  MenuItem,
-  Typography,
-  Container,
-  Grid,
-  FormControl,
-  IconButton,
+    Button,
+    Modal,
+    Box,
+    TextField,
+    Select,
+    MenuItem,
+    Typography,
+    Container,
+    Grid,
+    FormControl,
+    IconButton, Tooltip
 } from "@mui/material";
 import { FIELD_DATA, FIELD_TYPES, VARIANT_TYPES } from "./form_data";
 import { CircularProgress } from "@mui/material";
@@ -18,6 +18,7 @@ import { CircularProgress } from "@mui/material";
 import { FIELD_ADD_FORM } from "./add_elements";
 import { set } from "lodash";
 import CloseIcon from "@mui/icons-material/Close";
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 function AddFieldForm({ handleAddNewField, getLastCoordinate, currentFields }) {
   const [fieldType, setFieldType] = useState([]);
@@ -27,7 +28,7 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate, currentFields }) {
   const [options, setOptions] = useState([]);
   const [required, setRequired] = useState(true);
   const [select, setSelect] = useState("text");
-  const [referenceField, setReferenceField] = useState("");
+  const [referenceField, setReferenceField] = useState([]);
   const [prompt, setPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isStatusModalOpen, setStatusModalOpen] = useState(false);
@@ -69,8 +70,7 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate, currentFields }) {
       const newField = {
         name: fieldTitle,
         type: select,
-        isAi:
-          select === FIELD_TYPES.AI_TEXT || select === FIELD_TYPES.AI_NUMBER,
+        isAi: select === FIELD_TYPES.AI_TEXT,
         aiField: {
           referenceId: referenceField,
           prompt: prompt,
@@ -99,7 +99,7 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate, currentFields }) {
   };
 
   return (
-    <Container style={{ height: "80vh", width: "80vh", overflow: "auto" }}>
+    <Container style={{ height: "80vh", width: "80vh", overflow: "auto", border: "solid 2px #7D7D7D"}}>
       <Typography variant="h6" fontWeight={600} align="left" sx={{ my: 5 }}>
         Select Field Type
       </Typography>
@@ -195,7 +195,12 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate, currentFields }) {
               onOptionChange: (option) => setOptions(option),
               onRequiredChange: (e) => setRequired(e.target.value),
               onPlaceHolderChange: (e) => setPlaceholder(e.target.value),
-              onReferenceFieldChange: (fieldId) => setReferenceField(fieldId),
+              onReferenceFieldChange: (e) =>
+                setReferenceField(
+                  typeof e.target.value === "string"
+                    ? e.target.value.split(",")
+                    : e.target.value
+                ),
               onPromptChange: (e) => setPrompt(e.target.value),
               currentFields: currentFields,
               initialDescription: fieldDescription,
@@ -204,6 +209,7 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate, currentFields }) {
               initialRequired: required,
               initialPlaceholder: placeholder,
               initialPrompt: prompt,
+              initialReferenceField: referenceField,
             })}
           </>
         ) : (
@@ -228,12 +234,19 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate, currentFields }) {
             marginTop={2}
           >
             <FormControl fullWidth>
+                <Box sx = {{display: "flex", alignItems: "center"}}>
               <Typography variant={VARIANT_TYPES.LABEL} fontWeight={600}>
                 {fieldTitle} {required ? "*" : ""}
               </Typography>
-              <Typography variant={VARIANT_TYPES.BODY}>
-                {fieldDescription}
-              </Typography>
+                    {(fieldDescription.length>0)? <Tooltip title={fieldDescription}>
+                        <IconButton sx={{color: "#FFB600", fontSize: "small"}}>
+                            <InfoOutlinedIcon />
+                        </IconButton>
+                    </Tooltip>:<></>}
+                </Box>
+              {/*<Typography variant={VARIANT_TYPES.BODY}>*/}
+              {/*  {fieldDescription}*/}
+              {/*</Typography>*/}
               {select === FIELD_TYPES.SELECTION_SINGLE ||
               select === FIELD_TYPES.SELECTION_MULTI ? (
                 <Select value={""} required={required}>
@@ -298,15 +311,17 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate, currentFields }) {
           </Box>
         )}
       </Container>
+        <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
       <Button
         onClick={handleSubmit}
         variant="contained"
         color="primary"
-        sx={{ mt: 3 }}
+        sx={{ mt: 1, marginBottom: 3}}
         disabled={isLoading}
       >
         {isLoading ? <CircularProgress size={24} /> : "Create"}
       </Button>
+        </Box>
     </Container>
   );
 }

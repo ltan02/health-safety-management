@@ -9,6 +9,9 @@ import com.teamadc.backend.model.Incident;
 import com.teamadc.backend.model.StatusHistory;
 import com.teamadc.backend.service.CommentService;
 import com.teamadc.backend.service.IncidentService;
+import com.teamadc.backend.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -26,11 +29,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 
 @RestController
+@CrossOrigin
 @RequestMapping("/incidents")
 public class IncidentController {
 
     private final IncidentService incidentService;
     private final CommentService commentService;
+
+    private static final Logger logger = LoggerFactory.getLogger(IncidentController.class);
 
     @Autowired
     public IncidentController(IncidentService incidentService, CommentService commentService) {
@@ -215,7 +221,7 @@ public class IncidentController {
     @PostMapping("/{incidentId}/reporter/{reporterId}")
     public ResponseEntity<Incident> updateReporter(@PathVariable String incidentId, @PathVariable String reporterId) {
         try {
-            System.out.println("Updating reporter");
+            logger.debug("Updating reporter for incident " + incidentId + " to " + reporterId);
             Incident incident = incidentService.updateReporter(incidentId, reporterId);
             return ResponseEntity.ok(incident);
         } catch (InterruptedException | ExecutionException e) {
@@ -227,6 +233,16 @@ public class IncidentController {
     public ResponseEntity<Incident> updateCategory(@PathVariable String incidentId, @RequestBody IncidentRequest request) {
         try {
             Incident incident = incidentService.updateCategory(incidentId, request.getIncidentCategory());
+            return ResponseEntity.ok(incident);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PutMapping("/{incidentId}/date")
+    public ResponseEntity<Incident> updateDate(@PathVariable String incidentId, @RequestBody IncidentRequest request) {
+        try {
+            Incident incident = incidentService.updateDate(incidentId, request.getIncidentDate());
             return ResponseEntity.ok(incident);
         } catch (InterruptedException | ExecutionException e) {
             return ResponseEntity.internalServerError().build();

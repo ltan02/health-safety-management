@@ -25,6 +25,7 @@ import AddFormModal from "../../../components/form/AddFormModal";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteFormModal from "../../../components/form/DeleteFormModal";
 import ActivateFormModal from "../../../components/form/ActivateFormModal";
+import useAxios from "../../../hooks/useAxios";
 
 function AdminForm() {
   const {
@@ -42,7 +43,10 @@ function AdminForm() {
     createNewForm,
     deleteForm,
     toggleForm,
+    updateForm
   } = useForm();
+
+  const { sendAIRequest } = useAxios();
   const [fields, setFields] = useState({});
   const [selectingForm, setSelectingForm] = useState({});
 
@@ -101,9 +105,96 @@ function AdminForm() {
     await fetchForms();
   };
 
-  const handleCreateForm = async (form) => {
-    await createNewForm(form);
-    await fetchForms();
+  const handleCreateForm = async (form, isAiChecked) => {
+    try {
+    const newForm = await createNewForm(form);
+    if (isAiChecked) {
+
+      const newFields = await generateFields(0, newForm);
+      if(newFields.length === 0){
+        return;
+      }
+      
+      let x = 0;
+      let y = 2;
+      newFields.forEach((field, index) => {
+        newFields[index]["coordinate"] = {
+          x: x,
+          y: y,
+        };
+        if(x === 0){
+          x = 1;
+        } else {
+          x = 0;
+          y++;
+        }
+      })
+
+      newForm.fields = [...newForm.fields, ...newFields]
+      await updateForm(newForm)
+    } 
+    } catch (error) {
+      console.error("Error creating new form:", error);
+    } finally {
+      await fetchForms();
+    }
+  };
+
+  const generateFields = async (count=0, form) => {
+    if(count > 3) {
+      return [];
+    }
+    try{
+      const newField =
+        '\n\n{\n  "fields": [\n    {\n      "name": null,\n      "type": "description",\n      "props": {\n        "label": "Description of the incident",\n        "name": "description",\n        "required": false,\n        "description": "A brief summary outlining the key events and outcomes of the incident.",\n        "options": null\n      }\n    },\n    {\n      "name": null,\n      "type": "datetime-local",\n      "props": {\n        "label": "Time Of Incident",\n        "name": "incidentDate",\n        "required": true,\n        "description": "The precise date and time when the incident took place, in YYYY/MM/DD HH:MM format.",\n        "options": null\n      }\n    },\n    \n    {\n      "name": null,\n      "type": "text-box",\n      "props": {\n        "label": "Actions Taken",\n        "name": "actions_taken",\n        "required": false,\n        "placeholder": "First aid was applied etc.",\n        "description": "Immediate response actions taken following the incident, including first aid or emergency services contacted.",\n        "options": null\n      }\n    },\n    {\n      "name": "Preventive Measures",\n      "type": "text-box",\n      "props": {\n        "label": "Preventive Measures",\n        "name": "preventive_measures",\n        "required": true,\n        "description": "Proposed steps and strategies to prevent similar incidents in the future.",\n        "options": []\n      }\n    },\n    {\n      "name": "Existing Barriers",\n      "type": "text-box",\n      "props": {\n        "label": "Existing Barriers",\n        "name": "existing_barriers",\n        "required": true,\n        "description": "Pre-existing safety measures or protocols in place at the time of the incident.",\n        "options": []\n      }\n    },\n    {\n      "name": null,\n      "type": "selection-single",\n      "props": {\n        "label": "Category",\n        "required": true,\n        "description": "The specific type of incident, such as a workplace injury or equipment failure.",\n        "options": [\n          {\n            "label": "test",\n            "value": "test"\n          },\n          {\n            "label": "Minor",\n            "value": "minor"\n          },\n          {\n            "label": "Major",\n            "value": "major"\n          }\n        ]\n      }\n    }\n  ]\n}\n';
+      const res = await sendAIRequest({
+        url: "/generate",
+        method: "POST",
+        body: {
+          prompt:
+            "Create a list of JSON for Incident Report for the following: [" +
+            form.description +
+            "]. Generate the VALID JSON by following the data format given. REPLACE the value of name, label, options, description:" +
+            newField,
+        },
+      });
+
+      // console.log(extractAndParseJson(res.response));
+      const newFields = JSON.parse(res.response)?.fields
+      return checkTypeValidity(newFields)
+    } catch (error) {
+      console.error("Error generating fields:", error);
+      return generateFields(count + 1, form);
+    }
+  };
+
+  const checkTypeValidity = (newFields) => {
+    const validType = ["text-box", "selection-single", "selection-multi"];
+    const validFields = newFields.filter((field) => validType.includes(field.type));
+    return validFields;
+
+  };
+
+  const extractAndParseJson = (inputString) => {
+    // Regular expression to find code block with optional 'json' language identifier
+    const codeBlockRegex = /```json\s*([\s\S]*?)```/g;
+
+    // Attempt to find and extract JSON string from the input
+    const matches = codeBlockRegex.exec(inputString);
+
+    if (matches && matches[1]) {
+      // Attempt to parse the extracted JSON string
+      try {
+        const parsedJson = JSON.parse(matches[1]);
+        return parsedJson;
+      } catch (error) {
+        console.error("Failed to parse JSON:", error);
+        return null;
+      }
+    } else {
+      console.error("No JSON found in input string.");
+      return null;
+    }
   };
 
   const openCreateFormModal = () => {
@@ -139,12 +230,45 @@ function AdminForm() {
   }, [forms]);
 
   return (
-    <Container sx={{ mt: 4 }}>
+    <Container sx={{ display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        mt: 5,
+        width: "90%",}}>
+      <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "start",
+            justifyContent: "start",
+            width: "100%",
+            marginBottom: "20px",
+          }}
+      >
+        <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%",mb: 1}}>
+          <Typography variant="h4" fontWeight={600}>
+            Form Customization
+          </Typography>
+          <Button
+              variant="contained"
+              color="primary"
+              onClick={openCreateFormModal}
+          >
+            Add New Form
+          </Button>
+        </Box>
+        <Typography variant="body" fontWeight={400}>
+          Use form customization to create, edit and delete forms here. However, only one form can be active at a time.
+        </Typography>
+      </div>
+
       <AddFormModal
         open={openCreateForm}
         handleClose={() => setOpenCreateForm(false)}
         createNewForm={handleCreateForm}
       />
+
       <DeleteFormModal
         open={openDeleteForm}
         handleClose={() => setOpenDeleteForm(false)}
@@ -166,25 +290,25 @@ function AdminForm() {
           <TableHead>
             <TableRow>
               <TableCell>
-                <Typography variant="subtitle2">Id</Typography>
+                <Typography variant="subtitle2" sx={{fontWeight: 600}}>Id</Typography>
               </TableCell>
               <TableCell align="left">
-                <Typography variant="subtitle2">Name</Typography>
+                <Typography variant="subtitle2" sx={{fontWeight: 600}}>Name</Typography>
               </TableCell>
               <TableCell align="left">
-                <Typography variant="subtitle2">Author</Typography>
+                <Typography variant="subtitle2" sx={{fontWeight: 600}}>Author</Typography>
               </TableCell>
               <TableCell align="left">
-                <Typography variant="subtitle2">Date Added</Typography>
+                <Typography variant="subtitle2" sx={{fontWeight: 600}}>Date Added</Typography>
               </TableCell>
               <TableCell align="left">
-                <Typography variant="subtitle2">Last Updated</Typography>
+                <Typography variant="subtitle2" sx={{fontWeight: 600}}>Last Updated</Typography>
               </TableCell>
               <TableCell align="center">
-                <Typography variant="subtitle2">In Use</Typography>
+                <Typography variant="subtitle2" sx={{fontWeight: 600}}>In Use</Typography>
               </TableCell>
               <TableCell align="center">
-                <Typography variant="subtitle2">Actions</Typography>
+                <Typography variant="subtitle2" sx={{fontWeight: 600}}>Actions</Typography>
               </TableCell>
             </TableRow>
           </TableHead>
@@ -226,7 +350,10 @@ function AdminForm() {
                     </Tooltip>
                   ) : (
                     <Tooltip title="Inactive Form" arrow>
-                      <IconButton size="small" onClick={() => handleActivateModalOpen(forms[formId])}>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleActivateModalOpen(forms[formId])}
+                      >
                         <CancelIcon color="error" />
                       </IconButton>
                     </Tooltip>
@@ -245,6 +372,7 @@ function AdminForm() {
                   <IconButton
                     size="small"
                     onClick={() => handleDeleteModalOpen(forms[formId])}
+                    disabled={forms[formId].active}
                   >
                     <Tooltip title="Delete Form" arrow>
                       <DeleteIcon />
@@ -256,6 +384,14 @@ function AdminForm() {
           </TableBody>
         </Table>
       </TableContainer>
+      <CircularProgress
+        sx={{
+          display: loading ? "flex" : "none",
+          mr: "auto",
+          ml: "auto",
+          mt: 5,
+        }}
+      />
 
       <FormCustomizationModal
         open={open}
@@ -271,15 +407,6 @@ function AdminForm() {
         updateFormName={handleUpdateFormName}
         deleteForm={handleDeleteForm}
       />
-      <Box sx={{ display: "flex", justifyContent: "right", mt: 2 }}>
-        <Button
-          variant="outlined"
-          color="primary"
-          onClick={openCreateFormModal}
-        >
-          Add New Form
-        </Button>
-      </Box>
     </Container>
   );
 }

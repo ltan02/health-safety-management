@@ -9,11 +9,12 @@ import {
   MenuItem,
   TextField,
   Container,
-  Grid,
+  Grid, IconButton, Tooltip,
 } from "@mui/material";
 import { useState } from "react";
 import { FIELD_TYPES, VARIANT_TYPES } from "./form_data";
 import { FIELD_ADD_FORM } from "./add_elements";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined.js";
 function EditFieldModal({
   open,
   setOpen,
@@ -103,9 +104,11 @@ function EditFieldModal({
           border: "2px solid #000",
           boxShadow: 24,
           p: 4,
+          maxHeight: "90vh",
+          overflow: "auto"
         }}
       >
-        <Typography variant="h5" fontWeight={500} align="center">
+        <Typography variant="h5" fontWeight={500}>
           Edit Field
         </Typography>
         {FIELD_ADD_FORM[select] ? (
@@ -119,7 +122,13 @@ function EditFieldModal({
               onPromptChange: (e) =>
                 setAiField({ ...aiField, prompt: e.target.value }),
               onReferenceFieldChange: (e) =>
-                setAiField({ ...aiField, referenceId: e.target.value }),
+                setAiField({
+                  ...aiField,
+                  referenceId:
+                    typeof e.target.value === "string"
+                      ? e.target.value.split(",")
+                      : e.target.value,
+                }),
               initialDescription: description,
               initialTitle: title,
               initialOptions: options,
@@ -130,7 +139,7 @@ function EditFieldModal({
               initialReferenceField:
                 fieldData.type === FIELD_TYPES.AI_TEXT
                   ? aiField.referenceId
-                  : "",
+                  : [],
               currentFields: fieldsData,
             })}
           </>
@@ -139,16 +148,23 @@ function EditFieldModal({
             variant="h6"
             align="center"
             fontWeight={600}
-            sx={{ my: 5 }}
+            sx={{mt: 1 }}
           >
             Select Field Type
           </Typography>
         )}
         <Box border={1} borderColor="grey.500" borderRadius={2} p={2} m={2}>
           <FormControl fullWidth>
+            <Box sx = {{display: "flex", alignItems: "center"}}>
             <Typography variant={VARIANT_TYPES.LABEL}>{title}</Typography>
+              {(description.length>0)? <Tooltip title={description}>
+                <IconButton sx={{color: "#FFB600", fontSize: "small"}}>
+                  <InfoOutlinedIcon />
+                </IconButton>
+              </Tooltip>:<></>}
+            </Box>
             <Typography variant={VARIANT_TYPES.BODY}>
-              {description} {required ? "(Required)" : "(Optional)"}
+               {required ? "(Required)" : "(Optional)"}
             </Typography>
             {select === FIELD_TYPES.SELECTION_SINGLE ||
             select === FIELD_TYPES.SELECTION_MULTI ? (

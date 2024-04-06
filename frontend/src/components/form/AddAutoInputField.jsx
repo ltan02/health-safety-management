@@ -18,6 +18,7 @@ function AddInputField({
   initialDescription,
   initialPlaceHolder,
   onReferenceFieldChange,
+  currentReferenceField,
   onPromptChange,
   initialRequired,
   currentFields,
@@ -25,7 +26,7 @@ function AddInputField({
   initialReferenceField,
 }) {
   let textFields = [];
-  textFields = currentFields.filter((field) => field.type === "text-box");
+  textFields = currentFields.filter((field) => field.type === "text-box" || field.type === "description");
   return (
     <Box margin="normal" sx={{ gap: 1 }}>
       <TextField
@@ -65,9 +66,10 @@ function AddInputField({
           placeholder="Reference Field"
           sx={{ marginTop: 2 }}
           id="reference-field"
-          onChange={(e) => onReferenceFieldChange(e.target.value)}
+          onChange={onReferenceFieldChange}
           defaultValue={initialReferenceField}
           required
+          multiple
         >
           {textFields.map((field) => (
             <MenuItem key={field.id} value={field.id}>

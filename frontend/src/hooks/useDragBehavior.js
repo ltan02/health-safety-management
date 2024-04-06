@@ -6,87 +6,53 @@ import { useBoard } from "../context/BoardContext";
 
 const useDragBehavior = (tasks, setTasks) => {
     const [activeId, setActiveId] = useState(null);
+    const { adminColumns, employeeColumns } = useBoard();
     const { user } = useAuthContext();
     const { sendRequest } = useAxios();
-    const { adminColumns, employeeColumns } = useBoard();
 
     const handleDragStart = (event) => {
         setActiveId(event.active.id);
     };
 
-    const handleDragOver = ({ active, over }) => {
-        if (!over) return;
-
-        const columns = isPrivileged(user.role) ? adminColumns : employeeColumns;
-        const sourceColumn = Object.keys(tasks).find((column) => tasks[column].some((task) => task.id === active.id));
-        let destinationColumn = over.id;
-
-        if (!sourceColumn || !destinationColumn) return;
-
-        if (columns.find((column) => column.id === destinationColumn) === undefined) {
-            destinationColumn = Object.keys(tasks).find((column) => tasks[column].some((task) => task.id === over.id));
+    const handleDragEnd = ({ over }) => {
+        if (!over) {
+            setActiveId(null);
+            return;
         }
 
-        setTasks((prevTasks) => {
-            const newTasks = { ...prevTasks };
-            const activeTask = newTasks[sourceColumn].find((task) => task.id === active.id);
-            const movingTaskIndex = newTasks[sourceColumn].findIndex((task) => task.id === active.id);
-            const targetIndex = newTasks[destinationColumn].findIndex((task) => task.id === over.id);
+        const destinationStatus = over.id;
+        const activeColumn = Object.keys(tasks).find((column) => tasks[column].some((task) => task.id === activeId));
+        const activeTask = tasks[activeColumn].find((task) => task.id === activeId);
 
-            newTasks[sourceColumn] = newTasks[sourceColumn].filter((task) => task.id !== active.id);
-
-            if (!newTasks[destinationColumn].some((task) => task.id === active.id)) {
-                if (sourceColumn === destinationColumn) {
-                    newTasks[destinationColumn].splice(
-                        movingTaskIndex < targetIndex ? targetIndex : targetIndex,
-                        0,
-                        activeTask,
-                    );
-                } else {
-                    const updatedTask = {
-                        ...activeTask,
-                        employeeIncidentStatus: isPrivileged(user.role)
-                            ? activeTask.employeeIncidentStatus
-                            : destinationColumn,
-                        safetyWardenIncidentStatus: isPrivileged(user.role)
-                            ? destinationColumn
-                            : activeTask.safetyWardenIncidentStatus,
-                    };
-
-                    newTasks[destinationColumn].splice(targetIndex, 0, updatedTask);
-                }
-            }
-
-            return newTasks;
-        });
-    };
-
-    const handleDragEnd = ({ active, over }) => {
-        if (!over) return;
-        let destinationColumn = over.id;
-
-        if (!destinationColumn) return;
-
-        const columns = isPrivileged(user.role) ? adminColumns : employeeColumns;
-        if (Object.keys(columns).indexOf(destinationColumn) < 0) {
-            destinationColumn = Object.keys(tasks).find((column) => tasks[column].some((task) => task.id === over.id));
-        }
-
-        const activeTask = tasks[destinationColumn].find((task) => task.id === active.id);
         const updatedTask = {
             ...activeTask,
-            employeeIncidentStatus: isPrivileged(user.role) ? activeTask.employeeIncidentStatus : destinationColumn,
-            safetyWardenIncidentStatus: isPrivileged(user.role)
-                ? destinationColumn
-                : activeTask.safetyWardenIncidentStatus,
+            statusId: destinationStatus,
         };
+
         sendRequest({
             url: `/incidents/${activeTask.id}`,
             method: "POST",
             body: {
-                employeeIncidentStatus: updatedTask.employeeIncidentStatus,
-                safetyWardenIncidentStatus: updatedTask.safetyWardenIncidentStatus,
+                statusId: destinationStatus,
             },
+        });
+
+        setTasks((prevTasks) => {
+            const updatedTasks = { ...prevTasks };
+            const columns = isPrivileged(user.role) ? adminColumns : employeeColumns;
+
+            const newColumn = columns.find((column) => column.statusIds.includes(destinationStatus)).id;
+
+            updatedTasks[activeColumn] = updatedTasks[activeColumn].filter((task) => task.id !== activeId);
+            updatedTasks[newColumn].push(updatedTask);
+
+            Object.keys(updatedTasks).forEach((key) => {
+                updatedTasks[key] = updatedTasks[key].sort(
+                    (a, b) => new Date(a.incidentDate) - new Date(b.incidentDate),
+                );
+            });
+
+            return updatedTasks;
         });
 
         setActiveId(null);
@@ -95,7 +61,6 @@ const useDragBehavior = (tasks, setTasks) => {
     return {
         activeId,
         handleDragStart,
-        handleDragOver,
         handleDragEnd,
     };
 };
