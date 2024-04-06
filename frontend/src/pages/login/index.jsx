@@ -179,7 +179,7 @@ function Login() {
           <Grid
             container
             alignItems="center"
-            style={{ justifyContent: "start" }}
+            style={{ justifyContent: "center" }}
           >
             <Link href="/signup" style={{ marginTop: "20px", display: "flex" }}>
               <Typography

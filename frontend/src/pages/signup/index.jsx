@@ -114,9 +114,9 @@ function SignUp() {
               }}
             />
             <Typography
-              variant="h5"
-              component="h2"
-              style={{ marginBottom: "20px" }}
+                variant="h6"
+                component="h6"
+                style={{ marginBottom: "20px" }}
             >
               Sign Up
             </Typography>
@@ -202,7 +202,7 @@ function SignUp() {
           <Grid
             container
             alignItems="center"
-            style={{ justifyContent: "start" }}
+            style={{ justifyContent: "center" }}
           >
             <Link href="/" style={{ marginTop: "20px", display: "flex" }}>
               <Typography
