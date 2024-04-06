@@ -87,6 +87,9 @@ function Dashboard() {
         if (flatTasks) {
             flatTasks.map((task) => {
                 const newCommentData = initialCommentData;
+                if(task.comments.length === newCommentData[task.id]?.length){
+                    return;
+                }
                 task.comments.map((comment) => {
                     if (!newCommentData[comment.id]) {
                         newCommentData[comment.id] = [];
@@ -97,14 +100,12 @@ function Dashboard() {
                         user: employees.filter((employee) => employee.id === comment.userId)[0],
                     };
                     const tempId = hasTempComment(newCommentData[comment.id], data);
-                    // this is to prevent duplicate temp comments
                     if (tempId) {
                         newCommentData[comment.id][tempId] = data;
                     } else {
                         newCommentData[comment.id].push(data);
                     }
                 });
-
                 initialCommentData[task.id] = newCommentData[task.id];
             });
         }
@@ -140,6 +141,7 @@ function Dashboard() {
     }, [forms]);
 
     useEffect(() => {
+        console.log("hd use effect")
         handleComment();
     }, [filteredTasks]);
 
@@ -218,7 +220,6 @@ function Dashboard() {
                                 sortedRows={handleSort}
                                 formName={activeForm?.name}
                                 commentData={commentData}
-                                setCommentData={setCommentData}
                             />
                         </Box>
                     ))}
