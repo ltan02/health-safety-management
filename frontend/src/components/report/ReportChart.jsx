@@ -4,14 +4,12 @@ import { useEffect, useState } from "react";
 import useAxios from "../../hooks/useAxios.js";
 import { categoryReports } from "../../pages/report/initialData.js";
 
-function ReportChart({ type, locked, data, height, width, handleSubmit, graphName }) {
+function ReportChart({ type, locked, data, height, width, handleSubmit }) {
     const { sendRequest } = useAxios();
     const [report, setReport] = useState(categoryReports);
     const [field, setField] = useState(data.field);
     const [startDate, setStartDate] = useState(data.start);
     const [endDate, setEndDate] = useState(data.end);
-
-    // const [GraphName, setGName] = useState("");
 
     useEffect(() => {
         setEndDate(data.end);
@@ -68,7 +66,7 @@ function ReportChart({ type, locked, data, height, width, handleSubmit, graphNam
     const LineChartCard = (
         <>
             {/*<h1>Line Chart</h1>*/}
-            <h1>{graphName}</h1>
+            <h1>{data.name}</h1>
             <LineChart
                 xAxis={[{data: report.map((v) => v.label), scaleType: "point"}]}
                 series={[
@@ -85,7 +83,7 @@ function ReportChart({ type, locked, data, height, width, handleSubmit, graphNam
     const ScatterChartCard = (
         <>
             {/*<h1>Scatter Chart</h1>*/}
-            <h1>{graphName}</h1>
+            <h1>{data.name}</h1>
             <ScatterChart
                 height={height}
                 width={width}
@@ -101,7 +99,7 @@ function ReportChart({ type, locked, data, height, width, handleSubmit, graphNam
     const PieChartCard = (
         <>
             {/*<h1>Pie Chart</h1>*/}
-            <h1>{graphName}</h1>
+            <h1>{data.name}</h1>
             <PieChart
                 series={[
                     {

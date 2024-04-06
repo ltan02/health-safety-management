@@ -19,11 +19,9 @@ const modalStyle = {
     flexDirection: "column",
 };
 
-function ReportModal({ open, onClose, newData, setNewData, GraphName, setGName, boardId, onRefresh }) {
+function ReportModal({ open, onClose, newData, setNewData, boardId, onRefresh }) {
     const { updateBoard } = useDashboard();
 
-    console.log(newData);
-    console.log(boardId);
     const handleSubmit = (field, start, end) => {
         const changedData = newData.map((c, i) => {
             if (i === selectedVal) {
@@ -32,7 +30,7 @@ function ReportModal({ open, onClose, newData, setNewData, GraphName, setGName, 
                     field: field,
                     start: start,
                     end: end,
-                    name: GraphName,
+                    name: newData[i].name,
                 };
             } else {
                 return c;
@@ -44,6 +42,7 @@ function ReportModal({ open, onClose, newData, setNewData, GraphName, setGName, 
     const [selectedVal, setSelectedVal] = useState(0);
     const handleChange = (event) => {
         setSelectedVal(event.target.value);
+        setName(newData[event.target.value].name);
         setGraphType(newData[event.target.value].type);
     };
 
@@ -57,7 +56,7 @@ function ReportModal({ open, onClose, newData, setNewData, GraphName, setGName, 
                     field: newData[i].field,
                     start: newData[i].start,
                     end: newData[i].end,
-                    name: setGName,
+                    name: newData[i].name,
                 };
             } else {
                 return c;
@@ -76,10 +75,24 @@ function ReportModal({ open, onClose, newData, setNewData, GraphName, setGName, 
         onClose();
     };
 
-    // const [GraphName, setGName] = useState("");
+    const [name, setName] = useState(newData[selectedVal].name);
 
     const GraphNameHandler = (event) => {
-        setGName(event.target.value);
+        setName(event.target.value);
+        const changedData = newData.map((c, i) => {
+            if (i === selectedVal) {
+                return {
+                    type: newData[i].type,
+                    field: newData[i].field,
+                    start: newData[i].start,
+                    end: newData[i].end,
+                    name: event.target.value,
+                };
+            } else {
+                return c;
+            }
+        });
+        setNewData(changedData);
     };
 
     return (
@@ -117,7 +130,7 @@ function ReportModal({ open, onClose, newData, setNewData, GraphName, setGName, 
                     Graph Name
                 </Typography>
                 <TextField
-                    value={GraphName}
+                    value={name}
                     onChange={GraphNameHandler}
                 />
                 <ReportChart
@@ -126,7 +139,7 @@ function ReportModal({ open, onClose, newData, setNewData, GraphName, setGName, 
                     locked={false}
                     height={300}
                     width={400}
-                    graphName={GraphName}
+                    graphName={name}
                     handleSubmit={handleSubmit}
                 />
                 <Button

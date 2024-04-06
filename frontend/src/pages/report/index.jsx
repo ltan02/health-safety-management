@@ -49,10 +49,6 @@ function ReportOverview() {
         }
     }, [loading]);
 
-    const [GraphName, setGName] = useState("");
-
-    console.log(GraphName);
-    console.log(newData);
 
     const boardFn = (
         <>
@@ -61,8 +57,6 @@ function ReportOverview() {
                 onClose={toggleModal}
                 newData={newData}
                 setNewData={setNewData}
-                GraphName={GraphName}
-                setGName={setGName}
                 boardId={boardId}
                 onRefresh={refreshDashboard}
             />
