@@ -10,14 +10,15 @@ export default function useTasks() {
     const { user } = useAuthContext();
     const { sendRequest } = useAxios();
     const { adminColumns, employeeColumns } = useBoard();
-
+    const [loading, setLoading] = useState(true);
     const fetchTasks = useCallback(async () => {
         let url = "/incidents";
         if (isPrivileged(user.role)) {
             url = "/incidents?all=true";
         }
-
+        setLoading(true);
         const incidents = await sendRequest({ url });
+        
 
         const userIds = [...new Set(incidents.flatMap((incident) => [incident?.reporter]))].filter(Boolean);
         const users = await Promise.all(userIds.map((id) => sendRequest({ url: `/users/${id}` })));
@@ -70,6 +71,7 @@ export default function useTasks() {
 
         setTasks(newTasks);
         setFilteredTasks(newTasks);
+        setLoading(false);
     }, [adminColumns, employeeColumns]);
 
     useEffect(() => {
@@ -105,5 +107,5 @@ export default function useTasks() {
         },
         [tasks],
     );
-    return { tasks, filteredTasks, filterTasks, setTasks, fetchTasks, setFilteredTasks };
+    return { tasks, filteredTasks, filterTasks, setTasks, fetchTasks, setFilteredTasks, loading };
 }

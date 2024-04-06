@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import IncidentDataGrid from "../../../components/incident/IncidentDataGrid";
 import useTasks from "../../../hooks/useTasks";
 import Profile from "../../../components/users/Profile";
@@ -9,9 +9,10 @@ import AddTaskModal from "../../../components/incident/AddTaskModal";
 import useForm from "../../../hooks/useForm";
 import useAxios from "../../../hooks/useAxios";
 import { useAuthContext } from "../../../context/AuthContext";
+import LoadingBar from "../../../components/global/LoadingBar";
 
 function IncidentReport() {
-    const { filteredTasks, fetchTasks, setFilteredTasks } = useTasks();
+    const { filteredTasks, fetchTasks, setFilteredTasks, loading } = useTasks();
     const [rows, setRows] = useState(Object.values(filteredTasks).flat());
     const { user } = useAuthContext();
     const [selectedIncident, setSelectedIncident] = useState(null);
@@ -135,7 +136,7 @@ function IncidentReport() {
             </Typography>
             <div style={{ marginRight: "3rem", marginLeft: "3rem" }}>
                 <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                    <Button
+                    {!loading && (<Button
                         variant="contained"
                         onClick={toggleAddModal}
                         style={{
@@ -146,9 +147,29 @@ function IncidentReport() {
                         }}
                     >
                         Add Incident
-                    </Button>
+                    </Button>)}
                 </div>
-                <IncidentDataGrid rows={rows} columns={columns} onRowClick={handleRowClick} />
+                {loading && (
+                    <Box
+                        sx={{
+                            position: "fixed",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            height: "100%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            backgroundColor: "rgba(0, 0, 0, 0.5)",
+                            zIndex: 1500,
+                            pointerEvents: "none",
+                        }}
+                    >
+                        <CircularProgress />
+                    </Box>
+                )}
+
+                {!loading && (<IncidentDataGrid rows={rows} columns={columns} onRowClick={handleRowClick} />)}
                 {isModalOpen && selectedIncident && (
                     <IncidentDetailModal
                         open={isModalOpen}
