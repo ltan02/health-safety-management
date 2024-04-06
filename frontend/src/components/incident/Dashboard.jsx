@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Container, Box, Button, Input } from "@mui/material";
+import { Container, Box, Button, Input, CircularProgress } from "@mui/material";
 import {
   DndContext,
   PointerSensor,
@@ -58,7 +58,6 @@ function Dashboard() {
   const containerRef = useRef(null);
 
   useAutoScroll(containerRef, Boolean(activeId));
-
   const activeTask = activeId
     ? Object.values(filteredTasks)
         .flat()
@@ -349,7 +348,24 @@ function Dashboard() {
           setTasks={setFilteredTasks}
         />
       )}
-      <LoadingBar top="50%" left="50%" expectedDuration={10000} />
+      {loading && (
+                    <Box
+                        sx={{
+                            position: "fixed",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            height: "100%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            backgroundColor: "rgba(0, 0, 0, 0.5)",
+                            zIndex: 1500,
+                        }}
+                    >
+                        <CircularProgress />
+                    </Box>
+                )}
     </Container>
   );
 }
