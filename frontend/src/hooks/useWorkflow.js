@@ -42,7 +42,7 @@ export default function useWorkflow() {
             const fetchedStates = await Promise.all(statePromises);
 
             const statusPromises = fetchedStates
-                .filter((state) => state.statusId !== null)
+                .filter((state) => state.statusId !== null && state.statusId !== undefined)
                 .map((state) => {
                     return sendRequest({
                         url: `/status/${state.statusId}`,
@@ -59,6 +59,7 @@ export default function useWorkflow() {
                     x: state.coordinates?.x ?? 0,
                     y: state.coordinates?.y ?? 0,
                 },
+                selectable: state?.name !== "START",
                 deletable: state?.name !== "START",
                 data: {
                     label:
@@ -243,6 +244,31 @@ export default function useWorkflow() {
         });
     }, []);
 
+    const updateName = useCallback(
+        (name, id) => {
+            if (states.some((state) => state.id === id)) {
+                setStates((prev) => {
+                    return prev.map((state) => {
+                        if (state.id === id) {
+                            return { ...state, data: { label: name } };
+                        }
+                        return state;
+                    });
+                });
+            } else {
+                setTransitions((prev) => {
+                    return prev.map((transition) => {
+                        if (transition.id === id) {
+                            return { ...transition, data: { label: name } };
+                        }
+                        return transition;
+                    });
+                });
+            }
+        },
+        [states],
+    );
+
     const createTransition = useCallback((source, target, label = null) => {
         setTransitions((prev) => {
             const existingTransitions = prev.filter((t) => t.source === source.id && t.target === target.id);
@@ -344,7 +370,7 @@ export default function useWorkflow() {
         });
 
         setTransitions((prev) => {
-            return prev.filter((transition) => transition.source !== id || transition.target !== id);
+            return prev.filter((transition) => transition.source !== id && transition.target !== id);
         });
     }, []);
 
@@ -428,12 +454,12 @@ export default function useWorkflow() {
                 });
 
                 const deleteStatusPromise = sendRequest({
-                    url: `/status/${state.statusId}`,
+                    url: `/status/${state.data.statusId}`,
                     method: "DELETE",
                 });
 
                 const removeStatusFromBoardPromise = sendRequest({
-                    url: `/boards/${activeWorkflow.boardId}/status/${state.statusId}`,
+                    url: `/boards/${activeWorkflow.boardId}/status/${state.data.statusId}`,
                     method: "DELETE",
                 });
 
@@ -520,6 +546,12 @@ export default function useWorkflow() {
                 return {
                     ...state,
                     id: state.id.startsWith("temp") ? newStates.find((s) => s.name === state.data.label).id : state.id,
+                    data: {
+                        ...state.data,
+                        statusId: state.id.startsWith("temp")
+                            ? newStates.find((s) => s.name === state.data.label).statusId
+                            : state.data.statusId,
+                    },
                 };
             });
 
@@ -542,8 +574,10 @@ export default function useWorkflow() {
                 });
             }
 
-            setOriginalStates(JSON.parse(JSON.stringify(states)));
-            setOriginalTransitions(JSON.parse(JSON.stringify(transitions)));
+            setOriginalStates(JSON.parse(JSON.stringify(newStatesLocal)));
+            setOriginalTransitions(JSON.parse(JSON.stringify(newTransitionsLocal)));
+            setStates(JSON.parse(JSON.stringify(newStatesLocal)));
+            setTransitions(JSON.parse(JSON.stringify(newTransitionsLocal)));
         } catch (err) {
             console.log(err);
         } finally {
@@ -582,5 +616,7 @@ export default function useWorkflow() {
         addUserRestrictionRule,
         updateTransitionRule,
         deleteRule,
+        updateName,
+        setLoadingWorkflow,
     };
 }
