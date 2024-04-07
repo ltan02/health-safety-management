@@ -354,7 +354,7 @@ function AdminForm() {
                         size="small"
                         onClick={() => handleActivateModalOpen(forms[formId])}
                       >
-                        <CancelIcon color="error" />
+                        <CancelIcon color="grey" />
                       </IconButton>
                     </Tooltip>
                   )}

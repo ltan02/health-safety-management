@@ -120,14 +120,12 @@ function Dashboard({ setViewModalOpen }) {
                         user: employees.filter((employee) => employee.id === comment.userId)[0],
                     };
                     const tempId = hasTempComment(newCommentData[comment.id], data);
-                    // this is to prevent duplicate temp comments
                     if (tempId) {
                         newCommentData[comment.id][tempId] = data;
                     } else {
                         newCommentData[comment.id].push(data);
                     }
                 });
-
                 initialCommentData[task.id] = newCommentData[task.id];
             });
         }
@@ -343,7 +341,6 @@ function Dashboard({ setViewModalOpen }) {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        backgroundColor: "rgba(0, 0, 0, 0.5)",
                         zIndex: 1500,
                         pointerEvents: "none",
                     }}

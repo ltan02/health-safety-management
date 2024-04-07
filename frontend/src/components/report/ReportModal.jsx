@@ -1,26 +1,45 @@
 import { useState } from "react";
-import { Box, Modal, Typography, Button, MenuItem, Select } from "@mui/material";
+import {
+    Box,
+    Modal,
+    Typography,
+    Button,
+    MenuItem,
+    Select,
+    Paper,
+    FormControl,
+    InputLabel,
+    Grid, TextField,
+} from "@mui/material";
 import ReportChart from "./ReportChart";
 import useDashboard from "../../hooks/useDashboard";
 
 const modalStyle = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: "auto",
-    bgcolor: "background.paper",
-    boxShadow: 24,
-    p: 4,
-    borderRadius: 2,
-    overflow: "auto",
-    maxHeight: "90%",
-    display: "flex",
-    flexDirection: "column",
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: "auto",
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  p: 4,
+  borderRadius: 2,
+  overflow: "auto",
+  maxHeight: "90%",
+  display: "flex",
+  flexDirection: "column",
 };
 
-function ReportModal({ open, onClose, newData, setNewData, boardId, onRefresh }) {
-    const { updateBoard } = useDashboard();
+function ReportModal({
+  open,
+  onClose,
+  newData,
+  setNewData,
+  boardId,
+  onRefresh,
+  selectedVal,
+}) {
+  const { updateBoard } = useDashboard();
 
     const handleSubmit = (field, start, end) => {
         const changedData = newData.map((c, i) => {
@@ -30,6 +49,7 @@ function ReportModal({ open, onClose, newData, setNewData, boardId, onRefresh })
                     field: field,
                     start: start,
                     end: end,
+                    name: newData[i].name,
                 };
             } else {
                 return c;
@@ -38,11 +58,12 @@ function ReportModal({ open, onClose, newData, setNewData, boardId, onRefresh })
         setNewData(changedData);
     };
 
-    const [selectedVal, setSelectedVal] = useState(0);
-    const handleChange = (event) => {
-        setSelectedVal(event.target.value);
-        setGraphType(newData[event.target.value].type);
-    };
+    // const [selectedVal, setSelectedVal] = useState(0);
+    // const handleChange = (event) => {
+    //     setSelectedVal(event.target.value);
+    //     setName(newData[event.target.value].name);
+    //     setGraphType(newData[event.target.value].type);
+    // };
 
     const [graphType, setGraphType] = useState(newData[0].type);
     const handleGraphChange = (event) => {
@@ -54,6 +75,7 @@ function ReportModal({ open, onClose, newData, setNewData, boardId, onRefresh })
                     field: newData[i].field,
                     start: newData[i].start,
                     end: newData[i].end,
+                    name: newData[i].name,
                 };
             } else {
                 return c;
@@ -72,65 +94,109 @@ function ReportModal({ open, onClose, newData, setNewData, boardId, onRefresh })
         onClose();
     };
 
-    return (
-        <Modal
-            open={open}
-            onClose={() => {
-                onClose();
-            }}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
+    const [name, setName] = useState(newData[selectedVal].name);
+
+    const GraphNameHandler = (event) => {
+        setName(event.target.value);
+        console.log(selectedVal)
+        const changedData = newData.map((c, i) => {
+            if (i === selectedVal) {
+                return {
+                    type: newData[i].type,
+                    field: newData[i].field,
+                    start: newData[i].start,
+                    end: newData[i].end,
+                    name: name,
+                };
+            } else {
+                return c;
+            }
+        });
+        setNewData(changedData);
+    };
+
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    >
+      <Box sx={modalStyle}>
+        <Typography
+          id="modal-modal-title"
+          variant="h6"
+          component="h2"
+          fontWeight={600}
+          sx={{ mb: 3 }}
         >
-            <Box sx={modalStyle}>
-                <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ mb: 2 }}>
-                    Edit Dashboard
-                </Typography>
-                <Select value={selectedVal} label="Select Widget" onChange={handleChange}>
-                    <MenuItem value={0}>Top Left</MenuItem>
-                    <MenuItem value={1}>Top Right</MenuItem>
-                    <MenuItem value={2}>Bottom Left</MenuItem>
-                    <MenuItem value={3}>Bottom Right</MenuItem>
-                </Select>
-                <Typography variant="h7" component="h2" sx={{ mb: 2 }}>
-                    Widget details
-                </Typography>
-                <Typography variant="h8" sx={{ mb: 2 }}>
-                    Select Graph Type
-                </Typography>
-                <Select value={graphType} label="Select Graph Type" onChange={handleGraphChange}>
-                    <MenuItem value={"Bar"}>Bar</MenuItem>
-                    <MenuItem value={"Line"}>Line</MenuItem>
-                    <MenuItem value={"Scatter"}>Scatter</MenuItem>
-                    <MenuItem value={"Pie"}>Pie</MenuItem>
-                </Select>
-                <ReportChart
-                    type={newData[selectedVal].type}
-                    data={newData[selectedVal]}
-                    locked={false}
-                    height={300}
-                    width={400}
-                    handleSubmit={handleSubmit}
-                />
-                <Button
-                    type="submit"
-                    variant="contained"
-                    color="primary"
-                    sx={{ mt: 3, position: "fixed", bottom: "0px", right: "10px" }}
-                    onClick={pushSubmitButton}
-                >
-                    Submit
-                </Button>
-                <Button
-                    variant="contained"
-                    color="secondary"
-                    sx={{ mt: 3, position: "fixed", bottom: "50px", right: "10px" }}
-                    onClick={pushCloseButton}
-                >
-                    Cancel
-                </Button>
-            </Box>
-        </Modal>
-    );
+          Customize Widget
+        </Typography>
+        <Grid container spacing={2} justifyContent="center">
+          <Grid item xs={12}>
+            <Typography variant="subtitle1" sx={{ mb: 2 }}>
+              Widget details
+            </Typography>
+            <FormControl fullWidth>
+              <InputLabel>Select Graph Type</InputLabel>
+              <Select
+                value={graphType}
+                onChange={handleGraphChange}
+                label="Select Graph Type"
+                sx={{ mb: 3 }}
+              >
+                <MenuItem value="Bar">Bar</MenuItem>
+                <MenuItem value="Line">Line</MenuItem>
+                <MenuItem value="Scatter">Scatter</MenuItem>
+                <MenuItem value="Pie">Pie</MenuItem>
+              </Select>
+            </FormControl>
+              <InputLabel>Graph Name</InputLabel>
+              <TextField
+                  value={name}
+                  onChange={GraphNameHandler}
+              />
+          </Grid>
+
+          <Grid item xs={12}>
+            <Paper elevation={3} sx={{ p: 2, mb: 2 }}>
+              <ReportChart
+                type={newData[selectedVal].type}
+                data={newData[selectedVal]}
+                locked={false}
+                height={300}
+                width={400}
+                handleSubmit={handleSubmit}
+              />
+            </Paper>
+          </Grid>
+
+          <Grid item xs={6}>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              onClick={pushSubmitButton}
+              sx={{ width: "100%" }}
+            >
+              Submit
+            </Button>
+          </Grid>
+
+          <Grid item xs={6}>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={pushCloseButton}
+              sx={{ width: "100%" }}
+            >
+              Cancel
+            </Button>
+          </Grid>
+        </Grid>
+      </Box>
+    </Modal>
+  );
 }
 
 export default ReportModal;
