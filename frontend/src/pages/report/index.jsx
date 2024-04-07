@@ -56,6 +56,7 @@ function ReportOverview() {
     setSelectedVal(index);
     console.log(item);
     console.log(index);
+    console.log(dashData);
     toggleModal();
     setNewData(dashData);
   };

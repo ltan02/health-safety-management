@@ -38,6 +38,7 @@ function ReportModal({
   boardId,
   onRefresh,
   selectedVal,
+    item,
 }) {
   const { updateBoard } = useDashboard();
 
@@ -65,7 +66,7 @@ function ReportModal({
     //     setGraphType(newData[event.target.value].type);
     // };
 
-    const [graphType, setGraphType] = useState(newData[0].type);
+    const [graphType, setGraphType] = useState(newData[selectedVal].type);
     const handleGraphChange = (event) => {
         setGraphType(event.target.value);
         const changedData = newData.map((c, i) => {
@@ -140,7 +141,7 @@ function ReportModal({
             <FormControl fullWidth>
               <InputLabel>Select Graph Type</InputLabel>
               <Select
-                value={graphType}
+                value={newData[selectedVal].type}
                 onChange={handleGraphChange}
                 label="Select Graph Type"
                 sx={{ mb: 3 }}
@@ -153,7 +154,7 @@ function ReportModal({
             </FormControl>
               <InputLabel>Graph Name</InputLabel>
               <TextField
-                  value={name}
+                  value={""}
                   onChange={GraphNameHandler}
               />
           </Grid>
