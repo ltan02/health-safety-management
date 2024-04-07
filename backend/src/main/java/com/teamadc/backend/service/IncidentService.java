@@ -52,8 +52,8 @@ public class IncidentService {
          return incidentRepository.findAll();
     }
 
-    public List<Incident> getIncidentsByStatusId(String uid, String statusId) throws InterruptedException, ExecutionException {
-        List<Incident> incidents = this.getIncidents(uid);
+    public List<Incident> getIncidentsByStatusId(String statusId) throws InterruptedException, ExecutionException {
+        List<Incident> incidents = incidentRepository.findAll();
         return incidents.stream().filter(incident -> incident.getStatusId().equals(statusId)).toList();
     }
 
