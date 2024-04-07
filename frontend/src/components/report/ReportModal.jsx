@@ -98,6 +98,7 @@ function ReportModal({
 
     const GraphNameHandler = (event) => {
         setName(event.target.value);
+        console.log(selectedVal)
         const changedData = newData.map((c, i) => {
             if (i === selectedVal) {
                 return {
@@ -105,7 +106,7 @@ function ReportModal({
                     field: newData[i].field,
                     start: newData[i].start,
                     end: newData[i].end,
-                    name: event.target.value,
+                    name: name,
                 };
             } else {
                 return c;
@@ -150,9 +151,6 @@ function ReportModal({
                 <MenuItem value="Pie">Pie</MenuItem>
               </Select>
             </FormControl>
-              {/*<Typography variant="h8" sx={{ mb: 2 }}>*/}
-              {/*    Graph Name*/}
-              {/*</Typography>*/}
               <InputLabel>Graph Name</InputLabel>
               <TextField
                   value={name}
