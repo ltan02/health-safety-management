@@ -43,7 +43,10 @@ export const WorkflowProvider = ({ children }) => {
             }, {});
 
             const transitionMap = fetchedTransitions.reduce((acc, transition) => {
-                acc[transition.id] = transition;
+                acc[transition.id] = {
+                    ...transition,
+                    rules: transition.rules || [],
+                };
                 return acc;
             }, {});
 
@@ -76,8 +79,8 @@ export const WorkflowProvider = ({ children }) => {
     }, [fetchWorkflow]);
 
     const value = useMemo(
-        () => ({ activeWorkflow, activeStateMap, activeTransitionMap, flowMap }),
-        [activeStateMap, activeTransitionMap, activeWorkflow, flowMap],
+        () => ({ activeWorkflow, activeStateMap, activeTransitionMap, flowMap, fetchWorkflowNew: fetchWorkflow }),
+        [activeStateMap, activeTransitionMap, activeWorkflow, flowMap, fetchWorkflow],
     );
 
     return <WorkflowContext.Provider value={value}>{children}</WorkflowContext.Provider>;

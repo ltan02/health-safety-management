@@ -4,6 +4,8 @@ import ReactFlow, { Controls, useNodesState, useEdgesState } from "reactflow";
 import "reactflow/dist/style.css";
 import useWorkflow from "../../hooks/useWorkflow";
 import CustomEdge from "../../components/workflows/CustomEdge";
+import { isPrivileged } from "../../utils/permissions";
+import { useAuthContext } from "../../context/AuthContext";
 
 const edgeTypes = {
     customEdge: CustomEdge,
@@ -26,6 +28,7 @@ const style = {
 function ViewWorkflowModal({ open, handleClose, handleEdit }) {
     const [nodes, setNodes] = useNodesState([]);
     const [edges, setEdges] = useEdgesState([]);
+    const { user } = useAuthContext();
 
     const { states, transitions, fetchWorkflow } = useWorkflow();
 
@@ -51,9 +54,11 @@ function ViewWorkflowModal({ open, handleClose, handleEdit }) {
                         Workflow
                     </Typography>
                     <div style={{ display: "flex" }}>
-                        <Button onClick={handleEdit} variant="contained" sx={{ mr: 2 }}>
-                            Edit workflow
-                        </Button>
+                        {isPrivileged(user?.role) && (
+                            <Button onClick={handleEdit} variant="contained" sx={{ mr: 2 }}>
+                                Edit workflow
+                            </Button>
+                        )}
                         <Button onClick={handleClose} variant="outlined">
                             Close
                         </Button>

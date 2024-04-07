@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import IncidentDataGrid from "../../../components/incident/IncidentDataGrid";
 import useTasks from "../../../hooks/useTasks";
 import Profile from "../../../components/users/Profile";
@@ -9,15 +9,34 @@ import AddTaskModal from "../../../components/incident/AddTaskModal";
 import useForm from "../../../hooks/useForm";
 import useAxios from "../../../hooks/useAxios";
 import { useAuthContext } from "../../../context/AuthContext";
+import { useWorkflowNew } from "../../../context/WorkflowContext";
+import useWorkflow from "../../../hooks/useWorkflow";
+import ViewWorkflowModal from "../../../components/workflows/ViewWorkflowModal";
+import AdminManagement from "../../admin/management";
 
 function IncidentReport() {
-    const { filteredTasks, fetchTasks, setFilteredTasks } = useTasks();
+    const { filteredTasks, fetchTasks, setFilteredTasks, loading } = useTasks();
     const [rows, setRows] = useState(Object.values(filteredTasks).flat());
     const { user } = useAuthContext();
     const [selectedIncident, setSelectedIncident] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { statuses } = useBoard();
     const { sendRequest } = useAxios();
+    const { transitions, fetchWorkflow } = useWorkflow();
+    const { fetchWorkflowNew } = useWorkflowNew();
+
+    const [viewModalOpen, setViewModalOpen] = useState(false);
+    const [editModalOpen, setEditModalOpen] = useState(false);
+
+    const handleView = async () => {
+        setEditModalOpen(true);
+        setViewModalOpen(false);
+    };
+
+    useEffect(() => {
+        fetchWorkflow();
+        fetchWorkflowNew();
+    }, []);
 
     const styles = {
         styleHeader: {
@@ -63,6 +82,10 @@ function IncidentReport() {
     useEffect(() => {
         setRows(Object.values(filteredTasks).flat());
     }, [filteredTasks]);
+
+    useEffect(() => {
+        fetchWorkflow();
+    }, []);
 
     const [addModal, setAddModal] = useState(false);
     const toggleAddModal = () => setAddModal(!addModal);
@@ -135,20 +158,42 @@ function IncidentReport() {
             </Typography>
             <div style={{ marginRight: "3rem", marginLeft: "3rem" }}>
                 <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                    <Button
-                        variant="contained"
-                        onClick={toggleAddModal}
-                        style={{
+                    {!loading && (
+                        <Button
+                            variant="contained"
+                            onClick={toggleAddModal}
+                            style={{
+                                display: "flex",
+                                justifyContent: "flex-end",
+                                marginBottom: "1rem",
+                                fontWeight: "bold",
+                            }}
+                        >
+                            Add Incident
+                        </Button>
+                    )}
+                </div>
+                {loading && (
+                    <Box
+                        sx={{
+                            position: "fixed",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            height: "100%",
                             display: "flex",
-                            justifyContent: "flex-end",
-                            marginBottom: "1rem",
-                            fontWeight: "bold",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            backgroundColor: "rgba(0, 0, 0, 0.5)",
+                            zIndex: 1500,
+                            pointerEvents: "none",
                         }}
                     >
-                        Add Incident
-                    </Button>
-                </div>
-                <IncidentDataGrid rows={rows} columns={columns} onRowClick={handleRowClick} />
+                        <CircularProgress />
+                    </Box>
+                )}
+
+                {!loading && <IncidentDataGrid rows={rows} columns={columns} onRowClick={handleRowClick} />}
                 {isModalOpen && selectedIncident && (
                     <IncidentDetailModal
                         open={isModalOpen}
@@ -156,9 +201,21 @@ function IncidentReport() {
                         incidentId={selectedIncident.id}
                         onClose={handleCloseModal}
                         setTasks={setFilteredTasks}
+                        transitions={transitions}
+                        setViewModalOpen={setViewModalOpen}
                     />
                 )}
             </div>
+            {viewModalOpen && (
+                <ViewWorkflowModal
+                    open={viewModalOpen}
+                    handleClose={() => {
+                        setViewModalOpen(false);
+                    }}
+                    handleEdit={handleView}
+                />
+            )}
+            {editModalOpen && <AdminManagement open={editModalOpen} handleClose={() => setEditModalOpen(false)} />}
         </>
     );
 }

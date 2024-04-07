@@ -230,7 +230,39 @@ function AdminForm() {
   }, [forms]);
 
   return (
-    <Container sx={{ mt: 4 }}>
+    <Container sx={{ display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        mt: 5,
+        width: "90%",}}>
+      <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "start",
+            justifyContent: "start",
+            width: "100%",
+            marginBottom: "20px",
+          }}
+      >
+        <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%",mb: 1}}>
+          <Typography variant="h4" fontWeight={600}>
+            Form Customization
+          </Typography>
+          <Button
+              variant="contained"
+              color="primary"
+              onClick={openCreateFormModal}
+          >
+            Add New Form
+          </Button>
+        </Box>
+        <Typography variant="body" fontWeight={400}>
+          Use form customization to create, edit and delete forms here. However, only one form can be active at a time.
+        </Typography>
+      </div>
+
       <AddFormModal
         open={openCreateForm}
         handleClose={() => setOpenCreateForm(false)}
@@ -258,25 +290,25 @@ function AdminForm() {
           <TableHead>
             <TableRow>
               <TableCell>
-                <Typography variant="subtitle2">Id</Typography>
+                <Typography variant="subtitle2" sx={{fontWeight: 600}}>Id</Typography>
               </TableCell>
               <TableCell align="left">
-                <Typography variant="subtitle2">Name</Typography>
+                <Typography variant="subtitle2" sx={{fontWeight: 600}}>Name</Typography>
               </TableCell>
               <TableCell align="left">
-                <Typography variant="subtitle2">Author</Typography>
+                <Typography variant="subtitle2" sx={{fontWeight: 600}}>Author</Typography>
               </TableCell>
               <TableCell align="left">
-                <Typography variant="subtitle2">Date Added</Typography>
+                <Typography variant="subtitle2" sx={{fontWeight: 600}}>Date Added</Typography>
               </TableCell>
               <TableCell align="left">
-                <Typography variant="subtitle2">Last Updated</Typography>
+                <Typography variant="subtitle2" sx={{fontWeight: 600}}>Last Updated</Typography>
               </TableCell>
               <TableCell align="center">
-                <Typography variant="subtitle2">In Use</Typography>
+                <Typography variant="subtitle2" sx={{fontWeight: 600}}>In Use</Typography>
               </TableCell>
               <TableCell align="center">
-                <Typography variant="subtitle2">Actions</Typography>
+                <Typography variant="subtitle2" sx={{fontWeight: 600}}>Actions</Typography>
               </TableCell>
             </TableRow>
           </TableHead>
@@ -375,15 +407,6 @@ function AdminForm() {
         updateFormName={handleUpdateFormName}
         deleteForm={handleDeleteForm}
       />
-      <Box sx={{ display: "flex", justifyContent: "right", mt: 2 }}>
-        <Button
-          variant="outlined"
-          color="primary"
-          onClick={openCreateFormModal}
-        >
-          Add New Form
-        </Button>
-      </Box>
     </Container>
   );
 }

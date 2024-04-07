@@ -22,6 +22,7 @@ function PreviewForm({
     height: formHeight ? formHeight + "vh" : "80vh",
     width: "80vh",
     overflow: "auto",
+    border: "solid 2px #7D7D7D"
   };
 
   const handleChange = (event, field) => {
@@ -153,15 +154,16 @@ function PreviewForm({
 
   return (
     <Container style={formHeightStyle}>
-      <Typography
-        variant="h4"
-        align="left"
-        fontWeight={500}
-        sx={{ marginTop: 5 }}
-      >
-        {formName}
-      </Typography>
-      <Divider sx={{ my: 2 }} color="primary" />
+      <Container sx={{ width: "100%", bgcolor:"#EB8C00", alignItems: "center",}}>
+        <Typography
+          variant="h5"
+          align="left"
+          fontWeight={600}
+          sx={{ marginTop: 2, textAlign: "center", p: 1}}
+        >
+          {formName}
+        </Typography>
+      </Container>
       <form onSubmit={pushSubmitButton}>
         <Grid container alignItems="top">
           {sortedRows().map((row, rowIndex) => (
@@ -248,7 +250,7 @@ function PreviewForm({
           <Button
             variant="contained"
             color="secondary"
-            sx={{ mt: 3, position: "fixed", bottom: "10px", right: "100px" }}
+            sx={{ mt: 3, position: "fixed", bottom: "10px", right: "115px" }}
             onClick={pushCloseButton}
           >
             Cancel

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Container, Box, Button, Input } from "@mui/material";
+import { Container, Box, Button, Input, CircularProgress } from "@mui/material";
 import {
     DndContext,
     PointerSensor,
@@ -23,12 +23,13 @@ import AddTaskModal from "./AddTaskModal.jsx";
 import { useWorkflowNew } from "../../context/WorkflowContext";
 import IncidentDetailModal from "./IncidentDetailModal";
 import useAutoScroll from "../../hooks/useAutoScroll";
+import useWorkflow from "../../hooks/useWorkflow.js";
 
-function Dashboard() {
-    const { filteredTasks, filterTasks, setFilteredTasks, fetchTasks } = useTasks();
+function Dashboard({ setViewModalOpen }) {
+    const { filteredTasks, filterTasks, setFilteredTasks, fetchTasks, loading } = useTasks();
 
     const { forms, fetchForms, groupedByRows, sortedRows, activeForm } = useForm();
-    const { activeId, handleDragStart, handleDragEnd } = useDragBehavior(filteredTasks, setFilteredTasks);
+    const { activeId, handleDragStart, handleDragEnd, setActiveId } = useDragBehavior(filteredTasks, setFilteredTasks);
     const { user } = useAuthContext();
     const { sendRequest } = useAxios();
     const { adminColumns, employeeColumns, statuses } = useBoard();
@@ -36,6 +37,7 @@ function Dashboard() {
     const [commentData, setCommentData] = useState({});
     const [columnFlowMap, setColumnFlowMap] = useState({});
     const { flowMap, activeStateMap, activeTransitionMap } = useWorkflowNew();
+    const { transitions, fetchWorkflow } = useWorkflow();
 
     const [employees, setEmployees] = useState([]);
     const [addModal, setAddModal] = useState(false);
@@ -48,7 +50,6 @@ function Dashboard() {
     const containerRef = useRef(null);
 
     useAutoScroll(containerRef, Boolean(activeId));
-
     const activeTask = activeId
         ? Object.values(filteredTasks)
               .flat()
@@ -56,6 +57,7 @@ function Dashboard() {
         : null;
 
     const handleOpenModal = (task) => {
+        setActiveId(null);
         setSelectedIncident(task);
         setIsModalOpen(true);
     };
@@ -105,7 +107,7 @@ function Dashboard() {
                 const newCommentData = initialCommentData;
                 //since we do not have comment edit logic, if the size of the comments array is the same, we do not need to push the comment data
                 //this prevent us from pushing the same comment data multiple times
-                if(task.comments.length === newCommentData[task.id]?.length){
+                if (task.comments.length === newCommentData[task.id]?.length) {
                     return;
                 }
                 task.comments.map((comment) => {
@@ -151,6 +153,7 @@ function Dashboard() {
             const res = await sendRequest({ url: "/users" });
             setEmployees(res);
         };
+        fetchWorkflow();
         fetchForms();
         fetchEmployees();
     }, []);
@@ -188,6 +191,7 @@ function Dashboard() {
                         statusName: statuses.find((status) => status.id === activeStateMap[item.toStateId].statusId)
                             ?.name,
                         statusId: activeStateMap[item.toStateId].statusId,
+                        rules: activeTransitionMap[item.transitionId]?.rules || [],
                     });
                 });
 
@@ -232,13 +236,19 @@ function Dashboard() {
                 <div>
                     <Input variant="outlined" placeholder="Search..." onChange={(e) => filterTasks(e.target.value)} />
                 </div>
-                <Button
-                    variant="contained"
-                    onClick={toggleAddModal}
-                    style={{ display: "flex", justifyContent: "flex-end", fontWeight: "bold" }}
-                >
-                    Add Incident
-                </Button>
+                {!loading && (
+                    <Button
+                        variant="contained"
+                        onClick={toggleAddModal}
+                        style={{
+                            display: "flex",
+                            justifyContent: "flex-end",
+                            fontWeight: "bold",
+                        }}
+                    >
+                        Add Incident
+                    </Button>
+                )}
             </div>
             <DndContext
                 sensors={useSensors(
@@ -288,6 +298,8 @@ function Dashboard() {
                                 columnMap={columnFlowMap[column.id]}
                                 setFilteredTasks={setFilteredTasks}
                                 handleOpenModal={handleOpenModal}
+                                loading={loading}
+                                sendRequest={sendRequest}
                             />
                         </Box>
                     ))}
@@ -316,7 +328,28 @@ function Dashboard() {
                     commentData={commentData}
                     setCommentData={setCommentData}
                     setTasks={setFilteredTasks}
+                    transitions={transitions}
+                    setViewModalOpen={setViewModalOpen}
                 />
+            )}
+            {loading && (
+                <Box
+                    sx={{
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: "rgba(0, 0, 0, 0.5)",
+                        zIndex: 1500,
+                        pointerEvents: "none",
+                    }}
+                >
+                    <CircularProgress />
+                </Box>
             )}
         </Container>
     );

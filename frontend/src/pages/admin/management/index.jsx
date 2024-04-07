@@ -6,7 +6,6 @@ import AddTransitionModal from "../../../components/workflows/AddTransitionModal
 import { Button, Typography, CircularProgress, Box, Divider, IconButton, Modal } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import MoveDownIcon from "@mui/icons-material/MoveDown";
-import ElectricBoltIcon from "@mui/icons-material/ElectricBolt";
 import InfoIcon from "@mui/icons-material/Info";
 import WorkflowModal from "../../../components/workflows/WorkflowModal";
 import AddStatusModal from "../../../components/workflows/AddStatusModal";
@@ -14,6 +13,9 @@ import CustomEdge from "../../../components/workflows/CustomEdge";
 import DiscardChangesModal from "../../../components/workflows/DiscardChangesModal";
 import CloseIcon from "@mui/icons-material/Close";
 import SaveWorkflowModal from "../../../components/workflows/SaveWorkflowModal";
+import WorkflowSidebar from "../../../components/workflows/WorkflowSidebar";
+import AddRuleModal from "../../../components/workflows/AddRuleModal";
+import EditRuleModal from "../../../components/workflows/EditRuleModal";
 
 const edgeTypes = {
     customEdge: CustomEdge,
@@ -30,13 +32,15 @@ function AdminManagement({ open, handleClose }) {
     const [discardChangesModalOpen, setDiscardChangesModalOpen] = React.useState(false);
     const [saveChangesModalOpen, setSaveChangesModalOpen] = React.useState(false);
     const [selectedNode, setSelectedNode] = React.useState(null);
+    const [addRuleModalOpen, setAddRuleModalOpen] = React.useState(false);
+    const [selectedRule, setSelectedRule] = React.useState(null);
 
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges] = useEdgesState([]);
     const {
         states,
         transitions,
-        loading,
+        loadingWorkflow,
         fetchWorkflow,
         updateCoordinate,
         addState,
@@ -44,6 +48,13 @@ function AdminManagement({ open, handleClose }) {
         createTransition,
         discardChanges,
         saveChanges,
+        updateFromTransition,
+        updateToTransition,
+        isChangesMade,
+        deleteTransition,
+        addUserRestrictionRule,
+        updateTransitionRule,
+        deleteRule,
     } = useWorkflow();
 
     const onConnect = useCallback(
@@ -84,9 +95,8 @@ function AdminManagement({ open, handleClose }) {
     const handleEdgesUpdated = useCallback(
         (params) => {
             onConnect(params);
-            createTransition(params.source, params.target, params?.label);
         },
-        [onConnect, createTransition],
+        [onConnect],
     );
 
     const handleStatusNameChange = (event) => {
@@ -125,6 +135,52 @@ function AdminManagement({ open, handleClose }) {
         handleClose();
     };
 
+    const handleChangeFromStatus = (newFromStateId, transitionId) => {
+        updateFromTransition(transitionId, newFromStateId);
+        setEdges((prev) => {
+            return prev.map((edge) => {
+                if (edge.id === transitionId) {
+                    return {
+                        ...edge,
+                        source: newFromStateId,
+                    };
+                }
+                return edge;
+            });
+        });
+    };
+
+    const handleChangeToStatus = (newToStateId, transitionId) => {
+        updateToTransition(transitionId, newToStateId);
+        setEdges((prev) => {
+            return prev.map((edge) => {
+                if (edge.id === transitionId) {
+                    return {
+                        ...edge,
+                        target: newToStateId,
+                    };
+                }
+                return edge;
+            });
+        });
+    };
+
+    const handleChangeNode = (newNodeId) => {
+        setSelectedNode(transitions.find((transition) => transition.id === newNodeId));
+    };
+
+    const handleAddUserRestrictionRule = (transitionId, users, groups) => {
+        addUserRestrictionRule(transitionId, users, groups);
+    };
+
+    const handleEditRule = (index, users, groups) => {
+        updateTransitionRule(index, users, groups, selectedNode?.id);
+    };
+
+    const handleDeleteRule = (index) => {
+        deleteRule(index);
+    };
+
     useEffect(() => {
         setNodes(states);
         setEdges(transitions);
@@ -133,6 +189,16 @@ function AdminManagement({ open, handleClose }) {
     useEffect(() => {
         fetchWorkflow();
     }, [fetchWorkflow]);
+
+    useEffect(() => {
+        if (selectedNode) {
+            if (selectedNode?.type) {
+                setSelectedNode(transitions.find((transition) => transition.id === selectedNode.id));
+            } else {
+                setSelectedNode(states.find((state) => state.id === selectedNode.id));
+            }
+        }
+    }, [transitions, states]);
 
     return (
         <Modal
@@ -154,6 +220,7 @@ function AdminManagement({ open, handleClose }) {
                     outline: "none",
                     height: "100vh",
                     paddingTop: 2,
+                    display: "flex",
                 }}
             >
                 <Box
@@ -257,47 +324,12 @@ function AdminManagement({ open, handleClose }) {
                                     Transition
                                 </Typography>
                             </Button>
-                            {/* <Button
-                            onClick={() => {}}
-                            variant="text"
-                            style={{
-                                flexDirection: "column",
-                                alignItems: "center",
-                                justifyContent: "center",
-                            }}
-                        >
-                            <Box
-                                sx={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                }}
-                            >
-                                <ElectricBoltIcon
-                                    sx={{
-                                        width: "20px",
-                                        height: "20px",
-                                        backgroundColor: "#f0f0f0",
-                                        borderRadius: "2px",
-                                    }}
-                                />
-                            </Box>
-                            <Typography
-                                variant="body1"
-                                sx={{
-                                    mt: 0.5,
-                                    fontSize: "12px",
-                                    color: "black",
-                                }}
-                            >
-                                Rules
-                            </Typography>
-                        </Button> */}
                         </div>
                         <div>
                             <Button
                                 onClick={() => setSaveChangesModalOpen(true)}
                                 variant="contained"
+                                disabled={!isChangesMade}
                                 sx={{
                                     height: "32px",
                                     fontWeight: 500,
@@ -328,7 +360,14 @@ function AdminManagement({ open, handleClose }) {
                     </div>
                     <Divider variant="fullWidth" sx={{ my: 2, width: "100vw", borderBottomWidth: 2 }} />
                     <div
-                        style={{ flexGrow: 1, position: "relative", overflow: "hidden", width: "100%", height: "100%" }}
+                        style={{
+                            display: "flex",
+                            flexGrow: 1,
+                            position: "relative",
+                            overflow: "hidden",
+                            width: "100%",
+                            height: "100%",
+                        }}
                     >
                         <IconButton
                             aria-label="information"
@@ -395,23 +434,76 @@ function AdminManagement({ open, handleClose }) {
                                 }}
                             />
                         )}
-                        <ReactFlow
-                            nodes={nodes}
-                            edges={edges}
-                            edgeTypes={edgeTypes}
-                            onNodesChange={handleStatesChange}
-                            onNodeDragStop={handleDragEnd}
-                            onConnect={handleEdgesUpdated}
-                            fitView
-                            style={{ width: "100%", height: "100%" }}
-                            onSelectionChange={(elements) => setSelectedNode(elements?.nodes?.[0] || null)}
+                        {addRuleModalOpen && (
+                            <AddRuleModal
+                                open={addRuleModalOpen}
+                                handleClose={() => setAddRuleModalOpen(false)}
+                                selectedNode={selectedNode}
+                                transitions={transitions}
+                                states={states}
+                                handleAddUserRestrictionRule={handleAddUserRestrictionRule}
+                            />
+                        )}
+                        {selectedRule && (
+                            <EditRuleModal
+                                open={selectedRule !== null}
+                                handleClose={() => setSelectedRule(null)}
+                                states={states}
+                                selectedRule={selectedRule}
+                                handleEditRule={handleEditRule}
+                                selectedTransition={selectedNode?.id}
+                                transitions={transitions}
+                                handleDeleteRule={handleDeleteRule}
+                            />
+                        )}
+                        <Box
+                            sx={{
+                                flexGrow: 1, // Allow this box to grow as needed
+                                overflow: "hidden", // Hide overflow
+                            }}
                         >
-                            <MiniMap />
-                            <Controls />
-                        </ReactFlow>
+                            <ReactFlow
+                                nodes={nodes}
+                                edges={edges}
+                                edgeTypes={edgeTypes}
+                                onNodeClick={(event, node) =>
+                                    setSelectedNode(states.find((state) => state.id === node.id))
+                                }
+                                onEdgeClick={(event, edge) =>
+                                    setSelectedNode(transitions.find((transition) => transition.id === edge.id))
+                                }
+                                onNodesChange={handleStatesChange}
+                                onNodeDragStop={handleDragEnd}
+                                onConnect={handleEdgesUpdated}
+                                selectable="true"
+                                fitView
+                                style={{ width: "100%", height: "100%" }}
+                                onPaneClick={() => setSelectedNode(null)}
+                            >
+                                <MiniMap />
+                                <Controls />
+                            </ReactFlow>
+                            {selectedNode && (
+                                <WorkflowSidebar
+                                    node={selectedNode}
+                                    states={states}
+                                    transitions={transitions}
+                                    handleChangeFromStatus={handleChangeFromStatus}
+                                    handleChangeToStatus={handleChangeToStatus}
+                                    handleChangeNode={handleChangeNode}
+                                    setAddTransitionModalOpen={setAddTransitionModalOpen}
+                                    setFromStatusNames={setFromStatusNames}
+                                    deleteState={deleteState}
+                                    deleteTransition={deleteTransition}
+                                    setAddRuleModalOpen={setAddRuleModalOpen}
+                                    setSelectedRule={setSelectedRule}
+                                    deleteRule={handleDeleteRule}
+                                />
+                            )}
+                        </Box>
                     </div>
                 </Box>
-                {loading && (
+                {loadingWorkflow && (
                     <Box
                         sx={{
                             position: "fixed",
