@@ -245,7 +245,7 @@ function PreviewForm({
             sx={{ mt: 3, position: "fixed", bottom: "10px", right: "10px" }}
             disabled={!filledRequired}
           >
-            Generate
+            Submit
           </Button>
           <Button
             variant="contained"

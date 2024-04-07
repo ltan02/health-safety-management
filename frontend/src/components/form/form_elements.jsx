@@ -387,7 +387,7 @@ export const FIELD_ELEMENT = {
               </Typography>
             )}
           </Box>
-          <Tooltip title="Search and Select Category by AI" placement="top">
+          <Tooltip title="Generate Category by AI" placement="top">
             <Button
               disabled={disabled}
               onClick={onClick}
@@ -395,7 +395,7 @@ export const FIELD_ELEMENT = {
               color="primary"
               sx={{ boxShadow: "none", "&:hover": { boxShadow: "none" } }}
             >
-              Search
+              Generate
             </Button>
           </Tooltip>
         </Box>

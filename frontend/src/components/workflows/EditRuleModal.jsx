@@ -123,8 +123,6 @@ function EditRuleModal({
         }
     }, [selectedRule]);
 
-    console.log(selectedTransition, selectedGroups, selectedUsers, ruleType, ruleIndex, users);
-
     return (
         <Modal
             open={open}

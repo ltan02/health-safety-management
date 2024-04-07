@@ -62,6 +62,7 @@ const useDragBehavior = (tasks, setTasks) => {
         activeId,
         handleDragStart,
         handleDragEnd,
+        setActiveId,
     };
 };
 
