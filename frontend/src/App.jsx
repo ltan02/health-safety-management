@@ -12,10 +12,13 @@ import Sidebar from "./components/global/Sidebar";
 import { useState } from "react";
 import EmployeeInvolvement from "./pages/report/EmployeeInvolvement.jsx";
 import { WorkflowProvider } from "./context/WorkflowContext.jsx";
+import ProfilePage from "./pages/profile/index.jsx";
+
 
 const ReportOverview = lazy(() => import("./pages/report/index.jsx"));
 const Incident = lazy(() => import("./pages/incident"));
 const Login = lazy(() => import("./pages/login"));
+const SignUp = lazy(() => import("./pages/signup"));
 const AdminWorkflow = lazy(() => import("./pages/admin/workflows/index.jsx"));
 const AdminStatus = lazy(() => import("./pages/admin/status/index.jsx"));
 const AdminForm = lazy(() => import("./pages/admin/form/index.jsx"));
@@ -61,6 +64,7 @@ function App() {
             !isUserLoggedIn() && !user?.role ? (
                 <Routes>
                     <Route path="/" element={<Login />} />
+                    <Route path="/signup" element={<SignUp />} />
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
             ) : (
@@ -70,6 +74,9 @@ function App() {
                             <Routes>
                                 {isPrivileged(user?.role) ? (
                                     <>
+                                        <Route path="profile" >
+                                            <Route index element={<ProfilePage />} />
+                                        </Route>
                                         <Route path="admin">
                                             <Route path="workflow" element={<AdminWorkflow />} />
                                             <Route path="form" element={<AdminForm />} />
