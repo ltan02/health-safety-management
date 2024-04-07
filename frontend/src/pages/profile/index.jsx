@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import {
     Box,
     Container,
     TextField,
     Typography,
     Switch,
-    FormControlLabel, Link, Grid,
+    FormControlLabel, Link, Grid, Button, Icon,
 } from "@mui/material";
 import { useAuthContext } from "../../context/AuthContext";
+import HomeIcon from '@mui/icons-material/Home';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 export default function ProfilePage() {
   // State for managing the switch (notification preference)
@@ -26,6 +28,7 @@ export default function ProfilePage() {
         alignItems: "center",
         justifyContent: "center",
         marginTop: "5%",
+        backgroundColor: "white"
     }}>
       <Box
         sx={{
@@ -36,10 +39,14 @@ export default function ProfilePage() {
             borderRadius: 2,
             padding: 5,
             width: "90%",
+            backgroundColor: "white"
         }}
       >
         <Typography component="h1" variant="h5" fontWeight={600}>
-          Profile
+            <Box display="flex" alignItems="center" sx={{color:"#464646"}}>
+                <AccountCircleIcon fontSize={"large"} sx={{ marginRight: 1,}} />
+                Profile
+            </Box>
         </Typography>
         {/* User's Name */}
           <Grid
@@ -164,12 +171,12 @@ export default function ProfilePage() {
           <Grid
               container
               alignItems="center"
-              sx={{ justifyContent: "space-between", mt: 5 }}
+              sx={{ justifyContent: "space-between", mt: 1 }}
           >
               <FormControlLabel
                   label={<Typography fontSize={16} color="secondary" >Would you like to receive Notifications?</Typography>}
                   labelPlacement="start"
-                  sx={{mt: 4,}}
+                  sx={{mt: 2,}}
                   control={
                       <Switch
                           checked={isNotified}
@@ -180,6 +187,9 @@ export default function ProfilePage() {
                   }
               />
           </Grid>
+          <Button variant={"contained"} sx={{borderRadius: 5,
+              mt: 2, paddingInline: 8, color: "white"}} size={"large"}
+                  startIcon={<HomeIcon />}>Home</Button>
         {/* Notification Preference */}
       </Box>
     </Container>
