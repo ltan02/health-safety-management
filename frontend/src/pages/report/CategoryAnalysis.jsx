@@ -126,7 +126,7 @@ function CategoryAnalysis() {
                     });
                     return categoryData;
                 });
-
+                
                 setData(transformedData);
             }
         };
@@ -152,6 +152,15 @@ function CategoryAnalysis() {
     }, {});
 
     const dateRanges = ["Past Week", "Past 2 Weeks", "Past Month", "Past 3 Months", "Past 6 Months", "All Time"];
+    const modernPalette = [
+        "rgba(46, 147, 250, 0.7)", // Vibrant Blue with reduced opacity
+        "rgba(102, 218, 38, 0.7)", // Lime Green with reduced opacity
+        "rgba(255, 193, 7, 0.7)", // Amber with reduced opacity
+        "rgba(252, 104, 104, 0.7)", // Soft Red with reduced opacity
+        "rgba(64, 86, 244, 0.7)", // Royal Blue with reduced opacity
+        "rgba(161, 161, 161, 0.7)", // Grey with reduced opacity
+      ];
+    
 
     return (
         <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", overflow: "hidden" }}>
