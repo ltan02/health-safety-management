@@ -1,5 +1,6 @@
 package com.teamadc.backend.model;
 
+import com.google.cloud.firestore.annotation.DocumentId;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +12,6 @@ public class Graph {
     private String end;
     private String start;
     private String type;
-    private String name;
 
     public Graph() {
         this.field = "category";
@@ -19,17 +19,15 @@ public class Graph {
     }
 
 
-    public Graph(String field, String type, String name) {
+    public Graph(String field, String type) {
         this.field = field;
         this.type = type;
-        this.name = name;
     }
 
-    public Graph(String field, String type, String start, String end, String name) {
+    public Graph(String field, String type, String start, String end) {
         this.field = field;
         this.type = type;
         this.end = end;
         this.start = start;
-        this.name = name;
     }
 }
