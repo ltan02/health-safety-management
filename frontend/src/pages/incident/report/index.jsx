@@ -184,7 +184,6 @@ function IncidentReport() {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            backgroundColor: "rgba(0, 0, 0, 0.5)",
                             zIndex: 1500,
                             pointerEvents: "none",
                         }}
