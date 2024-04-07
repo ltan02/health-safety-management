@@ -24,10 +24,10 @@ public class ReportBoard {
         this.id = id;
         this.userId = userId;
         List<Graph> graphs = new ArrayList<>();
-        graphs.add(new Graph("category", "Bar", "Bar Graph of Category"));
-        graphs.add(new Graph("reporter", "Line", "Line Graph of Reporter"));
-        graphs.add(new Graph("status", "Pie", "Pie Graph of Status"));
-        graphs.add(new Graph("date", "Scatter", "Scatter Date Graph"));
+        graphs.add(new Graph("category", "Bar"));
+        graphs.add(new Graph("reporter", "Line"));
+        graphs.add(new Graph("status", "Pie"));
+        graphs.add(new Graph("date", "Scatter"));
         this.graphs = graphs;
     }
     

@@ -1,15 +1,15 @@
 import { useState } from "react";
 import {
-    Box,
-    Modal,
-    Typography,
-    Button,
-    MenuItem,
-    Select,
-    Paper,
-    FormControl,
-    InputLabel,
-    Grid, TextField,
+  Box,
+  Modal,
+  Typography,
+  Button,
+  MenuItem,
+  Select,
+  Paper,
+  FormControl,
+  InputLabel,
+  Grid,
 } from "@mui/material";
 import ReportChart from "./ReportChart";
 import useDashboard from "../../hooks/useDashboard";
@@ -41,79 +41,55 @@ function ReportModal({
 }) {
   const { updateBoard } = useDashboard();
 
-    const handleSubmit = (field, start, end) => {
-        const changedData = newData.map((c, i) => {
-            if (i === selectedVal) {
-                return {
-                    type: newData[i].type,
-                    field: field,
-                    start: start,
-                    end: end,
-                    name: newData[i].name,
-                };
-            } else {
-                return c;
-            }
-        });
-        setNewData(changedData);
-    };
+  const handleSubmit = (field, start, end) => {
+    const changedData = newData.map((c, i) => {
+      if (i === selectedVal) {
+        return {
+          type: newData[i].type,
+          field: field,
+          start: start,
+          end: end,
+        };
+      } else {
+        return c;
+      }
+    });
+    setNewData(changedData);
+  };
 
-    // const [selectedVal, setSelectedVal] = useState(0);
-    // const handleChange = (event) => {
-    //     setSelectedVal(event.target.value);
-    //     setName(newData[event.target.value].name);
-    //     setGraphType(newData[event.target.value].type);
-    // };
+  // const [selectedVal, setSelectedVal] = useState(0);
+  // const handleChange = (event) => {
+  //   setSelectedVal(event.target.value);
+  //   setGraphType(newData[event.target.value].type);
+  // };
 
-    const [graphType, setGraphType] = useState(newData[0].type);
-    const handleGraphChange = (event) => {
-        setGraphType(event.target.value);
-        const changedData = newData.map((c, i) => {
-            if (i === selectedVal) {
-                return {
-                    type: event.target.value,
-                    field: newData[i].field,
-                    start: newData[i].start,
-                    end: newData[i].end,
-                    name: newData[i].name,
-                };
-            } else {
-                return c;
-            }
-        });
-        setNewData(changedData);
-    };
+  const [graphType, setGraphType] = useState(newData[0].type);
+  const handleGraphChange = (event) => {
+    setGraphType(event.target.value);
+    const changedData = newData.map((c, i) => {
+      if (i === selectedVal) {
+        return {
+          type: event.target.value,
+          field: newData[i].field,
+          start: newData[i].start,
+          end: newData[i].end,
+        };
+      } else {
+        return c;
+      }
+    });
+    setNewData(changedData);
+  };
 
-    const pushCloseButton = () => {
-        onClose();
-    };
+  const pushCloseButton = () => {
+    onClose();
+  };
 
-    const pushSubmitButton = () => {
-        updateBoard(boardId, newData);
-        onRefresh();
-        onClose();
-    };
-
-    const [name, setName] = useState(newData[selectedVal].name);
-
-    const GraphNameHandler = (event) => {
-        setName(event.target.value);
-        console.log(selectedVal)
-        const changedData = newData.map((c, i) => {
-            if (i === selectedVal) {
-                return {
-                    type: newData[i].type,
-                    field: newData[i].field,
-                    start: newData[i].start,
-                    end: newData[i].end,
-                    name: name,
-                };
-            } else {
-                return c;
-            }
-        });
-        setNewData(changedData);
-    };
+  const pushSubmitButton = () => {
+    updateBoard(boardId, newData);
+    onRefresh();
+    onClose();
+  };
 
   return (
     <Modal
@@ -151,11 +127,6 @@ function ReportModal({
                 <MenuItem value="Pie">Pie</MenuItem>
               </Select>
             </FormControl>
-              <InputLabel>Graph Name</InputLabel>
-              <TextField
-                  value={name}
-                  onChange={GraphNameHandler}
-              />
           </Grid>
 
           <Grid item xs={12}>
