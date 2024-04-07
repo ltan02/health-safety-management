@@ -9,6 +9,10 @@ import AddTaskModal from "../../../components/incident/AddTaskModal";
 import useForm from "../../../hooks/useForm";
 import useAxios from "../../../hooks/useAxios";
 import { useAuthContext } from "../../../context/AuthContext";
+import { useWorkflowNew } from "../../../context/WorkflowContext";
+import useWorkflow from "../../../hooks/useWorkflow";
+import ViewWorkflowModal from "../../../components/workflows/ViewWorkflowModal";
+import AdminManagement from "../../admin/management";
 import LoadingBar from "../../../components/global/LoadingBar";
 import {v4 as uuidv4} from "uuid";
 
@@ -20,6 +24,21 @@ function IncidentReport() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { statuses } = useBoard();
     const { sendRequest } = useAxios();
+    const { transitions, fetchWorkflow } = useWorkflow();
+    const { fetchWorkflowNew } = useWorkflowNew();
+
+    const [viewModalOpen, setViewModalOpen] = useState(false);
+    const [editModalOpen, setEditModalOpen] = useState(false);
+
+    const handleView = async () => {
+        setEditModalOpen(true);
+        setViewModalOpen(false);
+    };
+
+    useEffect(() => {
+        fetchWorkflow();
+        fetchWorkflowNew();
+    }, []);
     const [commentData, setCommentData] = useState({});
     const [employees, setEmployees] = useState([]);
 
@@ -68,6 +87,10 @@ function IncidentReport() {
     useEffect(() => {
         setRows(Object.values(filteredTasks).flat());
     }, [filteredTasks]);
+
+    useEffect(() => {
+        fetchWorkflow();
+    }, []);
 
     const [addModal, setAddModal] = useState(false);
     const toggleAddModal = () => setAddModal(!addModal);
@@ -195,18 +218,20 @@ function IncidentReport() {
             </Typography>
             <div style={{ marginRight: "3rem", marginLeft: "3rem" }}>
                 <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                    {!loading && (<Button
-                        variant="contained"
-                        onClick={toggleAddModal}
-                        style={{
-                            display: "flex",
-                            justifyContent: "flex-end",
-                            marginBottom: "1rem",
-                            fontWeight: "bold",
-                        }}
-                    >
-                        Add Incident
-                    </Button>)}
+                    {!loading && (
+                        <Button
+                            variant="contained"
+                            onClick={toggleAddModal}
+                            style={{
+                                display: "flex",
+                                justifyContent: "flex-end",
+                                marginBottom: "1rem",
+                                fontWeight: "bold",
+                            }}
+                        >
+                            Add Incident
+                        </Button>
+                    )}
                 </div>
                 {loading && (
                     <Box
@@ -228,7 +253,7 @@ function IncidentReport() {
                     </Box>
                 )}
 
-                {!loading && (<IncidentDataGrid rows={rows} columns={columns} onRowClick={handleRowClick} />)}
+                {!loading && <IncidentDataGrid rows={rows} columns={columns} onRowClick={handleRowClick} />}
                 {isModalOpen && selectedIncident && (
                     <IncidentDetailModal
                         open={isModalOpen}
@@ -236,9 +261,21 @@ function IncidentReport() {
                         incidentId={selectedIncident.id}
                         onClose={handleCloseModal}
                         setTasks={setFilteredTasks}
+                        transitions={transitions}
+                        setViewModalOpen={setViewModalOpen}
                     />
                 )}
             </div>
+            {viewModalOpen && (
+                <ViewWorkflowModal
+                    open={viewModalOpen}
+                    handleClose={() => {
+                        setViewModalOpen(false);
+                    }}
+                    handleEdit={handleView}
+                />
+            )}
+            {editModalOpen && <AdminManagement open={editModalOpen} handleClose={() => setEditModalOpen(false)} />}
         </>
     );
 }

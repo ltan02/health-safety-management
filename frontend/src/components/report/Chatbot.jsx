@@ -30,7 +30,7 @@ const Chatbot = () => {
         setMessages((prev) => [...prev, { text: newMessage, sender: "user" }, { text: undefined, sender: "bot" }]);
         setNewMessage("");
         const response = await sendAIRequest({
-            url: "/chat",
+            url: "/chat/",
             method: "POST",
             body: { prompt: newMessage },
             id: randomID,

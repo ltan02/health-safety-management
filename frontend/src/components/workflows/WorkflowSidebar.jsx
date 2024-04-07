@@ -108,8 +108,6 @@ const WorkflowSidebar = ({
         handleMenuClose();
     };
 
-    console.log(rules);
-
     return (
         <SwipeableDrawer
             ModalProps={{ keepMounted: true }}
@@ -304,30 +302,30 @@ const WorkflowSidebar = ({
                                                                         ? ` ${
                                                                               users.find(
                                                                                   (user) => user.id === rule.userIds[0],
-                                                                              ).firstName
+                                                                              )?.firstName
                                                                           } ${
                                                                               users.find(
                                                                                   (user) => user.id === rule.userIds[0],
-                                                                              ).lastName
+                                                                              )?.lastName
                                                                           }`
                                                                         : rule.roles.length === 1
                                                                         ? ` ${
                                                                               users.find(
                                                                                   (user) => user.id === rule.userIds[0],
-                                                                              ).firstName
+                                                                              )?.firstName
                                                                           } ${
                                                                               users.find(
                                                                                   (user) => user.id === rule.userIds[0],
-                                                                              ).lastName
+                                                                              )?.lastName
                                                                           } and ${ROLES[rule.roles[0]]}`
                                                                         : ` ${
                                                                               users.find(
                                                                                   (user) => user.id === rule.userIds[0],
-                                                                              ).firstName
+                                                                              )?.firstName
                                                                           } ${
                                                                               users.find(
                                                                                   (user) => user.id === rule.userIds[0],
-                                                                              ).lastName
+                                                                              )?.lastName
                                                                           } and ${rule.roles.length} roles`
                                                                     : rule.roles.length === 0
                                                                     ? ` ${rule.userIds.length} people`
