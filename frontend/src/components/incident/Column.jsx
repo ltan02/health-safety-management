@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
 import { Container, Typography, Box, Chip, Modal } from "@mui/material";
 import Task from "./Task";
 import PreviewForm from "../form/PreviewForm";
 import DoNotDisturbIcon from "@mui/icons-material/DoNotDisturb";
 import DroppableTransitionBox from "./DroppableTransitionBox";
+import { useAuthContext } from "../../context/AuthContext";
 
 const modalStyle = {
     position: "absolute",
@@ -37,7 +38,9 @@ function Column({
     onRefresh,
     setFilteredTasks,
 }) {
+    const { user } = useAuthContext();
     const [openModal, setOpenModal] = useState(false);
+    const [filteredColumnMap, setFilteredColumnMap] = useState([]);
 
     const handleSubmit = (field) => {
         handleAddTask(field);
@@ -61,6 +64,18 @@ function Column({
             };
         });
     };
+
+    useEffect(() => {
+        if (columnMap) {
+            const filteredMap = columnMap.filter((column) => column.rules.every((rule) => {
+                if (rule.type === "restrict-who-can-move-an-issue") {
+                    return rule.userIds.includes(user.id) || rule.roles.includes(user.role);
+                }
+                return true;
+            }));
+            setFilteredColumnMap(filteredMap);
+        }
+    }, [columnMap, user]);
 
     return (
         <Container
@@ -114,8 +129,8 @@ function Column({
                         alignItems: "center",
                     }}
                 >
-                    {columnMap && columnMap.length > 0 ? (
-                        columnMap.map((column, index) => (
+                    {filteredColumnMap && filteredColumnMap.length > 0 ? (
+                        filteredColumnMap.map((column, index) => (
                             <DroppableTransitionBox
                                 key={index}
                                 statusId={column.statusId}
@@ -137,7 +152,7 @@ function Column({
                         >
                             <DoNotDisturbIcon />
                             <p style={{ fontSize: 12, marginTop: 5 }}>
-                                You can&apos;t move this incident to this column due to workflow configuration.
+                                You can&apos;t move this incident to this column due to workflow configuration or permissions.
                             </p>
                         </Box>
                     )}

@@ -187,10 +187,10 @@ export default function useWorkflow() {
         });
     }, []);
 
-    const updateTransitionRule = useCallback((index, users, groups) => {
+    const updateTransitionRule = useCallback((index, users, groups, transitionId) => {
         setTransitions((prev) => {
             return prev.map((transition) => {
-                if (transition.data.index === index) {
+                if (transition.id === transitionId) {
                     const updatedRules = [
                         ...transition.data.rules.slice(0, index),
                         { type: "restrict-who-can-move-an-issue", userIds: users, roles: groups },
@@ -452,10 +452,11 @@ export default function useWorkflow() {
             });
 
             transitionsToUpdate.map((transition) => {
-                sendRequest({
+                return sendRequest({
                     url: `/transitions/${transition.id}`,
                     method: "PUT",
                     body: {
+                        id: transition.id,
                         fromStateId: transition.source,
                         toStateId: transition.target,
                         label: transition.data.label,
@@ -522,22 +523,27 @@ export default function useWorkflow() {
                 };
             });
 
-            await sendRequest({
-                url: `/workflows/${activeWorkflow.id}`,
-                method: "PUT",
-                body: {
-                    name: activeWorkflow.name,
-                    active: activeWorkflow.active,
-                    stateIds: newStatesLocal.map((state) => state.id),
-                    transitionIds: newTransitionsLocal.map((transition) => transition.id),
-                    boardId: activeWorkflow.boardId,
-                },
-            });
+            if (
+                statesToAdd.length > 0 ||
+                statesToDelete.length > 0 ||
+                transitionsToAdd.length > 0 ||
+                transitionsToDelete.length > 0
+            ) {
+                await sendRequest({
+                    url: `/workflows/${activeWorkflow.id}`,
+                    method: "PUT",
+                    body: {
+                        name: activeWorkflow.name,
+                        active: activeWorkflow.active,
+                        stateIds: newStatesLocal.map((state) => state.id),
+                        transitionIds: newTransitionsLocal.map((transition) => transition.id),
+                        boardId: activeWorkflow.boardId,
+                    },
+                });
+            }
 
-            setOriginalStates(JSON.parse(JSON.stringify(newStatesLocal)));
-            setOriginalTransitions(JSON.parse(JSON.stringify(newTransitionsLocal)));
-            setStates(JSON.parse(JSON.stringify(newStatesLocal)));
-            setTransitions(JSON.parse(JSON.stringify(newTransitionsLocal)));
+            setOriginalStates(JSON.parse(JSON.stringify(states)));
+            setOriginalTransitions(JSON.parse(JSON.stringify(transitions)));
         } catch (err) {
             console.log(err);
         } finally {

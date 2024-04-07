@@ -174,7 +174,7 @@ function AdminManagement({ open, handleClose }) {
     };
 
     const handleEditRule = (index, users, groups) => {
-        updateTransitionRule(index, users, groups);
+        updateTransitionRule(index, users, groups, selectedNode?.id);
     };
 
     const handleDeleteRule = (index) => {

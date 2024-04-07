@@ -23,12 +23,13 @@ import AddTaskModal from "./AddTaskModal.jsx";
 import { useWorkflowNew } from "../../context/WorkflowContext";
 import IncidentDetailModal from "./IncidentDetailModal";
 import useAutoScroll from "../../hooks/useAutoScroll";
+import useWorkflow from "../../hooks/useWorkflow.js";
 
-function Dashboard() {
+function Dashboard({ setViewModalOpen }) {
     const { filteredTasks, filterTasks, setFilteredTasks, fetchTasks, loading } = useTasks();
 
     const { forms, fetchForms, groupedByRows, sortedRows, activeForm } = useForm();
-    const { activeId, handleDragStart, handleDragEnd } = useDragBehavior(filteredTasks, setFilteredTasks);
+    const { activeId, handleDragStart, handleDragEnd, setActiveId } = useDragBehavior(filteredTasks, setFilteredTasks);
     const { user } = useAuthContext();
     const { sendRequest } = useAxios();
     const { adminColumns, employeeColumns, statuses } = useBoard();
@@ -36,6 +37,7 @@ function Dashboard() {
     const [commentData, setCommentData] = useState({});
     const [columnFlowMap, setColumnFlowMap] = useState({});
     const { flowMap, activeStateMap, activeTransitionMap } = useWorkflowNew();
+    const { transitions, fetchWorkflow } = useWorkflow();
 
     const [employees, setEmployees] = useState([]);
     const [addModal, setAddModal] = useState(false);
@@ -55,6 +57,7 @@ function Dashboard() {
         : null;
 
     const handleOpenModal = (task) => {
+        setActiveId(null);
         setSelectedIncident(task);
         setIsModalOpen(true);
     };
@@ -150,6 +153,7 @@ function Dashboard() {
             const res = await sendRequest({ url: "/users" });
             setEmployees(res);
         };
+        fetchWorkflow();
         fetchForms();
         fetchEmployees();
     }, []);
@@ -187,6 +191,7 @@ function Dashboard() {
                         statusName: statuses.find((status) => status.id === activeStateMap[item.toStateId].statusId)
                             ?.name,
                         statusId: activeStateMap[item.toStateId].statusId,
+                        rules: activeTransitionMap[item.transitionId]?.rules || [],
                     });
                 });
 
@@ -323,6 +328,8 @@ function Dashboard() {
                     commentData={commentData}
                     setCommentData={setCommentData}
                     setTasks={setFilteredTasks}
+                    transitions={transitions}
+                    setViewModalOpen={setViewModalOpen}
                 />
             )}
             {loading && (
