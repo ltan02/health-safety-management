@@ -254,25 +254,25 @@ function ReportChart({
         return {
           color: "rgba(46, 147, 250, 0.2)", // A warm orange
           // title: "Number of Tickets by " + uppercase(field),
-          title: field,
+          title: data.name,
         };
       case "Line":
         return {
           color: "rgba(102, 218, 38, 0.2)", // A deep teal
           // title: "Number of Tickets by " + uppercase(field),
-          title: field,
+          title: data.name,
         };
       case "Scatter":
         return {
           color: "rgba(255, 193, 7, 0.2)", // A light orange
           // title: "Number of Tickets by " + uppercase(field),
-          title: field,
+          title: data.name,
         };
       case "Pie":
         return {
           color: "rgba(252, 104, 104, 0.2)", // A deep teal
           // title: "Number of Tickets by " + uppercase(field),
-          title: field,
+          title: data.name,
         };
       default:
         return "rgba(64, 86, 244, 0.7)"; // A light grey for defaults
@@ -293,7 +293,7 @@ function ReportChart({
             fontWeight={600}
             color={"grey.800"}
           >
-            Number of tickets by {uppercase(field)}
+            {chartDataByType(type, field).title}
           </Typography>
         </CardActionArea>
         <Divider />
