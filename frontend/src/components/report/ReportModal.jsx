@@ -154,7 +154,7 @@ function ReportModal({
             </FormControl>
               <InputLabel>Graph Name</InputLabel>
               <TextField
-                  value={""}
+                  value={newData[selectedVal].name}
                   onChange={GraphNameHandler}
               />
           </Grid>
