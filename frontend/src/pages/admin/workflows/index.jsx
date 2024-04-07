@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Container, Typography, Button } from "@mui/material";
+import { Container, Typography, Button, Box, CircularProgress } from "@mui/material";
 import useWorkflow from "../../../hooks/useWorkflow";
 import { useAuthContext } from "../../../context/AuthContext";
 import ReactFlow, { Controls, useNodesState, useEdgesState } from "reactflow";
@@ -17,6 +17,7 @@ export default function AdminWorkflow() {
     const [edges, setEdges] = useEdgesState([]);
     const { user } = useAuthContext();
     const [editModalOpen, setEditModalOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const { states, transitions, fetchWorkflow } = useWorkflow();
 
@@ -26,7 +27,20 @@ export default function AdminWorkflow() {
     }, [setEdges, setNodes, states, transitions]);
 
     useEffect(() => {
-        fetchWorkflow();
+        const getWorkflow = async () => {
+            try {
+                setIsLoading(true);
+                await fetchWorkflow();
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        if (fetchWorkflow) {
+            getWorkflow();
+        }
     }, [fetchWorkflow]);
 
     return (
@@ -81,7 +95,40 @@ export default function AdminWorkflow() {
                     </ReactFlow>
                 </div>
             </Container>
-            {editModalOpen && <AdminManagement open={editModalOpen} handleClose={() => setEditModalOpen(false)} />}
+            {editModalOpen && (
+                <AdminManagement
+                    open={editModalOpen}
+                    handleClose={async () => {
+                        setEditModalOpen(false);
+                        try {
+                            setIsLoading(true);
+                            await fetchWorkflow();
+                        } catch (error) {
+                            console.error(error);
+                        } finally {
+                            setIsLoading(false);
+                        }
+                    }}
+                />
+            )}
+            {isLoading && (
+                <Box
+                    sx={{
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: "rgba(0, 0, 0, 0)",
+                        zIndex: 1500,
+                    }}
+                >
+                    <CircularProgress />
+                </Box>
+            )}
         </>
     );
 }

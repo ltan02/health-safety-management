@@ -30,6 +30,7 @@ const WorkflowSidebar = ({
     node,
     states,
     transitions,
+    handleNameChange,
     handleChangeFromStatus,
     handleChangeToStatus,
     handleChangeNode,
@@ -76,6 +77,7 @@ const WorkflowSidebar = ({
     const handleSaveChanges = (event) => {
         event.stopPropagation();
         if (newName !== "") {
+            handleNameChange(newName, node.id);
             setName(newName);
         }
         setNewName("");

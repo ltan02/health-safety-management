@@ -55,6 +55,8 @@ function AdminManagement({ open, handleClose }) {
         addUserRestrictionRule,
         updateTransitionRule,
         deleteRule,
+        updateName,
+        setLoadingWorkflow,
     } = useWorkflow();
 
     const onConnect = useCallback(
@@ -107,6 +109,10 @@ function AdminManagement({ open, handleClose }) {
         addState(statusName);
         setAddStatusModalOpen(false);
         setStatusName("");
+    };
+
+    const handleNameChange = (newName, id) => {
+        updateName(newName, id);
     };
 
     const handleAddTransition = () => {
@@ -427,9 +433,16 @@ function AdminManagement({ open, handleClose }) {
                             <SaveWorkflowModal
                                 open={saveChangesModalOpen}
                                 handleClose={() => setSaveChangesModalOpen(false)}
-                                handleSaveChanges={() => {
-                                    saveChanges();
+                                handleSaveChanges={async () => {
                                     setSaveChangesModalOpen(false);
+                                    try {
+                                        setLoadingWorkflow(true);
+                                        await saveChanges();
+                                    } catch (error) {
+                                        console.error(error);
+                                    } finally {
+                                        setLoadingWorkflow(false);
+                                    }
                                     handleClose();
                                 }}
                             />
@@ -466,9 +479,10 @@ function AdminManagement({ open, handleClose }) {
                                 nodes={nodes}
                                 edges={edges}
                                 edgeTypes={edgeTypes}
-                                onNodeClick={(event, node) =>
-                                    setSelectedNode(states.find((state) => state.id === node.id))
-                                }
+                                onNodeClick={(event, node) => {
+                                    if (node.data.label === "START") return;
+                                    setSelectedNode(states.find((state) => state.id === node.id));
+                                }}
                                 onEdgeClick={(event, edge) =>
                                     setSelectedNode(transitions.find((transition) => transition.id === edge.id))
                                 }
@@ -498,6 +512,7 @@ function AdminManagement({ open, handleClose }) {
                                     setAddRuleModalOpen={setAddRuleModalOpen}
                                     setSelectedRule={setSelectedRule}
                                     deleteRule={handleDeleteRule}
+                                    handleNameChange={handleNameChange}
                                 />
                             )}
                         </Box>
