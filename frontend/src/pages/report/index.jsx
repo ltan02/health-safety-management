@@ -1,15 +1,9 @@
 import {
   Grid,
   Fab,
-  Card,
-  CardActionArea,
-  CardContent,
-  Button,
   Divider,
   Typography,
-  Box,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 import Chatbot from "../../components/report/Chatbot.jsx";
 import ChatIcon from "@mui/icons-material/Chat";
 import Draggable from "react-draggable";
@@ -51,13 +45,16 @@ function ReportOverview() {
     window.location.reload();
   };
 
+  const [name, setName] = useState('');
   const handleOpenEdit = (item, index) => {
     console.log("open edit");
     setSelectedVal(index);
     console.log(item);
     console.log(index);
+    setName(item.name);
     toggleModal();
     setNewData(dashData);
+    console.log(name);
   };
 
   useEffect(() => {
@@ -91,6 +88,7 @@ function ReportOverview() {
         boardId={boardId}
         onRefresh={refreshDashboard}
         selectedVal={selectedVal}
+        name={name}
       />
 
       <div
