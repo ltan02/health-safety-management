@@ -154,7 +154,7 @@ function PreviewForm({
 
   return (
     <Container style={formHeightStyle}>
-      <Container sx={{ width: "100%", bgcolor:"#EB8C00", alignItems: "center",}}>
+      <Container sx={{ width: "100%", bgcolor:"rgb(235, 140, 0, 0.7)", alignItems: "center",}}>
         <Typography
           variant="h5"
           align="left"
