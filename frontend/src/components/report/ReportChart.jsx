@@ -104,44 +104,53 @@ function ReportChart({ type, locked, data, height, width, handleSubmit }) {
                 series={[
                     {
                         data: report.map((v) => ({id: v.id, value: v.value, label: v.label})),
+                        outerRadius: 65,
+                        cx: '50%',
+                        cy: '25%'
                     },
                 ]}
                 height={height}
                 width={width}
+                slotProps={{
+                    legend: {
+                        direction: 'row',
+                        position: { vertical: 'bottom', horizontal: 'middle' },
+                        padding: 0,
+                    }
+                }}
             />
         </>
     );
 
     const customize = (
         <>
-            <Typography gutterBottom variant="h7">
-                {" "}
-                Select Field{" "}
-            </Typography>
-            <Select value={field} onChange={handleFieldChange}>
-                <MenuItem value={"category"}>Category</MenuItem>
-                <MenuItem value={"date"}>Date</MenuItem>
-                <MenuItem value={"status"}>Status</MenuItem>
-                <MenuItem value={"reporter"}>Reporter</MenuItem>
-            </Select>
-            <Typography gutterBottom variant="h7">
-                {" "}
-                Select Date Range{" "}
-            </Typography>
-            <Grid>
-                <Typography gutterBottom variant="h8">
-                    {" "}
-                    Start:{" "}
-                </Typography>
-                <TextField type="datetime-local" value={startDate} onChange={handleStartChange} />
-            </Grid>
-            <Grid>
-                <Typography gutterBottom variant="h8">
-                    {" "}
-                    End:{" "}
-                </Typography>
-                <TextField type="datetime-local" value={endDate} onChange={handleEndChange} />
-            </Grid>
+            <div style={{alignItems: "center"}}>
+                <div style={{ width: "100%", display: "flex", marginTop: 10 }}>
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                        <Typography style={{ fontSize: "14px", fontWeight: 600, color: "#626f86", marginBottom: 5}}>
+                            Select Field
+                        </Typography>
+                        <Select value={field} onChange={handleFieldChange}>
+                            <MenuItem value={"category"}>Category</MenuItem>
+                            <MenuItem value={"date"}>Date</MenuItem>
+                            <MenuItem value={"status"}>Status</MenuItem>
+                            <MenuItem value={"reporter"}>Reporter</MenuItem>
+                        </Select>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", marginLeft: "20px",}}>
+                        <Typography gutterBottom style={{ fontSize: "14px", fontWeight: 600, color: "#626f86" }}>
+                            Start:
+                        </Typography>
+                        <TextField type="datetime-local" value={startDate} onChange={handleStartChange} />
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", marginLeft: "20px",}}>
+                        <Typography gutterBottom style={{ fontSize: "14px", fontWeight: 600, color: "#626f86" }}>
+                            End:
+                        </Typography>
+                        <TextField type="datetime-local" value={endDate} onChange={handleEndChange}/>
+                    </div>
+                </div>
+            </div>
         </>
     );
 
