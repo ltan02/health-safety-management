@@ -120,14 +120,12 @@ function Dashboard({ setViewModalOpen }) {
                         user: employees.filter((employee) => employee.id === comment.userId)[0],
                     };
                     const tempId = hasTempComment(newCommentData[comment.id], data);
-                    // this is to prevent duplicate temp comments
                     if (tempId) {
                         newCommentData[comment.id][tempId] = data;
                     } else {
                         newCommentData[comment.id].push(data);
                     }
                 });
-
                 initialCommentData[task.id] = newCommentData[task.id];
             });
         }
