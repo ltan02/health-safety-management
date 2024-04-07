@@ -1,6 +1,7 @@
 import { useState, useEffect, createContext, useContext } from "react";
 import { auth } from "../firebase";
 import useAxios from "../hooks/useAxios";
+import { set } from "lodash";
 
 const AuthContext = createContext();
 export function useAuthContext() {
@@ -23,7 +24,9 @@ export function AuthProvider({ children }) {
         sessionStorage.removeItem("token");
         return null;
     });
-    const { error, sendRequest } = useAxios();
+    const [isCreatingAccount, setIsCreatingAccount] = useState(false);
+    const [createdId, setCreatedId] = useState(null);
+    const { error, sendRequest, loading } = useAxios();
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(async (user) => {
@@ -83,6 +86,28 @@ export function AuthProvider({ children }) {
         }
     };
 
+    const createAccount = async (email, password, firstName, lastName, role) => {
+        try {
+            setIsCreatingAccount(true);
+            const firebaseResponse = await auth.createUserWithEmailAndPassword(email, password);
+            setCreatedId(firebaseResponse.user.uid);
+            const backendResponse = await sendRequest({
+                url: "/auth/register",
+                method: "POST",
+                body: { id: firebaseResponse.user.uid, email, firstName, lastName, role },
+            });
+
+            if (error) {
+                console.error("Failed to register user to firebase. " + error);
+            }
+            return backendResponse;
+        } catch (e) {
+            console.error("SignUp error: ", e);
+        } finally {
+            setIsCreatingAccount(false);
+        }
+    };
+
     const signOut = async () => {
         await auth.signOut();
         sessionStorage.removeItem("token");
@@ -101,6 +126,8 @@ export function AuthProvider({ children }) {
         signOut,
         signUp,
         isUserLoggedIn,
+        createAccount,
+        loading
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

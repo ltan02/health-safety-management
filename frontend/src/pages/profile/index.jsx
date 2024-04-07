@@ -15,11 +15,13 @@ import { useAuthContext } from "../../context/AuthContext";
 import HomeIcon from "@mui/icons-material/Home";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { useNavigate } from "react-router-dom";
+import InviteUserModal from "../../components/profile/InviteUserModal";
 
 export default function ProfilePage() {
   // State for managing the switch (notification preference)
   const { user } = useAuthContext();
   const [isNotified, setIsNotified] = useState(false);
+  const [addModalOpen, setAddModalOpen] = useState(false);
 
   const handleNotificationChange = (event) => {
     setIsNotified(event.target.checked);
@@ -206,8 +208,21 @@ export default function ProfilePage() {
         >
           Home
         </Button>
+        <Button
+          variant={"contained"}
+          sx={{ borderRadius: 5, mt: 2, paddingInline: 8, color: "white" }}
+          size={"large"}
+          onClick={() => setAddModalOpen(true)}
+        >
+          + Add New User
+        </Button>
+
         {/* Notification Preference */}
       </Box>
+      <InviteUserModal
+        open={addModalOpen}
+        onClose={() => setAddModalOpen(false)}
+      />
     </Container>
   );
 }

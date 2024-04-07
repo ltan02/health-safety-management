@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Box } from "@mui/system";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
@@ -60,6 +60,7 @@ function App() {
   const { isUserLoggedIn, user } = useAuthContext();
   const drawerWidth = 220;
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [location] = useState(window.location);
   const getRoutesForRole = () => {
     const routes =
       !isUserLoggedIn() && !user?.role ? (
@@ -84,8 +85,8 @@ function App() {
                       <Route index element={<Incident />} />
                       <Route path="incidents" element={<IncidentReport />} />
                       <Route path="profile">
-                      <Route index element={<ProfilePage />} />
-                    </Route>
+                        <Route index element={<ProfilePage />} />
+                      </Route>
                     </Route>
                     <Route path="report">
                       <Route index element={<ReportOverview />} />
@@ -148,7 +149,7 @@ function App() {
               sx={{
                 flexGrow: 1,
                 paddingLeft: sidebarOpen
-                  ? isUserLoggedIn()
+                  ? isUserLoggedIn() && location.pathname !== "/profile"
                     ? drawerWidth + 20 + "px"
                     : 0
                   : 0,
