@@ -38,7 +38,7 @@ function ReportModal({
   boardId,
   onRefresh,
   selectedVal,
-    item,
+    name,
 }) {
   const { updateBoard } = useDashboard();
 
@@ -95,11 +95,9 @@ function ReportModal({
         onClose();
     };
 
-    const [name, setName] = useState(newData[selectedVal].name);
+
 
     const GraphNameHandler = (event) => {
-        setName(event.target.value);
-        console.log(selectedVal)
         const changedData = newData.map((c, i) => {
             if (i === selectedVal) {
                 return {
@@ -107,7 +105,7 @@ function ReportModal({
                     field: newData[i].field,
                     start: newData[i].start,
                     end: newData[i].end,
-                    name: name,
+                    name: event.target.value,
                 };
             } else {
                 return c;
@@ -116,6 +114,7 @@ function ReportModal({
         setNewData(changedData);
     };
 
+    console.log(name)
   return (
     <Modal
       open={open}
