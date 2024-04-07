@@ -9,17 +9,13 @@ import {
   Card,
   CardActionArea,
   CardContent,
-  CardHeader,
   FormControl,
   InputLabel,
   Divider,
-  IconButton,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import useAxios from "../../hooks/useAxios.js";
 import { categoryReports } from "../../pages/report/initialData.js";
-import { set } from "lodash";
-import EditNoteIcon from "@mui/icons-material/EditNote";
 
 function ReportChart({
   type,
@@ -28,7 +24,6 @@ function ReportChart({
   height,
   width,
   handleSubmit,
-  handleOpenEdit,
 }) {
   const { sendRequest } = useAxios();
   const [report, setReport] = useState(categoryReports);
@@ -258,22 +253,26 @@ function ReportChart({
       case "Bar":
         return {
           color: "rgba(46, 147, 250, 0.2)", // A warm orange
-          title: "Number of Tickets by " + uppercase(field),
+          // title: "Number of Tickets by " + uppercase(field),
+          title: data.name,
         };
       case "Line":
         return {
           color: "rgba(102, 218, 38, 0.2)", // A deep teal
-          title: "Number of Tickets by " + uppercase(field),
+          // title: "Number of Tickets by " + uppercase(field),
+          title: data.name,
         };
       case "Scatter":
         return {
           color: "rgba(255, 193, 7, 0.2)", // A light orange
-          title: "Number of Tickets by " + uppercase(field),
+          // title: "Number of Tickets by " + uppercase(field),
+          title: data.name,
         };
       case "Pie":
         return {
           color: "rgba(252, 104, 104, 0.2)", // A deep teal
-          title: "Number of Tickets by " + uppercase(field),
+          // title: "Number of Tickets by " + uppercase(field),
+          title: data.name,
         };
       default:
         return "rgba(64, 86, 244, 0.7)"; // A light grey for defaults
