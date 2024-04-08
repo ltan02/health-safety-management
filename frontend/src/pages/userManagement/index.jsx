@@ -12,9 +12,12 @@ import {
   Icon,
   IconButton,
   Tooltip,
+  Paper,
+  Divider,
   Stack,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
+import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useAuthContext } from "../../context/AuthContext";
 import HomeIcon from "@mui/icons-material/Home";
@@ -70,94 +73,48 @@ export default function UserManagement() {
   }, []);
 
   return (
-    <Container
-      component="main"
-      maxWidth="xs"
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        marginTop: "5%",
-        backgroundColor: "white",
-      }}
-    >
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          border: "solid 4px #EB8C00",
-          borderRadius: 2,
-          padding: 5,
-          width: "90%",
-          backgroundColor: "white",
-        }}
+    <Container maxWidth="md">
+      <Typography
+        variant="h4"
+        fontWeight={700}
+        gutterBottom
+        align="center"
+        mt={5}
       >
-        <Typography component="h1" variant="h5" fontWeight={600}>
-          <Box display="flex" alignItems="center" sx={{ color: "#464646" }}>
-            User Management
-          </Box>
+        User Management
+      </Typography>
+      <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
+        <Typography variant="h5" gutterBottom>
+          Users
         </Typography>
-        <Button
-          variant={"contained"}
-          sx={{ borderRadius: 5, mt: 2, paddingInline: 8, color: "white" }}
-          size={"large"}
-          onClick={() => setAddModalOpen(true)}
-        >
-          + Add New User
-        </Button>
-
-        <Button
-          variant={"contained"}
-          sx={{ borderRadius: 5, mt: 2, paddingInline: 8, color: "white" }}
-          size={"large"}
-          onClick={() => setAddGroupModalOpen(true)}
-        >
-          + Add New Group
-        </Button>
-
-        <Box
-          sx={{ mt: 2, display: "flex", flexDirection: "column", gap: 2 }}
-          width={"100%"}
-        >
-          {groups?.map((group) => (
+        <Divider sx={{ mb: 2 }} />
+        <Box sx={{ height: 400, overflowY: "auto", mb: 2 }}>
+          {employees.map((employee) => (
             <Box
-              key={group.id}
+              key={employee.id}
               sx={{
-                p: 2,
                 display: "flex",
-                alignContent: "center",
-                boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-                borderRadius: "8px",
-                ":hover": {
-                  boxShadow: "0 6px 10px rgba(0,0,0,0.15)",
-                },
-                cursor: "pointer",
                 justifyContent: "space-between",
+                alignItems: "center",
+                p: 2,
+                mb: 1,
+                backgroundColor: "action.hover",
+                borderRadius: 1,
               }}
             >
-              <Typography variant="h6" >
-                {group.name}
-              </Typography>
+              <Typography>{`${employee.firstName} ${employee.lastName}`}</Typography>
               <Stack direction="row" spacing={1}>
-                <Tooltip title="Edit Group">
+                <Tooltip title="Edit User">
                   <IconButton
-                    onClick={() => {
-                      setGroupId(group.id);
-                      setEditMemberModalOpen(true);
-                    }}
+                    onClick={() => setEditMemberModalOpen(true)}
                     size="small"
                   >
                     <EditIcon />
                   </IconButton>
                 </Tooltip>
-                <Tooltip title="Delete Group">
+                <Tooltip title="Delete User">
                   <IconButton
-                    onClick={() => {
-                      setGroupId(group.id);
-                      setDeleteModalOpen(true);
-                    }}
+                    onClick={() => {setDeleteModalOpen(true)}}
                     size="small"
                   >
                     <DeleteIcon />
@@ -167,8 +124,61 @@ export default function UserManagement() {
             </Box>
           ))}
         </Box>
-      </Box>
-
+        <Button
+          startIcon={<AddIcon />}
+          variant="contained"
+          onClick={() => setAddModalOpen(true)}
+        >
+          Add New User
+        </Button>
+      </Paper>
+      <Paper elevation={3} sx={{ p: 3 }}>
+        <Typography variant="h5" gutterBottom>
+          Groups
+        </Typography>
+        <Divider sx={{ mb: 2 }} />
+        {groups.map((group) => (
+          <Box
+            key={group.id}
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              p: 2,
+              mb: 1,
+              backgroundColor: "action.hover",
+              borderRadius: 1,
+            }}
+          >
+            <Typography>{group.name}</Typography>
+            <Stack direction="row" spacing={1}>
+              <Tooltip title="Edit Group">
+                <IconButton
+                  onClick={() => setEditMemberModalOpen(true)}
+                  size="small"
+                >
+                  <EditIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Delete Group">
+                <IconButton
+                  onClick={() => {setGroupId(group.id); setDeleteModalOpen(true)}}
+                  size="small"
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Tooltip>
+            </Stack>
+          </Box>
+        ))}
+        <Button
+          startIcon={<AddIcon />}
+          variant="contained"
+          onClick={() => setAddGroupModalOpen(true)}
+        >
+          Add New Group
+        </Button>
+      </Paper>
       <InviteUserModal
         open={addModalOpen}
         onClose={() => setAddModalOpen(false)}
@@ -179,7 +189,7 @@ export default function UserManagement() {
           fetchGroups();
           setAddGroupModalOpen(false);
         }}
-        employees={[[]]}
+        employees={employees}
       />
       {editMemberModalOpen && (
         <ManageGroupMembersModal
@@ -198,8 +208,8 @@ export default function UserManagement() {
           open={deleteModalOpen}
           onClose={() => setDeleteModalOpen(false)}
           groupId={groupId}
-          groups={groups}
           removeGroup={removeGroup}
+          groups={groups}
         />
       )}
     </Container>

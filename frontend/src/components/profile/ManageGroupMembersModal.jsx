@@ -39,11 +39,10 @@ export default function ManageGroupMembersModal({
   const handleNewMemberEmailChange = (event) => {
     setNewMember(event.target.value);
     setSearch(event.target.value);
-    if (event.target.value) {
-      setAnchorEl(inputRef.current);
-    } else {
-      setAnchorEl(null);
-    }
+  };
+
+  const clickSearch = () => {
+    setAnchorEl(inputRef.current);
   };
 
   const handleMenuClose = () => {
@@ -151,26 +150,46 @@ export default function ManageGroupMembersModal({
           <Typography component="h1" variant="h5">
             Manage Group Members
           </Typography>
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="new-member-email"
-            label="New Member Email"
-            name="newMember"
-            value={newMember}
-            onChange={handleNewMemberEmailChange}
-            inputRef={inputRef}
-          />
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              width: "100%",
+            }}
+          >
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="new-member-email"
+              label="New Member Email"
+              name="newMember"
+              value={newMember}
+              onChange={handleNewMemberEmailChange}
+              inputRef={inputRef}
+            />
+            <Button
+              type="button"
+              fullWidth
+              variant="outlined"
+              color="primary"
+              sx={{ mt: 3 }}
+              onClick={clickSearch}
+              disabled={loading}
+            >
+              {loading ? <CircularProgress size={24} /> : "Search Member"}
+            </Button>
+          </Box>
           <Menu
             id="search-menu"
-            anchorEl={anchorEl}
+            anchorEl={inputRef.current}
             open={Boolean(anchorEl)}
             onClose={handleMenuClose}
             MenuListProps={{
               "aria-labelledby": "new-member-email",
             }}
-            autoFocus={false}
+            disableAutoFocus={true}
           >
             {filteredEmployees.map((employee) => (
               <MenuItem
@@ -180,7 +199,7 @@ export default function ManageGroupMembersModal({
                   setNewMember(employee.email);
                   handleMenuClose();
                 }}
-                autoFocus={false}
+                disableEnforceFocus={true}
               >
                 {`${employee.firstName} ${employee.lastName} - ${employee.email}`}
               </MenuItem>

@@ -9,6 +9,8 @@ export default function DeleteGroupModal({
   groups,
   removeGroup,
 }) {
+    console.log(groups);
+    console.log(groupId);
   const groupData = groups.find((group) => group.id === groupId);
   return (
     <Modal
