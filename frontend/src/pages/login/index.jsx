@@ -176,7 +176,7 @@ function Login() {
               Login
             </Button>
           </form>
-          <Grid
+          {/* <Grid
             container
             alignItems="center"
             style={{ justifyContent: "center" }}
@@ -201,7 +201,7 @@ function Login() {
                 Sign Up
               </Typography>
             </Link>
-          </Grid>
+          </Grid> */}
         </CardContent>
       </Card>
     </Container>

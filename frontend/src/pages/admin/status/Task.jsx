@@ -16,7 +16,7 @@ function Task({ id, task }) {
     return (
         <Card
             sx={{ m: 1, boxShadow: 3, borderRadius: 2, padding: 0 }}
-            id={task.name}
+            id={task?.name}
             ref={setNodeRef}
             {...attributes}
             {...listeners}
@@ -31,8 +31,8 @@ function Task({ id, task }) {
                     padding: 1,
                 }}
             >
-                <Chip sx={{ fontSize: "13px" }} label={`${task.name}`} variant="outlined" />
-                <Typography variant="p" sx={{ fontSize: "13px" }}>{`${task.count} ${task.count === 1 ? "report" : "reports"}`}</Typography>
+                <Chip sx={{ fontSize: "13px" }} label={`${task?.name}`} variant="outlined" />
+                <Typography variant="p" sx={{ fontSize: "13px" }}>{`${task?.count} ${task?.count === 1 ? "report" : "reports"}`}</Typography>
             </Box>
         </Card>
     );

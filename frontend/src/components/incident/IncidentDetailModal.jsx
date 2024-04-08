@@ -137,6 +137,11 @@ export default function IncidentDetailModal({
             const newColumn = columns.find((column) => column.statusIds.includes(newStateId)).id;
 
             updatedTasks[currentColumn] = updatedTasks[currentColumn].filter((task) => task.id !== incident.id);
+
+            if (!updatedTasks[newColumn] || !Array.isArray(updatedTasks[newColumn])) {
+                updatedTasks[newColumn] = [];
+            }
+
             updatedTasks[newColumn].push(newIncident);
 
             Object.keys(updatedTasks).forEach((key) => {

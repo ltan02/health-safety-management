@@ -511,7 +511,10 @@ function AdminManagement({ open, handleClose }) {
                             ).length > 0 && (
                                 <MigrateStatusWorkflowModal
                                     open={saveChangesModalOpen}
-                                    handleClose={() => setSaveChangesModalOpen(false)}
+                                    handleClose={() => {
+                                        setSaveChangesModalOpen(false);
+                                        handleClose();
+                                    }}
                                     statusesToMigrate={originalStates.filter(
                                         (originalState) => !states.find((state) => state.id === originalState.id),
                                     )}

@@ -64,7 +64,7 @@ function App() {
             !isUserLoggedIn() && !user?.role ? (
                 <Routes>
                     <Route path="/" element={<Login />} />
-                    <Route path="/signup" element={<SignUp />} />
+                    {/* <Route path="/signup" element={<SignUp />} /> */}
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
             ) : (
