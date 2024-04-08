@@ -49,15 +49,38 @@ export default function ManageGroupMembersModal({
     setAnchorEl(null);
   };
 
+  const roleName = (role) => {
+    switch (role) {
+      case "Admin":
+        return "ADMIN";
+      case "Safety Warden":
+        return "SAFETY_WARDEN";
+      default:
+        return "EMPLOYEE";
+    }
+  };
+  
+  const isValidUser = (user) => {
+    return employees.find((employee) => employee.email === user);
+  };
+
   const handleAddMember = async () => {
     // Implement the logic to add a new member to the group
     const employeeId = employees.find(
       (employee) => employee.email === newMember
     ).id;
-    console.log(employeeId);
-    const res = await sendRequest({
+    if (groupData.members.includes(employeeId)) {
+      return;
+    }
+    await sendRequest({
       url: `/groups/${groupId}/members/${employeeId}`,
       method: "PUT",
+    });
+
+    const res = await sendRequest({
+      url: `/users/${employeeId}/role`,
+      method: "PUT",
+      body: roleName(groupData.name),
     });
     setNewMember("");
     onClose();
@@ -66,9 +89,14 @@ export default function ManageGroupMembersModal({
 
   const handleRemoveMember = async (memberId) => {
     // Implement the logic to remove a member from the group
-    const res = await sendRequest({
+    await sendRequest({
       url: `/groups/${groupId}/members/${memberId} `,
       method: "DELETE",
+    });
+    await sendRequest({
+      url: `/users/${memberId}/role`,
+      method: "PUT",
+      body: "EMPLOYEE",
     });
     setNewMember("");
     fetchEmployees();
@@ -116,6 +144,19 @@ export default function ManageGroupMembersModal({
     };
     fetchGroupData();
   }, [open]);
+
+  const employeeName = (employee) => {
+    switch (employee.role) {
+      case "ADMIN":
+        return `${employee.firstName} ${employee.lastName} - Admin`;
+      case "SAFETY_WARDEN":
+        return `${employee.firstName} ${employee.lastName} - Safety Warden`;
+      case "EMPLOYEE":
+        return `${employee.firstName} ${employee.lastName} - Employee`;
+      default:
+        return `${employee.firstName} ${employee.lastName} - Employee`;
+    }
+  };
 
   return (
     <Modal
@@ -199,9 +240,8 @@ export default function ManageGroupMembersModal({
                   setNewMember(employee.email);
                   handleMenuClose();
                 }}
-                disableEnforceFocus={true}
               >
-                {`${employee.firstName} ${employee.lastName} - ${employee.email}`}
+                {`${employeeName(employee)}`}
               </MenuItem>
             ))}
           </Menu>
@@ -212,14 +252,17 @@ export default function ManageGroupMembersModal({
             color="primary"
             sx={{ mt: 3 }}
             onClick={handleAddMember}
-            disabled={loading}
+            disabled={loading || !isValidUser(newMember)}
           >
             {loading ? <CircularProgress size={24} /> : "Add Member"}
           </Button>
           <Typography component="h2" variant="h6" sx={{ mt: 4 }}>
             Current Members
           </Typography>
-          <List dense={true}>
+          <List
+            dense={true}
+            sx={{ width: "100%", maxHeight: 400, overflow: "auto" }}
+          >
             {members.map((member) => (
               <ListItem key={member.name}>
                 <ListItemText primary={member.name} secondary={member.email} />
@@ -228,6 +271,7 @@ export default function ManageGroupMembersModal({
                     edge="end"
                     aria-label="delete"
                     onClick={() => handleRemoveMember(member.id)}
+                    disabled={loading || roleName(groupData.name) === "EMPLOYEE"}
                   >
                     <DeleteIcon />
                   </IconButton>

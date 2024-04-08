@@ -27,4 +27,16 @@ public enum Role {
             default -> throw new IllegalArgumentException("Invalid role string");
         };
     }
+
+    public static String stringToStringRole(String roleStr) {
+        if (roleStr == null) {
+            throw new IllegalArgumentException("Role string cannot be null");
+        }
+        return switch (roleStr) {
+            case adminString -> adminString;
+            case safetyWardenString -> safetyWardenString;
+            case employeeString -> employeeString;
+            default -> throw new IllegalArgumentException("Invalid role string");
+        };
+    }
 }

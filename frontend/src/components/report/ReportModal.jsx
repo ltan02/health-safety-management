@@ -113,8 +113,6 @@ function ReportModal({
         });
         setNewData(changedData);
     };
-
-    console.log(name)
   return (
     <Modal
       open={open}

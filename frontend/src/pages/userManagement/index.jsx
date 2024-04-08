@@ -67,6 +67,18 @@ export default function UserManagement() {
     fetchGroups();
   };
 
+  const isInitialGroup = (group) => {
+    return (
+      group.name === "Admin" ||
+      group.name === "Safety Warden" ||
+      group.name === "Employee"
+    );
+  };
+
+  const groupNameFormatter = (name) => {
+    return name.charAt(0).toUpperCase() + name.replace(/_/g, " ").toLowerCase().slice(1)
+  };
+
   useEffect(() => {
     fetchGroups();
     fetchEmployees();
@@ -114,7 +126,9 @@ export default function UserManagement() {
                 </Tooltip>
                 <Tooltip title="Delete User">
                   <IconButton
-                    onClick={() => {setDeleteModalOpen(true)}}
+                    onClick={() => {
+                      setDeleteModalOpen(true);
+                    }}
                     size="small"
                   >
                     <DeleteIcon />
@@ -150,20 +164,35 @@ export default function UserManagement() {
               borderRadius: 1,
             }}
           >
-            <Typography>{group.name}</Typography>
+            <Typography>
+              {groupNameFormatter(group.name)} {group.name === "Employee" && "(Default)"}
+            </Typography>
             <Stack direction="row" spacing={1}>
               <Tooltip title="Edit Group">
                 <IconButton
-                  onClick={() => setEditMemberModalOpen(true)}
+                  onClick={() => {
+                    setGroupId(group.id);
+                    setEditMemberModalOpen(true);
+                  }}
                   size="small"
                 >
                   <EditIcon />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Delete Group">
+              <Tooltip
+                title={
+                  isInitialGroup(group)
+                    ? "Cannot delete initial group"
+                    : "Delete Group"
+                }
+              >
                 <IconButton
-                  onClick={() => {setGroupId(group.id); setDeleteModalOpen(true)}}
+                  onClick={() => {
+                    setGroupId(group.id);
+                    setDeleteModalOpen(true);
+                  }}
                   size="small"
+                  disabled={isInitialGroup(group)}
                 >
                   <DeleteIcon />
                 </IconButton>
