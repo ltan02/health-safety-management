@@ -60,6 +60,10 @@ export default function useTasks() {
                 if (existingIndex > -1) {
                     newState[columnId][existingIndex] = updatedIncident;
                 } else {
+                    if (!newState[columnId] || !Array.isArray(newState[columnId])) {
+                        newState[columnId] = [];
+                    }
+
                     newState[columnId].push(updatedIncident);
                 }
             });
