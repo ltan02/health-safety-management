@@ -156,15 +156,15 @@ function ReportChart({
               color: modernPalette[index % modernPalette.length],
             })),
             highlightScope: { faded: "global", highlighted: "item" },
-            faded: { innerRadius: 10, additionalRadius: -10, color: "gray" },
+            faded: { innerRadius: 20, additionalRadius: -5, color: "gray" },
             outerRadius: '75%',
+            innerRadius: '20%',
             cx: '66%',
             cy: '35%'
           },
         ]}
         height={height+15}
         width={width}
-        innerRadius={60}
         outerRadius={150}
         slotProps={{
           legend: {
