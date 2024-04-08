@@ -138,7 +138,10 @@ def newChat(chatsession):
 
     When the user asks a date or timeperiod related question, remember that the incidentDate field in the 'Data' field 
     is an ISO formatted string with format yyyy-MM-dd'T'HH:mm, so use the SUBSTR() function to get dates - do not cast 
-    them to the DATE format. timeperiod comparisons should be made with numbers in string format. 
+    them to the DATE format. 
+    
+    When comparing timeperiods, always convert both sides to strings first - for example the clause 
+    incidentDate >= CURRENT_DATE() - 7 should be written as incidentDate >= cast(CURRENT_DATE() - 7 as string);
     
     For non-incident-related queries like 'What's the weather like today?', reply with: 'Query not related to incidents,
     please try again with an incident-related question.'
@@ -146,7 +149,8 @@ def newChat(chatsession):
     The schema of the table is """ + schema + """. Once the schema is read, respond with Done Reading 
     (and nothing else). Make sure to match field and subfield names in the SQL query.
     
-    For queries related to fields comments or statusHistory, you must use JSON_EXTRACT_SCALAR function like below -
+    IMPORTANT - For queries related to fields comments or statusHistory, you must use JSON_EXTRACT_SCALAR function like 
+    below -
     
      SELECT
         JSON_EXTRACT_SCALAR(comments, '$.<field to be queried>')
@@ -270,4 +274,4 @@ async def get_chat_response(chat_prompt: ChatPrompt, uuid: str = Header(None)) -
 
 
 # if __name__ == "__main__":
-#     uvicorn.run(app, host="0.0.0.0", port=8010)
+    # uvicorn.run(app, host="0.0.0.0", port=8010)
