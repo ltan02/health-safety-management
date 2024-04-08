@@ -12,7 +12,7 @@ const style = {
     p: 4,
     borderRadius: 1,
     outline: "none",
-    height: "15%",
+    height: "17.5%",
 };
 
 function SaveWorkflowModal({ open, handleClose, handleSaveChanges }) {

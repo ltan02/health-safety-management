@@ -33,4 +33,12 @@ public class ColumnService {
     public List<Column> getColumns() throws InterruptedException, ExecutionException {
         return columnRepository.findAll();
     }
+
+    public void deleteStatusFromColumns(String statusId) throws InterruptedException, ExecutionException {
+        List<Column> columns = columnRepository.findAll();
+        for (Column column : columns) {
+            column.getStatusIds().remove(statusId);
+            columnRepository.save(column);
+        }
+    }
 }

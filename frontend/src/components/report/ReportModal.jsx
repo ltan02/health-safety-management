@@ -38,6 +38,7 @@ function ReportModal({
   boardId,
   onRefresh,
   selectedVal,
+    name,
 }) {
   const { updateBoard } = useDashboard();
 
@@ -65,7 +66,7 @@ function ReportModal({
     //     setGraphType(newData[event.target.value].type);
     // };
 
-    const [graphType, setGraphType] = useState(newData[0].type);
+    const [graphType, setGraphType] = useState(newData[selectedVal].type);
     const handleGraphChange = (event) => {
         setGraphType(event.target.value);
         const changedData = newData.map((c, i) => {
@@ -94,11 +95,9 @@ function ReportModal({
         onClose();
     };
 
-    const [name, setName] = useState(newData[selectedVal].name);
+
 
     const GraphNameHandler = (event) => {
-        setName(event.target.value);
-        console.log(selectedVal)
         const changedData = newData.map((c, i) => {
             if (i === selectedVal) {
                 return {
@@ -106,7 +105,7 @@ function ReportModal({
                     field: newData[i].field,
                     start: newData[i].start,
                     end: newData[i].end,
-                    name: name,
+                    name: event.target.value,
                 };
             } else {
                 return c;
@@ -115,6 +114,7 @@ function ReportModal({
         setNewData(changedData);
     };
 
+    console.log(name)
   return (
     <Modal
       open={open}
@@ -140,7 +140,7 @@ function ReportModal({
             <FormControl fullWidth>
               <InputLabel>Select Graph Type</InputLabel>
               <Select
-                value={graphType}
+                value={newData[selectedVal].type}
                 onChange={handleGraphChange}
                 label="Select Graph Type"
                 sx={{ mb: 3 }}
@@ -153,7 +153,7 @@ function ReportModal({
             </FormControl>
               <InputLabel>Graph Name</InputLabel>
               <TextField
-                  value={name}
+                  value={newData[selectedVal].name}
                   onChange={GraphNameHandler}
               />
           </Grid>
