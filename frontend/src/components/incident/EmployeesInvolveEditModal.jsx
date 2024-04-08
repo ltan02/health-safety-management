@@ -73,7 +73,7 @@ export default function EmployeesInvolveEditModal({
           !involvedEmployees.some((involved) => involved.id === employee.id)
       );
 
-      setVisibleEmployees(nonInvolvedEmployees.slice(0, 3));
+      setVisibleEmployees(nonInvolvedEmployees);
     }
   }, [employees]);
 
@@ -170,7 +170,7 @@ export default function EmployeesInvolveEditModal({
 
           {search !== "" && (
             <Paper elevation={3} sx={{ maxHeight: 300, overflow: "auto" }}>
-              <MenuList>
+              <MenuList sx={{ overflow: "auto", maxHeight: 150 }}>
                 {visibleEmployees.map((employee) => (
                   <MenuItem
                     key={employee.id}
