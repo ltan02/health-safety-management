@@ -19,7 +19,6 @@ const style = {
     p: 4,
     borderRadius: 1,
     outline: "none",
-    minHeight: "35%",
     display: "flex",
     flexDirection: "column",
     pb: 5,

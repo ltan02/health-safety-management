@@ -12,7 +12,6 @@ const style = {
     p: 4,
     borderRadius: 1,
     outline: "none",
-    height: "15%",
 };
 
 function DiscardChangesModal({ open, handleClose, handleDiscardChanges }) {
