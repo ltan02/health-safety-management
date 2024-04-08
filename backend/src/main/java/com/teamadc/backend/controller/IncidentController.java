@@ -5,6 +5,7 @@ import com.teamadc.backend.dto.request.CustomFieldRequest;
 import com.teamadc.backend.dto.request.IncidentRequest;
 import com.teamadc.backend.dto.request.MigrateIncidentRequest;
 import com.teamadc.backend.dto.response.BasicIncidentResponse;
+import com.teamadc.backend.dto.response.EnhancedIncidentResponse;
 import com.teamadc.backend.model.Comment;
 import com.teamadc.backend.model.Incident;
 import com.teamadc.backend.model.StatusHistory;
@@ -19,10 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -87,6 +85,17 @@ public class IncidentController {
 
             return ResponseEntity.ok(response);
         } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/fast")
+    public ResponseEntity<Map<String, List<EnhancedIncidentResponse>>> getIncidentsFast(@RequestParam String boardId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int pageSize) {
+        try {
+            Map<String, List<EnhancedIncidentResponse>> paginatedIncidents = incidentService.getPaginatedIncidentsForBoardColumns(boardId, page, pageSize);
+            return ResponseEntity.ok(paginatedIncidents);
+        } catch (InterruptedException | ExecutionException e) {
+            logger.error("Failed to fetch paginated incidents", e);
             return ResponseEntity.internalServerError().build();
         }
     }

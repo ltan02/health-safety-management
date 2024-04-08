@@ -1,8 +1,8 @@
 package com.teamadc.backend.service;
 
 import com.teamadc.backend.dto.request.CustomFieldRequest;
-import com.teamadc.backend.model.Comment;
-import com.teamadc.backend.model.Incident;
+import com.teamadc.backend.dto.response.EnhancedIncidentResponse;
+import com.teamadc.backend.model.*;
 import com.teamadc.backend.repository.GenericRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +24,17 @@ import java.util.stream.Collectors;
 public class IncidentService {
     private static final Logger logger = LoggerFactory.getLogger(IncidentService.class);
     private final GenericRepository<Incident> incidentRepository;
+    private final BoardService boardService;
+    private final ColumnService columnService;
+    private final UserService userService;
     private static final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
 
     @Autowired
-    public IncidentService(GenericRepository<Incident> incidentRepository) {
+    public IncidentService(GenericRepository<Incident> incidentRepository, BoardService boardService, ColumnService columnService, UserService userService) {
         this.incidentRepository = incidentRepository;
+        this.boardService = boardService;
+        this.columnService = columnService;
+        this.userService = userService;
     }
 
     public Incident createOrUpdateIncident(Incident incident) throws InterruptedException, ExecutionException {
@@ -208,5 +214,81 @@ public class IncidentService {
                 incidentRepository.save(incident);
             }
         }
+    }
+
+    private EnhancedIncidentResponse mapToEnhancedIncidentResponse(Incident incident) {
+        User reporter = null;
+        User reviewer = null;
+        List<User> employeesInvolved = new ArrayList<>();
+
+        try {
+            if (incident.getReporter() != null && !incident.getReporter().trim().isEmpty()) {
+                reporter = userService.getUserById(incident.getReporter());
+            }
+        } catch (ExecutionException | InterruptedException e) {
+            System.err.println("Error fetching reporter: " + e.getMessage());
+        }
+
+        try {
+            // Only attempt to fetch the reviewer if the ID is not null and not empty
+            if (incident.getReviewer() != null && !incident.getReviewer().trim().isEmpty()) {
+                reviewer = userService.getUserById(incident.getReviewer());
+            }
+        } catch (ExecutionException | InterruptedException e) {
+            System.err.println("Error fetching reviewer: " + e.getMessage());
+        }
+
+        for (String userId : incident.getEmployeesInvolved()) {
+            try {
+                if (userId != null && !userId.trim().isEmpty()) {
+                    User employee = userService.getUserById(userId);
+                    if (employee != null) { // Additional null check in case the user service returns null for a valid ID
+                        employeesInvolved.add(employee);
+                    }
+                }
+            } catch (ExecutionException | InterruptedException e) {
+                System.err.println("Error fetching employee involved: " + e.getMessage());
+            }
+        }
+
+        return new EnhancedIncidentResponse(
+                incident.getId(),
+                incident.getIncidentDate(),
+                incident.getIncidentCategory(),
+                reporter,
+                employeesInvolved,
+                incident.getStatusId(),
+                reviewer,
+                incident.getComments(),
+                incident.getCreatedAt(),
+                incident.getLastUpdatedAt(),
+                incident.getCustomFields(),
+                incident.getStatusHistory()
+        );
+    }
+
+    public Map<String, List<EnhancedIncidentResponse>> getPaginatedIncidentsForBoardColumns(String boardId, int page, int pageSize) throws InterruptedException, ExecutionException {
+        Board board = boardService.getBoardById(boardId);
+        Map<String, List<EnhancedIncidentResponse>> paginatedIncidentsByColumn = new HashMap<>();
+
+        for (String columnId : board.getAdminColumnIds()) { // Use adminColumnIds or adjust based on your logic
+            Column column = columnService.getColumnById(columnId);
+            for (String statusId : column.getStatusIds()) {
+                Map<String, Object> filters = new HashMap<>();
+                filters.put("statusId", statusId);
+
+                int offset = page * pageSize;
+                Optional<List<Incident>> incidents = incidentRepository.findAll(filters, offset, pageSize);
+                List<EnhancedIncidentResponse> responses = incidents.orElse(new ArrayList<>()).stream()
+                        .map(this::mapToEnhancedIncidentResponse)
+                        .collect(Collectors.toList());
+
+                if (!responses.isEmpty()) {
+                    paginatedIncidentsByColumn.put(column.getId(), responses);
+                }
+            }
+        }
+
+        return paginatedIncidentsByColumn;
     }
 }
