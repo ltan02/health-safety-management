@@ -9,10 +9,12 @@ export default function CommentSection({ commentData = [], incidentId }) {
   const sortComments = (comments) => {
     if (!comments) return [];
     return comments.sort(
-      (a, b) =>  new Date(b.comment.timestamp) - new Date(a.comment.timestamp),
+      (a, b) => new Date(b.comment.timestamp) - new Date(a.comment.timestamp)
     );
   };
-  const [comments, setComments] = useState(sortComments(commentData[incidentId]));
+  const [comments, setComments] = useState(
+    sortComments(commentData[incidentId])
+  );
 
   const dateFromTimestamp = (timestamp) => {
     const date = new Date(timestamp);
@@ -55,7 +57,6 @@ export default function CommentSection({ commentData = [], incidentId }) {
     <Box
       ref={containerRef}
       sx={{
-
         maxHeight: "300px",
         position: "relative",
         "&::after": {
@@ -110,7 +111,9 @@ export default function CommentSection({ commentData = [], incidentId }) {
               </Grid>
             </Grid>
             <Grid item style={{ marginLeft: "40px" }}>
-              <Typography variant="body2">{data.comment.content}</Typography>
+              <Typography variant="body2" style={{ whiteSpace: "pre-wrap" }}>
+                {data.comment.content}
+              </Typography>
             </Grid>
           </Grid>
         ))}

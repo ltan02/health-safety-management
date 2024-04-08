@@ -150,6 +150,7 @@ export default function IncidentDetailField({
                             maxRows={4}
                             placeholder="Add a comment..."
                             value={comment}
+                            multiline
                             style={{
                                 width: "100%",
                                 padding: "10px",
@@ -159,6 +160,7 @@ export default function IncidentDetailField({
                                 outline: "none",
                                 borderRadius: "7px",
                                 lineHeight: "50px",
+                                whiteSpace: "pre-wrap"
                             }}
                             onChange={(e) => setComment(e.target.value)}
                         />
