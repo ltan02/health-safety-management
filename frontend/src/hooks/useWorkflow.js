@@ -379,220 +379,241 @@ export default function useWorkflow() {
         setTransitions(originalTransitions);
     }, [originalStates, originalTransitions]);
 
-    const saveChanges = useCallback(async () => {
-        if (_.isEqual(originalStates, states) && _.isEqual(originalTransitions, transitions)) {
-            console.log("No changes made");
-            return;
-        }
+    const saveChanges = useCallback(
+        async (migrationMap = {}) => {
+            if (_.isEqual(originalStates, states) && _.isEqual(originalTransitions, transitions)) {
+                console.log("No changes made");
+                return;
+            }
 
-        try {
-            setLoadingWorkflow(true);
-            const statesToAdd = states.filter((state) => state.id.startsWith("temp"));
-            const statesToUpdate = states.filter(
-                (state) =>
-                    !state.id.startsWith("temp") &&
-                    !_.isEqual(
-                        state,
-                        originalStates.find((originalState) => originalState.id === state.id),
-                    ),
-            );
-            const statesToDelete = originalStates.filter(
-                (originalState) => !states.find((state) => state.id === originalState.id),
-            );
+            try {
+                setLoadingWorkflow(true);
+                const statesToAdd = states.filter((state) => state.id.startsWith("temp"));
+                const statesToUpdate = states.filter(
+                    (state) =>
+                        !state.id.startsWith("temp") &&
+                        !_.isEqual(
+                            state,
+                            originalStates.find((originalState) => originalState.id === state.id),
+                        ),
+                );
+                const statesToDelete = originalStates.filter(
+                    (originalState) => !states.find((state) => state.id === originalState.id),
+                );
 
-            const addStatePromises = statesToAdd.map(async (state) => {
-                try {
-                    const response = await sendRequest({
-                        url: "/status",
-                        method: "POST",
-                        body: {
-                            name: state.data.label,
-                        },
-                    });
+                const addStatePromises = statesToAdd.map(async (state) => {
+                    try {
+                        const response = await sendRequest({
+                            url: "/status",
+                            method: "POST",
+                            body: {
+                                name: state.data.label,
+                            },
+                        });
 
-                    sendRequest({
-                        url: `/boards/${activeWorkflow.boardId}/status/${response.id}`,
-                        method: "PUT",
-                    });
+                        sendRequest({
+                            url: `/boards/${activeWorkflow.boardId}/status/${response.id}`,
+                            method: "PUT",
+                        });
 
+                        return sendRequest({
+                            url: "/states",
+                            method: "POST",
+                            body: {
+                                name: state.data.label,
+                                coordinates: {
+                                    x: state.position.x,
+                                    y: state.position.y,
+                                },
+                                statusId: response.id,
+                            },
+                        });
+                    } catch (error) {
+                        console.log(error);
+                    }
+                });
+
+                statesToUpdate.map((state) => {
                     return sendRequest({
-                        url: "/states",
-                        method: "POST",
+                        url: `/states/${state.id}`,
+                        method: "PUT",
                         body: {
                             name: state.data.label,
                             coordinates: {
                                 x: state.position.x,
                                 y: state.position.y,
                             },
-                            statusId: response.id,
+                            statusId: state.data.statusId,
                         },
                     });
-                } catch (error) {
-                    console.log(error);
-                }
-            });
+                });
 
-            statesToUpdate.map((state) => {
-                return sendRequest({
-                    url: `/states/${state.id}`,
-                    method: "PUT",
-                    body: {
-                        name: state.data.label,
-                        coordinates: {
-                            x: state.position.x,
-                            y: state.position.y,
+                statesToDelete.map((state) => {
+                    sendRequest({
+                        url: `/incidents/migrate`,
+                        method: "POST",
+                        body: {
+                            fromStatusId: state.data.statusId,
+                            toStatusId: migrationMap[state.id],
                         },
-                        statusId: state.data.statusId,
-                    },
+                    });
+
+                    sendRequest({
+                        url: `/columns/delete-status/${state.data.statusId}`,
+                        method: "DELETE",
+                    });
+
+                    const deleteStatePromise = sendRequest({
+                        url: `/states/${state.id}`,
+                        method: "DELETE",
+                    });
+
+                    const deleteStatusPromise = sendRequest({
+                        url: `/status/${state.data.statusId}`,
+                        method: "DELETE",
+                    });
+
+                    const removeStatusFromBoardPromise = sendRequest({
+                        url: `/boards/${activeWorkflow.boardId}/status/${state.data.statusId}`,
+                        method: "DELETE",
+                    });
+
+                    return Promise.all([deleteStatePromise, deleteStatusPromise, removeStatusFromBoardPromise]);
                 });
-            });
 
-            statesToDelete.map((state) => {
-                const deleteStatePromise = sendRequest({
-                    url: `/states/${state.id}`,
-                    method: "DELETE",
+                const newStates = await Promise.all(addStatePromises);
+
+                const transitionsToAdd = transitions.filter((transition) => transition.id.startsWith("temp"));
+                const transitionsToDelete = originalTransitions.filter(
+                    (originalTransition) => !transitions.find((state) => state.id === originalTransition.id),
+                );
+                const transitionsToUpdate = transitions.filter((transition) => {
+                    const originalTransition = originalTransitions.find((t) => t.id === transition.id);
+                    return originalTransition && !_.isEqual(transition, originalTransition);
                 });
 
-                const deleteStatusPromise = sendRequest({
-                    url: `/status/${state.data.statusId}`,
-                    method: "DELETE",
+                transitionsToUpdate.map((transition) => {
+                    return sendRequest({
+                        url: `/transitions/${transition.id}`,
+                        method: "PUT",
+                        body: {
+                            id: transition.id,
+                            fromStateId: transition.source,
+                            toStateId: transition.target,
+                            label: transition.data.label,
+                            rules: transition.data.rules,
+                            type: null,
+                        },
+                    });
                 });
 
-                const removeStatusFromBoardPromise = sendRequest({
-                    url: `/boards/${activeWorkflow.boardId}/status/${state.data.statusId}`,
-                    method: "DELETE",
+                const newTransitionPromises = transitionsToAdd.map((transition) => {
+                    return sendRequest({
+                        url: "/transitions",
+                        method: "POST",
+                        body: {
+                            fromStateId: transition.source.startsWith("temp")
+                                ? newStates.find(
+                                      (s) =>
+                                          states.find((state) => state.id === transition.source).data.label === s.name,
+                                  ).id
+                                : transition.source,
+                            toStateId: transition.target.startsWith("temp")
+                                ? newStates.find(
+                                      (s) =>
+                                          states.find((state) => state.id === transition.target).data.label === s.name,
+                                  ).id
+                                : transition.target,
+                            label: transition.data.label,
+                            rules: transition.data.rules || [],
+                            type: null,
+                        },
+                    });
                 });
 
-                return Promise.all([deleteStatePromise, deleteStatusPromise, removeStatusFromBoardPromise]);
-            });
-
-            const newStates = await Promise.all(addStatePromises);
-
-            const transitionsToAdd = transitions.filter((transition) => transition.id.startsWith("temp"));
-            const transitionsToDelete = originalTransitions.filter(
-                (originalTransition) => !transitions.find((state) => state.id === originalTransition.id),
-            );
-            const transitionsToUpdate = transitions.filter((transition) => {
-                const originalTransition = originalTransitions.find((t) => t.id === transition.id);
-                return originalTransition && !_.isEqual(transition, originalTransition);
-            });
-
-            transitionsToUpdate.map((transition) => {
-                return sendRequest({
-                    url: `/transitions/${transition.id}`,
-                    method: "PUT",
-                    body: {
-                        id: transition.id,
-                        fromStateId: transition.source,
-                        toStateId: transition.target,
-                        label: transition.data.label,
-                        rules: transition.data.rules,
-                        type: null,
-                    },
+                transitionsToDelete.map((transition) => {
+                    return sendRequest({
+                        url: `/transitions/${transition.id}`,
+                        method: "DELETE",
+                    });
                 });
-            });
 
-            const newTransitionPromises = transitionsToAdd.map((transition) => {
-                return sendRequest({
-                    url: "/transitions",
-                    method: "POST",
-                    body: {
-                        fromStateId: transition.source.startsWith("temp")
+                const newTransitions = await Promise.all(newTransitionPromises);
+
+                const newTransitionsLocal = transitions.map((transition) => {
+                    return {
+                        ...transition,
+                        id: transition.id.startsWith("temp")
+                            ? newTransitions.find((s) => s.label === transition.data.label).id
+                            : transition.id,
+                        source: transition.source.startsWith("temp")
                             ? newStates.find(
                                   (s) => states.find((state) => state.id === transition.source).data.label === s.name,
                               ).id
                             : transition.source,
-                        toStateId: transition.target.startsWith("temp")
+                        target: transition.target.startsWith("temp")
                             ? newStates.find(
                                   (s) => states.find((state) => state.id === transition.target).data.label === s.name,
                               ).id
                             : transition.target,
-                        label: transition.data.label,
-                        rules: transition.data.rules || [],
-                        type: null,
-                    },
+                    };
                 });
-            });
 
-            transitionsToDelete.map((transition) => {
-                return sendRequest({
-                    url: `/transitions/${transition.id}`,
-                    method: "DELETE",
+                const newStatesLocal = states.map((state) => {
+                    return {
+                        ...state,
+                        id: state.id.startsWith("temp")
+                            ? newStates.find((s) => s.name === state.data.label).id
+                            : state.id,
+                        data: {
+                            ...state.data,
+                            statusId: state.id.startsWith("temp")
+                                ? newStates.find((s) => s.name === state.data.label).statusId
+                                : state.data.statusId,
+                        },
+                    };
                 });
-            });
 
-            const newTransitions = await Promise.all(newTransitionPromises);
+                if (
+                    statesToAdd.length > 0 ||
+                    statesToDelete.length > 0 ||
+                    transitionsToAdd.length > 0 ||
+                    transitionsToDelete.length > 0
+                ) {
+                    await sendRequest({
+                        url: `/workflows/${activeWorkflow.id}`,
+                        method: "PUT",
+                        body: {
+                            name: activeWorkflow.name,
+                            active: activeWorkflow.active,
+                            stateIds: newStatesLocal.map((state) => state.id),
+                            transitionIds: newTransitionsLocal.map((transition) => transition.id),
+                            boardId: activeWorkflow.boardId,
+                        },
+                    });
+                }
 
-            const newTransitionsLocal = transitions.map((transition) => {
-                return {
-                    ...transition,
-                    id: transition.id.startsWith("temp")
-                        ? newTransitions.find((s) => s.label === transition.data.label).id
-                        : transition.id,
-                    source: transition.source.startsWith("temp")
-                        ? newStates.find(
-                              (s) => states.find((state) => state.id === transition.source).data.label === s.name,
-                          ).id
-                        : transition.source,
-                    target: transition.target.startsWith("temp")
-                        ? newStates.find(
-                              (s) => states.find((state) => state.id === transition.target).data.label === s.name,
-                          ).id
-                        : transition.target,
-                };
-            });
-
-            const newStatesLocal = states.map((state) => {
-                return {
-                    ...state,
-                    id: state.id.startsWith("temp") ? newStates.find((s) => s.name === state.data.label).id : state.id,
-                    data: {
-                        ...state.data,
-                        statusId: state.id.startsWith("temp")
-                            ? newStates.find((s) => s.name === state.data.label).statusId
-                            : state.data.statusId,
-                    },
-                };
-            });
-
-            if (
-                statesToAdd.length > 0 ||
-                statesToDelete.length > 0 ||
-                transitionsToAdd.length > 0 ||
-                transitionsToDelete.length > 0
-            ) {
-                await sendRequest({
-                    url: `/workflows/${activeWorkflow.id}`,
-                    method: "PUT",
-                    body: {
-                        name: activeWorkflow.name,
-                        active: activeWorkflow.active,
-                        stateIds: newStatesLocal.map((state) => state.id),
-                        transitionIds: newTransitionsLocal.map((transition) => transition.id),
-                        boardId: activeWorkflow.boardId,
-                    },
-                });
+                setOriginalStates(JSON.parse(JSON.stringify(newStatesLocal)));
+                setOriginalTransitions(JSON.parse(JSON.stringify(newTransitionsLocal)));
+                setStates(JSON.parse(JSON.stringify(newStatesLocal)));
+                setTransitions(JSON.parse(JSON.stringify(newTransitionsLocal)));
+            } catch (err) {
+                console.log(err);
+            } finally {
+                setLoadingWorkflow(false);
             }
-
-            setOriginalStates(JSON.parse(JSON.stringify(newStatesLocal)));
-            setOriginalTransitions(JSON.parse(JSON.stringify(newTransitionsLocal)));
-            setStates(JSON.parse(JSON.stringify(newStatesLocal)));
-            setTransitions(JSON.parse(JSON.stringify(newTransitionsLocal)));
-        } catch (err) {
-            console.log(err);
-        } finally {
-            setLoadingWorkflow(false);
-        }
-    }, [
-        originalStates,
-        states,
-        originalTransitions,
-        transitions,
-        activeWorkflow.id,
-        activeWorkflow.name,
-        activeWorkflow.active,
-        activeWorkflow.boardId,
-    ]);
+        },
+        [
+            originalStates,
+            states,
+            originalTransitions,
+            transitions,
+            activeWorkflow.id,
+            activeWorkflow.name,
+            activeWorkflow.active,
+            activeWorkflow.boardId,
+        ],
+    );
 
     const isChangesMade = !_.isEqual(originalStates, states) || !_.isEqual(originalTransitions, transitions);
 
@@ -618,5 +639,6 @@ export default function useWorkflow() {
         deleteRule,
         updateName,
         setLoadingWorkflow,
+        originalStates,
     };
 }

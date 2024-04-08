@@ -3,6 +3,7 @@ package com.teamadc.backend.controller;
 import com.teamadc.backend.dto.request.CommentRequest;
 import com.teamadc.backend.dto.request.CustomFieldRequest;
 import com.teamadc.backend.dto.request.IncidentRequest;
+import com.teamadc.backend.dto.request.MigrateIncidentRequest;
 import com.teamadc.backend.dto.response.BasicIncidentResponse;
 import com.teamadc.backend.model.Comment;
 import com.teamadc.backend.model.Incident;
@@ -254,6 +255,16 @@ public class IncidentController {
         try {
             Incident incident = incidentService.updateEmployeesInvolved(incidentId, request.getEmployeesInvolved());
             return ResponseEntity.ok(incident);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PostMapping("/migrate")
+    public ResponseEntity<Void> migrateIncidents(@RequestBody MigrateIncidentRequest request) {
+        try {
+            incidentService.migrateIncidents(request.getFromStatusId(), request.getToStatusId());
+            return ResponseEntity.ok().build();
         } catch (InterruptedException | ExecutionException e) {
             return ResponseEntity.internalServerError().build();
         }

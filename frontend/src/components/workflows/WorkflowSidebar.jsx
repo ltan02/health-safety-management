@@ -12,6 +12,7 @@ import {
     IconButton,
     Tooltip,
     Menu,
+    alpha,
 } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import AddIcon from "@mui/icons-material/Add";
@@ -19,6 +20,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LockIcon from "@mui/icons-material/Lock";
 import useAxios from "../../hooks/useAxios";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import ErrorIcon from "@mui/icons-material/Error";
 
 const ROLES = {
     ["ADMIN"]: "Admins",
@@ -41,6 +43,7 @@ const WorkflowSidebar = ({
     setAddRuleModalOpen,
     setSelectedRule,
     deleteRule,
+    invalidStates,
 }) => {
     const [editingName, setEditingName] = useState(false);
     const [name, setName] = useState(node ? node.data.label : "");
@@ -236,7 +239,7 @@ const WorkflowSidebar = ({
                                 <div style={{ display: "flex", flexDirection: "column" }}>
                                     <h3 style={{ fontSize: "16px" }}>Restrict transition</h3>
                                     <p style={{ fontSize: "11px" }}>Hide this transition when these aren&apos;t met</p>
-                                    {rules.map((rule, index) => (
+                                    {(rules ?? []).map((rule, index) => (
                                         <div
                                             key={index}
                                             style={{
@@ -389,6 +392,21 @@ const WorkflowSidebar = ({
                             Transitions connect statuses. They represent actions people take to move issues through your
                             workflow.
                         </p>
+                        {invalidStates.some((stateId) => stateId === node.id) && (
+                            <div
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "start",
+                                    padding: "10px",
+                                    backgroundColor: alpha("#FF5630", 0.1),
+                                    marginTop: "10px",
+                                }}
+                            >
+                                <ErrorIcon sx={{ color: "#F00", marginRight: 1 }} />
+                                <p style={{ fontSize: "11px" }}>This status needs a transition</p>
+                            </div>
+                        )}
                         {transitions
                             .filter((transition) => transition.source === node.id)
                             .map((transition) => (

@@ -93,10 +93,10 @@ function Column({ id, title, tasks, handleRenameColumn, isOverlayActive, handleD
                 </Box>
             </Box>
             {tasks && tasks.length > 0 && (
-                <SortableContext items={tasks.map((task) => task.id)} strategy={rectSortingStrategy}>
+                <SortableContext items={tasks.map((task) => task?.id || "")} strategy={rectSortingStrategy}>
                     <Box sx={{ display: "flex", flexDirection: "column", gap: "10%" }}>
                         {tasks.map((task) => (
-                            <Task key={task.id} id={task.id} task={task} />
+                            <Task key={task?.id || ""} id={task?.id || ""} task={task} />
                         ))}
                     </Box>
                 </SortableContext>
