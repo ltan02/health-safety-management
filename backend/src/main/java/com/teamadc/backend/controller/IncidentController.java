@@ -68,7 +68,7 @@ public class IncidentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BasicIncidentResponse>> getIncidents(@RequestParam Optional<String> all) {
+    public ResponseEntity<List<Incident>> getIncidents(@RequestParam Optional<String> all) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = (String) authentication.getPrincipal();
 
@@ -80,12 +80,12 @@ public class IncidentController {
                 incidents = incidentService.getIncidents(uid);
             }
 
-            List<BasicIncidentResponse> response = new ArrayList<>();
-            for (Incident incident : incidents) {
-                response.add(new BasicIncidentResponse(incident.getId(), incident.getIncidentDate(), incident.getIncidentCategory(), incident.getReporter(), incident.getEmployeesInvolved(), incident.getStatusId(), incident.getReviewer()));
-            }
+//            List<BasicIncidentResponse> response = new ArrayList<>();
+//            for (Incident incident : incidents) {
+//                response.add(new BasicIncidentResponse(incident.getId(), incident.getIncidentDate(), incident.getIncidentCategory(), incident.getReporter(), incident.getEmployeesInvolved(), incident.getStatusId(), incident.getReviewer()));
+//            }
 
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(incidents);
         } catch (InterruptedException | ExecutionException e) {
             return ResponseEntity.internalServerError().build();
         }

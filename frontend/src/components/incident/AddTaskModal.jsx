@@ -1,4 +1,4 @@
-import { Box, Modal, Typography } from "@mui/material";
+import { Box, Modal } from "@mui/material";
 import PreviewForm from "../form/PreviewForm";
 
 const modalStyle = {
