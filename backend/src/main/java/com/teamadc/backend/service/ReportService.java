@@ -40,22 +40,43 @@ public class ReportService {
         List<Incident> incidents = incidentRepository.findAll();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
         List<Incident> filteredIncidents;
-        if(start.isPresent() && end.isPresent()) {
+        if (start.isPresent() && end.isPresent()) {
             Date startDate = formatter.parse(start.get());
             Date endDate = formatter.parse(end.get());
             filteredIncidents = incidents.stream()
-                .filter(incident -> !incident.getCreatedAt().before(startDate) && !incident.getCreatedAt().after(endDate))
-                .collect(Collectors.toList());
+                    .filter(incident -> {
+                        try {
+                            Date incidentDate = formatter.parse(incident.getIncidentDate());
+                            return !incidentDate.before(startDate) && !incidentDate.after(endDate);
+                        } catch (ParseException e) {
+                            return false;
+                        }
+                    })
+                    .collect(Collectors.toList());
         } else if (start.isPresent() && !end.isPresent()) {
             Date startDate = formatter.parse(start.get());
             filteredIncidents = incidents.stream()
-                .filter(incident -> !incident.getCreatedAt().before(startDate))
-                .collect(Collectors.toList());
+                    .filter(incident -> {
+                        try {
+                            Date incidentDate = formatter.parse(incident.getIncidentDate());
+                            return !incidentDate.before(startDate);
+                        } catch (ParseException e) {
+                            return false;
+                        }
+                    })
+                    .collect(Collectors.toList());
         } else if (!start.isPresent() && end.isPresent()) {
             Date endDate = formatter.parse(end.get());
             filteredIncidents = incidents.stream()
-                .filter(incident -> !incident.getCreatedAt().after(endDate))
-                .collect(Collectors.toList());
+                    .filter(incident -> {
+                        try {
+                            Date incidentDate = formatter.parse(incident.getIncidentDate());
+                            return !incidentDate.after(endDate);
+                        } catch (ParseException e) {
+                            return false;
+                        }
+                    })
+                    .collect(Collectors.toList());
         } else {
             filteredIncidents = incidents;
         }

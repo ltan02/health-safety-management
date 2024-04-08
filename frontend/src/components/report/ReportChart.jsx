@@ -16,6 +16,10 @@ import {
 import { useEffect, useState } from "react";
 import useAxios from "../../hooks/useAxios.js";
 import { categoryReports } from "../../pages/report/initialData.js";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import dayjs from "dayjs";
 
 function ReportChart({
   type,
@@ -29,18 +33,18 @@ function ReportChart({
   const [report, setReport] = useState(categoryReports);
   const [reportType, setReportType] = useState({});
   const [field, setField] = useState(data.field);
-  const [startDate, setStartDate] = useState(data.start);
-  const [endDate, setEndDate] = useState(data.end);
+  const [startDate, setStartDate] = useState(dayjs(data.start));
+  const [endDate, setEndDate] = useState(dayjs(data.end));
 
   useEffect(() => {
-    setEndDate(data.end);
-    setStartDate(data.start);
+    setEndDate(dayjs(data.end));
+    setStartDate(dayjs(data.start));
     setField(data.field);
-    getReportAPI(data.field, data.start, data.end);
+    getReportAPI(data.field, dayjs(data.start), dayjs(data.end));
   }, [data]);
 
   useEffect(() => {
-    getReportAPI(data.field, data.start, data.end);
+    getReportAPI(data.field, dayjs(data.start), dayjs(data.end));
   }, []);
 
   const handleFieldChange = (event) => {
@@ -49,28 +53,18 @@ function ReportChart({
     setField(event.target.value);
     getReportAPI(event.target.value, startDate, endDate);
   };
-  const handleStartChange = (event) => {
-    const newStartDate = event.target.value;
-    if (endDate && new Date(newStartDate) >= new Date(endDate)) {
-      alert("Start date must be before end date.");
-      return;
-    }
+  const handleStartChange = (newStartDate) => {
     if (typeof handleSubmit === "function")
-      handleSubmit(field, newStartDate, endDate);
-    setStartDate(newStartDate);
-    getReportAPI(field, newStartDate, endDate);
+      handleSubmit(field, dayjs(newStartDate.format('YYYY-MM-DDTHH:mm')), endDate);
+    setStartDate(dayjs(newStartDate.format('YYYY-MM-DDTHH:mm')));
+    getReportAPI(field, dayjs(newStartDate.format('YYYY-MM-DDTHH:mm')), endDate);
   };
 
-  const handleEndChange = (event) => {
-    const newEndDate = event.target.value;
-    if (startDate && new Date(newEndDate) <= new Date(startDate)) {
-      alert("End date must be after start date.");
-      return;
-    }
+  const handleEndChange = (newEndDate) => {
     if (typeof handleSubmit === "function")
-      handleSubmit(field, startDate, newEndDate);
-    setEndDate(newEndDate);
-    getReportAPI(field, startDate, newEndDate);
+      handleSubmit(field, startDate, dayjs(newEndDate.format('YYYY-MM-DDTHH:mm')));
+    setEndDate(dayjs(newEndDate.format('YYYY-MM-DDTHH:mm')));
+    getReportAPI(field, startDate, dayjs(newEndDate.format('YYYY-MM-DDTHH:mm')));
   };
 
   const modernPalette = [
@@ -224,33 +218,27 @@ function ReportChart({
         </Grid>
 
         <Grid item xs={6}>
-          <TextField
-            fullWidth
-            label="Start"
-            type="datetime-local"
-            defaultValue={startDate}
-            onChange={handleStartChange}
-            InputLabelProps={{
-              shrink: true,
-            }}
-            variant="outlined"
-            margin="dense"
-          />
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DateTimePicker
+              slotProps={{ textField: { size: "small", fontSize: "14px" } }}
+              label="Start Date"
+              value={startDate}
+              onChange={handleStartChange}
+              maxDateTime={endDate}
+            />
+          </LocalizationProvider>
         </Grid>
 
         <Grid item xs={6}>
-          <TextField
-            fullWidth
-            label="End"
-            type="datetime-local"
-            defaultValue={endDate}
-            onChange={handleEndChange}
-            InputLabelProps={{
-              shrink: true,
-            }}
-            variant="outlined"
-            margin="dense"
-          />
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DateTimePicker
+              slotProps={{ textField: { size: "small", fontSize: "14px" } }}
+              value={endDate}
+              label="End Date"
+              onChange={handleEndChange}
+              minDateTime={startDate}
+            />
+          </LocalizationProvider>
         </Grid>
       </Grid>
     </div>
@@ -332,12 +320,13 @@ function ReportChart({
     let url = `/reports/${value}`;
 
     const params = [];
-    if (start) params.push(`start=${start}`);
-    if (end) params.push(`end=${end}`);
+    const formatStart = start.format('YYYY-MM-DDTHH:mm')
+    const formatEnd = end.format('YYYY-MM-DDTHH:mm')
+    if (!(formatStart === 'Invalid Date')) params.push(`start=${formatStart}`);
+    if (!(formatEnd === 'Invalid Date')) params.push(`end=${formatEnd}`);
     if (params.length > 0) {
       url += "?" + params.join("&");
     }
-
     // Send the request and handle the response
     const response = Promise.all([sendRequest({ url })]);
     response
