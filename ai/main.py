@@ -24,6 +24,7 @@ if google_credentials_json:
 else:
     db = firestore.Client()
     aiplatform.init(project="pwc-project-b3778", location="us-west1")
+    client = bigquery.Client()
 
 doc_ref = db.collection('categories').document('categories')
 doc = doc_ref.get()
@@ -269,4 +270,4 @@ async def get_chat_response(chat_prompt: ChatPrompt, uuid: str = Header(None)) -
 
 
 # if __name__ == "__main__":
-    # uvicorn.run(app, host="0.0.0.0", port=8010)
+#     uvicorn.run(app, host="0.0.0.0", port=8010)
