@@ -25,33 +25,33 @@ import DynamicFormOutlinedIcon from "@mui/icons-material/DynamicFormOutlined";
 import AnalyticsOutlinedIcon from "@mui/icons-material/AnalyticsOutlined";
 import MyLocationOutlinedIcon from "@mui/icons-material/MyLocationOutlined";
 import ChevronLeftOutlinedIcon from "@mui/icons-material/ChevronLeftOutlined";
-import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 
 function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
-  const toggleDrawer = (open) => () => handleSidebarToggle(open);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [hoveringReports, setHoveringReports] = useState(false);
-  const [hoveringWorkflows, setHoveringWorkflows] = useState(false);
-  const [hoveringCustomizations, setHoveringCustomizations] = useState(false);
-  const [hoveringSidebar, setHoveringSidebar] = useState(false);
-  const [hoveringBack, setHoveringBack] = useState(false);
-  const { user } = useAuthContext();
-  let location = useLocation();
-  let history = useNavigate();
+    const toggleDrawer = (open) => () => handleSidebarToggle(open);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [hoveringReports, setHoveringReports] = useState(false);
+    const [hoveringWorkflows, setHoveringWorkflows] = useState(false);
+    const [hoveringCustomizations, setHoveringCustomizations] = useState(false);
+    const [hoveringSidebar, setHoveringSidebar] = useState(false);
+    const [hoveringBack, setHoveringBack] = useState(false);
+    const { user } = useAuthContext();
+    let location = useLocation();
+    let history = useNavigate();
 
-  return (
-    location.pathname !== "/profile" && (
-      <Box
-        onMouseEnter={() => setHoveringSidebar(true)}
-        onMouseLeave={() => setHoveringSidebar(false)}
-        sx={{
-          width: 240,
-          position: "relative",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        {/* {hoveringSidebar && sidebarOpen && (
+    return (
+        location.pathname !== "/profile" && (
+            <Box
+                onMouseEnter={() => setHoveringSidebar(true)}
+                onMouseLeave={() => setHoveringSidebar(false)}
+                sx={{
+                    width: 240,
+                    position: "relative",
+                    display: "flex",
+                    flexDirection: "column",
+                }}
+            >
+                {/* {hoveringSidebar && sidebarOpen && (
                 <div
                     onMouseEnter={() => setHoveringBack(true)}
                     onMouseLeave={() => setHoveringBack(false)}
@@ -76,923 +76,872 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
                     />
                 </div>
             )} */}
-        <SwipeableDrawer
-          ModalProps={{ keepMounted: true }}
-          anchor="left"
-          open={isOpen}
-          onOpen={toggleDrawer(true)}
-          onClose={toggleDrawer(false)}
-          variant="persistent"
-          sx={{
-            "& .MuiDrawer-paper": {
-              width: drawerWidth + 2,
-              boxSizing: "border-box",
-              display: "flex",
-              flexDirection: "column",
-              top: "64px",
-              zIndex: 1,
-            },
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "start",
-              alignContent: "start",
-              alignItems: "start",
-              height: "60%",
-              paddingX: "10px",
-              marginTop: "50px",
-            }}
-          >
-            {(location.pathname === "/" ||
-              location.pathname === "/incidents") && (
-              <>
-                <Typography
-                  sx={{
-                    fontWeight: 700,
-                    fontSize: "11px",
-                    marginLeft: "17px",
-                    marginBottom: "5px",
-                  }}
-                >
-                  INCIDENT MANAGEMENT
-                </Typography>
-                <Button
-                  onClick={() => history("/")}
-                  sx={{
-                    paddingLeft: "17px",
-                    paddingY: "8px",
-                    paddingRight: "8px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "start",
-                    width: "100%",
-                    "&:hover": {
-                      backgroundColor: alpha("#EB8C00", 0.2),
-                    },
-                    backgroundColor:
-                      location.pathname === "/"
-                        ? alpha("#EB8C00", 0.2)
-                        : "transparent",
-                  }}
-                >
-                  <ViewWeekOutlinedIcon
+                <SwipeableDrawer
+                    ModalProps={{ keepMounted: true }}
+                    anchor="left"
+                    open={isOpen}
+                    onOpen={toggleDrawer(true)}
+                    onClose={toggleDrawer(false)}
+                    variant="persistent"
                     sx={{
-                      fontSize: 24,
-                      marginRight: "10px",
-                      color: location.pathname === "/" ? "#D04A02" : "#000",
-                    }}
-                  />
-                  <span>
-                    <Typography
-                      style={{
-                        fontSize: "14px",
-                        fontWeight: 400,
-                        color: location.pathname === "/" ? "#D04A02" : "#000",
-                      }}
-                    >
-                      Board
-                    </Typography>
-                  </span>
-                </Button>
-                <Button
-                  onClick={() => history("/incidents")}
-                  sx={{
-                    paddingLeft: "17px",
-                    paddingY: "8px",
-                    paddingRight: "8px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "start",
-                    width: "100%",
-                    "&:hover": {
-                      backgroundColor: alpha("#EB8C00", 0.2),
-                    },
-                    backgroundColor:
-                      location.pathname === "/incidents"
-                        ? alpha("#EB8C00", 0.2)
-                        : "transparent",
-                  }}
-                >
-                  <DnsOutlinedIcon
-                    sx={{
-                      fontSize: 24,
-                      marginRight: "10px",
-                      color:
-                        location.pathname === "/incidents" ? "#D04A02" : "#000",
-                    }}
-                  />
-                  <span>
-                    <Typography
-                      style={{
-                        fontSize: "14px",
-                        fontWeight: 400,
-                        color:
-                          location.pathname === "/incidents"
-                            ? "#D04A02"
-                            : "#000",
-                      }}
-                    >
-                      Incidents
-                    </Typography>
-                  </span>
-                </Button>
-                {isPrivileged(user.role) && (
-                  <>
-                    <Button
-                      onClick={() => {
-                        history("/report");
-                        setHoveringReports(false);
-                      }}
-                      sx={{
-                        paddingLeft: "17px",
-                        paddingY: "8px",
-                        paddingRight: "8px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        width: "100%",
-                        "&:hover": {
-                          backgroundColor: alpha("#EB8C00", 0.2),
-                        },
-                        backgroundColor:
-                          location.pathname === "/report"
-                            ? alpha("#EB8C00", 0.2)
-                            : "transparent",
-                      }}
-                      onMouseEnter={() => setHoveringReports(true)}
-                      onMouseLeave={() => setHoveringReports(false)}
-                    >
-                      <div style={{ display: "flex" }}>
-                        <QueryStatsOutlinedIcon
-                          sx={{
-                            fontSize: 24,
-                            marginRight: "10px",
-                            color:
-                              location.pathname === "/report"
-                                ? "#D04A02"
-                                : "#000",
-                          }}
-                        />
-                        <span>
-                          <Typography
-                            style={{
-                              fontSize: "14px",
-                              fontWeight: 400,
-                              color:
-                                location.pathname === "/report"
-                                  ? "#D04A02"
-                                  : "#000",
-                            }}
-                          >
-                            Reports
-                          </Typography>
-                        </span>
-                      </div>
-                      {hoveringReports && (
-                        <div
-                          style={{
-                            borderRadius: "50%",
-                            width: "20px",
-                            height: "20px",
-                            backgroundColor: "#2d2d2d",
+                        "& .MuiDrawer-paper": {
+                            width: drawerWidth + 2,
+                            boxSizing: "border-box",
                             display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <ArrowForwardIcon
-                            sx={{ fontSize: 16, color: "#fff" }}
-                          />
-                        </div>
-                      )}
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        history("/admin/workflow");
-                        setHoveringWorkflows(false);
-                      }}
-                      sx={{
-                        paddingLeft: "17px",
-                        paddingY: "8px",
-                        paddingRight: "8px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        width: "100%",
-                        "&:hover": {
-                          backgroundColor: alpha("#EB8C00", 0.2),
+                            flexDirection: "column",
+                            top: "64px",
+                            zIndex: 1,
                         },
-                        backgroundColor:
-                          location.pathname === "/admin/workflow"
-                            ? alpha("#EB8C00", 0.2)
-                            : "transparent",
-                      }}
-                      onMouseEnter={() => setHoveringWorkflows(true)}
-                      onMouseLeave={() => setHoveringWorkflows(false)}
-                    >
-                      <div style={{ display: "flex" }}>
-                        <SchemaOutlinedIcon
-                          sx={{
-                            fontSize: 24,
-                            marginRight: "10px",
-                            color:
-                              location.pathname === "/admin/workflow"
-                                ? "#D04A02"
-                                : "#000",
-                          }}
-                        />
-                        <span>
-                          <Typography
-                            style={{
-                              fontSize: "14px",
-                              fontWeight: 400,
-                              color:
-                                location.pathname === "/admin/workflow"
-                                  ? "#D04A02"
-                                  : "#000",
-                            }}
-                          >
-                            Workflows
-                          </Typography>
-                        </span>
-                      </div>
-                      {hoveringWorkflows && (
-                        <div
-                          style={{
-                            borderRadius: "50%",
-                            width: "20px",
-                            height: "20px",
-                            backgroundColor: "#2d2d2d",
+                    }}
+                >
+                    <Box
+                        sx={{
                             display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <ArrowForwardIcon
-                            sx={{ fontSize: 16, color: "#fff" }}
-                          />
-                        </div>
-                      )}
-                    </Button>
-                    
-                    <Button
-                      onClick={() => {
-                        history("/admin/form");
-                        setHoveringCustomizations(false);
-                      }}
-                      sx={{
-                        paddingLeft: "17px",
-                        paddingY: "8px",
-                        paddingRight: "8px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        width: "100%",
-                        "&:hover": {
-                          backgroundColor: alpha("#EB8C00", 0.2),
-                        },
-                        backgroundColor:
-                          location.pathname === "/admin/form"
-                            ? alpha("#EB8C00", 0.2)
-                            : "transparent",
-                      }}
-                      onMouseEnter={() => setHoveringCustomizations(true)}
-                      onMouseLeave={() => setHoveringCustomizations(false)}
-                    >
-                      <div style={{ display: "flex" }}>
-                        <SettingsOutlinedIcon
-                          sx={{
-                            fontSize: 24,
-                            marginRight: "10px",
-                            color:
-                              location.pathname === "/admin/form"
-                                ? "#D04A02"
-                                : "#000",
-                          }}
-                        />
-                        <span>
-                          <Typography
-                            style={{
-                              fontSize: "14px",
-                              fontWeight: 400,
-                              color:
-                                location.pathname === "/admin/form"
-                                  ? "#D04A02"
-                                  : "#000",
-                            }}
-                          >
-                            Customizations
-                          </Typography>
-                        </span>
-                      </div>
-                      {hoveringCustomizations && (
-                        <div
-                          style={{
-                            borderRadius: "50%",
-                            width: "20px",
-                            height: "20px",
-                            backgroundColor: "#2d2d2d",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <ArrowForwardIcon
-                            sx={{ fontSize: 16, color: "#fff" }}
-                          />
-                        </div>
-                      )}
-                    </Button>
-                    {isAdmin(user.role) && (<Button
-                  onClick={() => history("/business")}
-                  sx={{
-                    paddingLeft: "17px",
-                    paddingY: "8px",
-                    paddingRight: "8px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "start",
-                    width: "100%",
-                    "&:hover": {
-                      backgroundColor: alpha("#EB8C00", 0.2),
-                    },
-                    backgroundColor:
-                      location.pathname === "/business"
-                        ? alpha("#EB8C00", 0.2)
-                        : "transparent",
-                  }}
-                >
-                  <ManageAccountsIcon
-                    sx={{
-                      fontSize: 24,
-                      marginRight: "10px",
-                      color:
-                        location.pathname === "/business" ? "#D04A02" : "#000",
-                    }}
-                  />
-                  <span>
-                    <Typography
-                      style={{
-                        fontSize: "14px",
-                        fontWeight: 400,
-                        color:
-                          location.pathname === "/business"
-                            ? "#D04A02"
-                            : "#000",
-                      }}
-                    >
-                      User Management
-                    </Typography>
-                  </span>
-                </Button>)}
-                  </>
-                )}
-              </>
-            )}
-            {location.pathname.split("/")[1] === "report" && (
-              <>
-                <Button
-                  onClick={() => {
-                    history("/");
-                    setHoveringCustomizations(false);
-                    setHoveringReports(false);
-                    setHoveringWorkflows(false);
-                  }}
-                  sx={{
-                    paddingLeft: "17px",
-                    paddingY: "8px",
-                    paddingRight: "8px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    width: "100%",
-                    "&:hover": {
-                      backgroundColor: alpha("#EB8C00", 0.2),
-                    },
-                    marginBottom: "8px",
-                  }}
-                  onMouseEnter={() => setHoveringReports(true)}
-                  onMouseLeave={() => setHoveringReports(false)}
-                >
-                  <div style={{ display: "flex" }}>
-                    <div
-                      style={{
-                        borderRadius: "50%",
-                        width: "20px",
-                        height: "20px",
-                        backgroundColor: "#2d2d2d",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        marginRight: "10px",
-                      }}
-                    >
-                      <ArrowBackIcon sx={{ fontSize: 16, color: "#fff" }} />
-                    </div>
-                    <span>
-                      <Typography
-                        style={{
-                          fontSize: "14px",
-                          fontWeight: 400,
-                          color: "#000",
+                            flexDirection: "column",
+                            justifyContent: "start",
+                            alignContent: "start",
+                            alignItems: "start",
+                            height: "60%",
+                            paddingX: "10px",
+                            marginTop: "50px",
                         }}
-                      >
-                        Back to board
-                      </Typography>
-                    </span>
-                  </div>
-                </Button>
-                <Divider
-                  style={{
-                    width: "100%",
-                    marginRight: "8px",
-                    color: "#44546F",
-                    borderBottomWidth: "2px",
-                  }}
-                />
-                <Typography
-                  sx={{
-                    fontWeight: 600,
-                    fontSize: "14px",
-                    marginLeft: "17px",
-                    marignBottom: "8px",
-                    marginTop: "12px",
-                  }}
-                >
-                  Reports
-                </Typography>
-                <Button
-                  onClick={() => history("/report")}
-                  sx={{
-                    marginTop: "8px",
-                    paddingLeft: "17px",
-                    paddingY: "8px",
-                    paddingRight: "8px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "start",
-                    width: "100%",
-                    "&:hover": {
-                      backgroundColor: alpha("#EB8C00", 0.2),
-                    },
-                    backgroundColor:
-                      location.pathname === "/report"
-                        ? alpha("#EB8C00", 0.2)
-                        : "transparent",
-                  }}
-                >
-                  <DashboardOutlinedIcon
-                    sx={{
-                      fontSize: 24,
-                      marginRight: "10px",
-                      color:
-                        location.pathname === "/report" ? "#D04A02" : "#000",
-                    }}
-                  />
-                  <span>
-                    <Typography
-                      style={{
-                        fontSize: "14px",
-                        fontWeight: 400,
-                        color:
-                          location.pathname === "/report" ? "#D04A02" : "#000",
-                      }}
                     >
-                      Dashboard
-                    </Typography>
-                  </span>
-                </Button>
-                <Button
-                  onClick={() => history("/report/status-insights")}
-                  sx={{
-                    paddingLeft: "17px",
-                    paddingY: "8px",
-                    paddingRight: "8px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "start",
-                    width: "100%",
-                    "&:hover": {
-                      backgroundColor: alpha("#EB8C00", 0.2),
-                    },
-                    backgroundColor:
-                      location.pathname === "/report/status-insights"
-                        ? alpha("#EB8C00", 0.2)
-                        : "transparent",
-                  }}
-                >
-                  <TimelineOutlinedIcon
-                    sx={{
-                      fontSize: 24,
-                      marginRight: "10px",
-                      color:
-                        location.pathname === "/report/status-insights"
-                          ? "#D04A02"
-                          : "#000",
-                    }}
-                  />
-                  <span>
-                    <Typography
-                      style={{
-                        fontSize: "14px",
-                        fontWeight: 400,
-                        color:
-                          location.pathname === "/report/status-insights"
-                            ? "#D04A02"
-                            : "#000",
-                      }}
-                    >
-                      Status Insights
-                    </Typography>
-                  </span>
-                </Button>
-                <Button
-                  onClick={() => history("/report/category-analysis")}
-                  sx={{
-                    paddingLeft: "17px",
-                    paddingY: "8px",
-                    paddingRight: "8px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "start",
-                    width: "100%",
-                    "&:hover": {
-                      backgroundColor: alpha("#EB8C00", 0.2),
-                    },
-                    backgroundColor:
-                      location.pathname === "/report/category-analysis"
-                        ? alpha("#EB8C00", 0.2)
-                        : "transparent",
-                  }}
-                >
-                  <AnalyticsOutlinedIcon
-                    sx={{
-                      fontSize: 24,
-                      marginRight: "10px",
-                      color:
-                        location.pathname === "/report/category-analysis"
-                          ? "#D04A02"
-                          : "#000",
-                    }}
-                  />
-                  <span>
-                    <Typography
-                      style={{
-                        fontSize: "14px",
-                        fontWeight: 400,
-                        color:
-                          location.pathname === "/report/category-analysis"
-                            ? "#D04A02"
-                            : "#000",
-                      }}
-                    >
-                      Category Analysis
-                    </Typography>
-                  </span>
-                </Button>
-                <Button
-                  onClick={() => history("/report/employee-involvement")}
-                  sx={{
-                    paddingLeft: "17px",
-                    paddingY: "8px",
-                    paddingRight: "8px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "start",
-                    width: "100%",
-                    "&:hover": {
-                      backgroundColor: alpha("#EB8C00", 0.2),
-                    },
-                    backgroundColor:
-                      location.pathname === "/report/employee-involvement"
-                        ? alpha("#EB8C00", 0.2)
-                        : "transparent",
-                  }}
-                >
-                  <MyLocationOutlinedIcon
-                    sx={{
-                      fontSize: 24,
-                      marginRight: "10px",
-                      color:
-                        location.pathname === "/report/employee-involvement"
-                          ? "#D04A02"
-                          : "#000",
-                    }}
-                  />
-                  <span>
-                    <Typography
-                      style={{
-                        fontSize: "14px",
-                        fontWeight: 400,
-                        color:
-                          location.pathname === "/report/employee-involvement"
-                            ? "#D04A02"
-                            : "#000",
-                      }}
-                    >
-                      Employee Involvement
-                    </Typography>
-                  </span>
-                </Button>
-              </>
-            )}
-            {location.pathname.split("/")[1] === "admin" &&
-              (location.pathname.split("/")[2] === "workflow" ||
-                location.pathname.split("/")[2] === "status") && (
-                <>
-                  <Button
-                    onClick={() => {
-                      history("/");
-                      setHoveringCustomizations(false);
-                      setHoveringReports(false);
-                      setHoveringWorkflows(false);
-                    }}
-                    sx={{
-                      paddingLeft: "17px",
-                      paddingY: "8px",
-                      paddingRight: "8px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      width: "100%",
-                      "&:hover": {
-                        backgroundColor: alpha("#EB8C00", 0.2),
-                      },
-                      marginBottom: "8px",
-                    }}
-                    onMouseEnter={() => setHoveringReports(true)}
-                    onMouseLeave={() => setHoveringReports(false)}
-                  >
-                    <div style={{ display: "flex" }}>
-                      <div
-                        style={{
-                          borderRadius: "50%",
-                          width: "20px",
-                          height: "20px",
-                          backgroundColor: "#2d2d2d",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          marginRight: "10px",
-                        }}
-                      >
-                        <ArrowBackIcon sx={{ fontSize: 16, color: "#fff" }} />
-                      </div>
-                      <span>
-                        <Typography
-                          style={{
-                            fontSize: "14px",
-                            fontWeight: 400,
-                            color: "#000",
-                          }}
-                        >
-                          Back to board
-                        </Typography>
-                      </span>
-                    </div>
-                  </Button>
-                  <Divider
-                    style={{
-                      width: "100%",
-                      marginRight: "8px",
-                      color: "#44546F",
-                      borderBottomWidth: "2px",
-                    }}
-                  />
-                  <Typography
-                    sx={{
-                      fontWeight: 600,
-                      fontSize: "14px",
-                      marginLeft: "17px",
-                      marignBottom: "8px",
-                      marginTop: "12px",
-                    }}
-                  >
-                    Workflows
-                  </Typography>
-                  <Button
-                    onClick={() => history("/admin/workflow")}
-                    sx={{
-                      marginTop: "8px",
-                      paddingLeft: "17px",
-                      paddingY: "8px",
-                      paddingRight: "8px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "start",
-                      width: "100%",
-                      "&:hover": {
-                        backgroundColor: alpha("#EB8C00", 0.2),
-                      },
-                      backgroundColor:
-                        location.pathname === "/admin/workflow"
-                          ? alpha("#EB8C00", 0.2)
-                          : "transparent",
-                    }}
-                  >
-                    <ManageSearchOutlinedIcon
-                      sx={{
-                        fontSize: 24,
-                        marginRight: "10px",
-                        color:
-                          location.pathname === "/admin/workflow"
-                            ? "#D04A02"
-                            : "#000",
-                      }}
-                    />
-                    <span>
-                      <Typography
-                        style={{
-                          fontSize: "14px",
-                          fontWeight: 400,
-                          color:
-                            location.pathname === "/admin/workflow"
-                              ? "#D04A02"
-                              : "#000",
-                        }}
-                      >
-                        Management
-                      </Typography>
-                    </span>
-                  </Button>
-                  <Button
-                    onClick={() => history("/admin/status")}
-                    sx={{
-                      paddingLeft: "17px",
-                      paddingY: "8px",
-                      paddingRight: "8px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "start",
-                      width: "100%",
-                      "&:hover": {
-                        backgroundColor: alpha("#EB8C00", 0.2),
-                      },
-                      backgroundColor:
-                        location.pathname === "/admin/status"
-                          ? alpha("#EB8C00", 0.2)
-                          : "transparent",
-                    }}
-                  >
-                    <CorporateFareOutlinedIcon
-                      sx={{
-                        fontSize: 24,
-                        marginRight: "10px",
-                        color:
-                          location.pathname === "/admin/status"
-                            ? "#D04A02"
-                            : "#000",
-                      }}
-                    />
-                    <span>
-                      <Typography
-                        style={{
-                          fontSize: "14px",
-                          fontWeight: 400,
-                          color:
-                            location.pathname === "/admin/status"
-                              ? "#D04A02"
-                              : "#000",
-                        }}
-                      >
-                        Columns and statuses
-                      </Typography>
-                    </span>
-                  </Button>
-                </>
-              )}
-            {location.pathname.split("/")[1] === "admin" &&
-              !(
-                location.pathname.split("/")[2] === "workflow" ||
-                location.pathname.split("/")[2] === "status"
-              ) && (
-                <>
-                  <Button
-                    onClick={() => {
-                      history("/");
-                      setHoveringCustomizations(false);
-                      setHoveringReports(false);
-                      setHoveringWorkflows(false);
-                    }}
-                    sx={{
-                      paddingLeft: "17px",
-                      paddingY: "8px",
-                      paddingRight: "8px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      width: "100%",
-                      "&:hover": {
-                        backgroundColor: alpha("#EB8C00", 0.2),
-                      },
-                      marginBottom: "8px",
-                    }}
-                    onMouseEnter={() => setHoveringReports(true)}
-                    onMouseLeave={() => setHoveringReports(false)}
-                  >
-                    <div style={{ display: "flex" }}>
-                      <div
-                        style={{
-                          borderRadius: "50%",
-                          width: "20px",
-                          height: "20px",
-                          backgroundColor: "#2d2d2d",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          marginRight: "10px",
-                        }}
-                      >
-                        <ArrowBackIcon sx={{ fontSize: 16, color: "#fff" }} />
-                      </div>
-                      <span>
-                        <Typography
-                          style={{
-                            fontSize: "14px",
-                            fontWeight: 400,
-                            color: "#000",
-                          }}
-                        >
-                          Back to board
-                        </Typography>
-                      </span>
-                    </div>
-                  </Button>
-                  <Divider
-                    style={{
-                      width: "100%",
-                      marginRight: "8px",
-                      color: "#44546F",
-                      borderBottomWidth: "2px",
-                    }}
-                  />
-                  <Typography
-                    sx={{
-                      fontWeight: 600,
-                      fontSize: "14px",
-                      marginLeft: "17px",
-                      marignBottom: "8px",
-                      marginTop: "12px",
-                    }}
-                  >
-                    Customizations
-                  </Typography>
-                  <Button
-                    onClick={() => history("/admin/form")}
-                    sx={{
-                      marginTop: "8px",
-                      paddingLeft: "17px",
-                      paddingY: "8px",
-                      paddingRight: "8px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "start",
-                      width: "100%",
-                      "&:hover": {
-                        backgroundColor: alpha("#EB8C00", 0.2),
-                      },
-                      backgroundColor:
-                        location.pathname === "/admin/form"
-                          ? alpha("#EB8C00", 0.2)
-                          : "transparent",
-                    }}
-                  >
-                    <DynamicFormOutlinedIcon
-                      sx={{
-                        fontSize: 24,
-                        marginRight: "10px",
-                        color:
-                          location.pathname === "/admin/form"
-                            ? "#D04A02"
-                            : "#000",
-                      }}
-                    />
-                    <span>
-                      <Typography
-                        style={{
-                          fontSize: "14px",
-                          fontWeight: 400,
-                          color:
-                            location.pathname === "/admin/form"
-                              ? "#D04A02"
-                              : "#000",
-                        }}
-                      >
-                        Form customization
-                      </Typography>
-                    </span>
-                  </Button>
-                  
-                </>
-              )}
-          </Box>
-        </SwipeableDrawer>
-      </Box>
-    )
-  );
+                        {(location.pathname === "/" ||
+                            location.pathname === "/incidents" ||
+                            location.pathname === "/business") && (
+                            <>
+                                <Typography
+                                    sx={{
+                                        fontWeight: 700,
+                                        fontSize: "11px",
+                                        marginLeft: "17px",
+                                        marginBottom: "5px",
+                                    }}
+                                >
+                                    INCIDENT MANAGEMENT
+                                </Typography>
+                                <Button
+                                    onClick={() => history("/")}
+                                    sx={{
+                                        paddingLeft: "17px",
+                                        paddingY: "8px",
+                                        paddingRight: "8px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "start",
+                                        width: "100%",
+                                        "&:hover": {
+                                            backgroundColor: alpha("#EB8C00", 0.2),
+                                        },
+                                        backgroundColor:
+                                            location.pathname === "/" ? alpha("#EB8C00", 0.2) : "transparent",
+                                    }}
+                                >
+                                    <ViewWeekOutlinedIcon
+                                        sx={{
+                                            fontSize: 24,
+                                            marginRight: "10px",
+                                            color: location.pathname === "/" ? "#D04A02" : "#000",
+                                        }}
+                                    />
+                                    <span>
+                                        <Typography
+                                            style={{
+                                                fontSize: "14px",
+                                                fontWeight: 400,
+                                                color: location.pathname === "/" ? "#D04A02" : "#000",
+                                            }}
+                                        >
+                                            Board
+                                        </Typography>
+                                    </span>
+                                </Button>
+                                <Button
+                                    onClick={() => history("/incidents")}
+                                    sx={{
+                                        paddingLeft: "17px",
+                                        paddingY: "8px",
+                                        paddingRight: "8px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "start",
+                                        width: "100%",
+                                        "&:hover": {
+                                            backgroundColor: alpha("#EB8C00", 0.2),
+                                        },
+                                        backgroundColor:
+                                            location.pathname === "/incidents" ? alpha("#EB8C00", 0.2) : "transparent",
+                                    }}
+                                >
+                                    <DnsOutlinedIcon
+                                        sx={{
+                                            fontSize: 24,
+                                            marginRight: "10px",
+                                            color: location.pathname === "/incidents" ? "#D04A02" : "#000",
+                                        }}
+                                    />
+                                    <span>
+                                        <Typography
+                                            style={{
+                                                fontSize: "14px",
+                                                fontWeight: 400,
+                                                color: location.pathname === "/incidents" ? "#D04A02" : "#000",
+                                            }}
+                                        >
+                                            Incidents
+                                        </Typography>
+                                    </span>
+                                </Button>
+                                {isPrivileged(user.role) && (
+                                    <>
+                                        <Button
+                                            onClick={() => {
+                                                history("/report");
+                                                setHoveringReports(false);
+                                            }}
+                                            sx={{
+                                                paddingLeft: "17px",
+                                                paddingY: "8px",
+                                                paddingRight: "8px",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "space-between",
+                                                width: "100%",
+                                                "&:hover": {
+                                                    backgroundColor: alpha("#EB8C00", 0.2),
+                                                },
+                                                backgroundColor:
+                                                    location.pathname === "/report"
+                                                        ? alpha("#EB8C00", 0.2)
+                                                        : "transparent",
+                                            }}
+                                            onMouseEnter={() => setHoveringReports(true)}
+                                            onMouseLeave={() => setHoveringReports(false)}
+                                        >
+                                            <div style={{ display: "flex" }}>
+                                                <QueryStatsOutlinedIcon
+                                                    sx={{
+                                                        fontSize: 24,
+                                                        marginRight: "10px",
+                                                        color: location.pathname === "/report" ? "#D04A02" : "#000",
+                                                    }}
+                                                />
+                                                <span>
+                                                    <Typography
+                                                        style={{
+                                                            fontSize: "14px",
+                                                            fontWeight: 400,
+                                                            color: location.pathname === "/report" ? "#D04A02" : "#000",
+                                                        }}
+                                                    >
+                                                        Reports
+                                                    </Typography>
+                                                </span>
+                                            </div>
+                                            {hoveringReports && (
+                                                <div
+                                                    style={{
+                                                        borderRadius: "50%",
+                                                        width: "20px",
+                                                        height: "20px",
+                                                        backgroundColor: "#2d2d2d",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                    }}
+                                                >
+                                                    <ArrowForwardIcon sx={{ fontSize: 16, color: "#fff" }} />
+                                                </div>
+                                            )}
+                                        </Button>
+                                        <Button
+                                            onClick={() => {
+                                                history("/admin/workflow");
+                                                setHoveringWorkflows(false);
+                                            }}
+                                            sx={{
+                                                paddingLeft: "17px",
+                                                paddingY: "8px",
+                                                paddingRight: "8px",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "space-between",
+                                                width: "100%",
+                                                "&:hover": {
+                                                    backgroundColor: alpha("#EB8C00", 0.2),
+                                                },
+                                                backgroundColor:
+                                                    location.pathname === "/admin/workflow"
+                                                        ? alpha("#EB8C00", 0.2)
+                                                        : "transparent",
+                                            }}
+                                            onMouseEnter={() => setHoveringWorkflows(true)}
+                                            onMouseLeave={() => setHoveringWorkflows(false)}
+                                        >
+                                            <div style={{ display: "flex" }}>
+                                                <SchemaOutlinedIcon
+                                                    sx={{
+                                                        fontSize: 24,
+                                                        marginRight: "10px",
+                                                        color:
+                                                            location.pathname === "/admin/workflow"
+                                                                ? "#D04A02"
+                                                                : "#000",
+                                                    }}
+                                                />
+                                                <span>
+                                                    <Typography
+                                                        style={{
+                                                            fontSize: "14px",
+                                                            fontWeight: 400,
+                                                            color:
+                                                                location.pathname === "/admin/workflow"
+                                                                    ? "#D04A02"
+                                                                    : "#000",
+                                                        }}
+                                                    >
+                                                        Workflows
+                                                    </Typography>
+                                                </span>
+                                            </div>
+                                            {hoveringWorkflows && (
+                                                <div
+                                                    style={{
+                                                        borderRadius: "50%",
+                                                        width: "20px",
+                                                        height: "20px",
+                                                        backgroundColor: "#2d2d2d",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                    }}
+                                                >
+                                                    <ArrowForwardIcon sx={{ fontSize: 16, color: "#fff" }} />
+                                                </div>
+                                            )}
+                                        </Button>
+
+                                        <Button
+                                            onClick={() => {
+                                                history("/admin/form");
+                                                setHoveringCustomizations(false);
+                                            }}
+                                            sx={{
+                                                paddingLeft: "17px",
+                                                paddingY: "8px",
+                                                paddingRight: "8px",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "space-between",
+                                                width: "100%",
+                                                "&:hover": {
+                                                    backgroundColor: alpha("#EB8C00", 0.2),
+                                                },
+                                                backgroundColor:
+                                                    location.pathname === "/admin/form"
+                                                        ? alpha("#EB8C00", 0.2)
+                                                        : "transparent",
+                                            }}
+                                            onMouseEnter={() => setHoveringCustomizations(true)}
+                                            onMouseLeave={() => setHoveringCustomizations(false)}
+                                        >
+                                            <div style={{ display: "flex" }}>
+                                                <SettingsOutlinedIcon
+                                                    sx={{
+                                                        fontSize: 24,
+                                                        marginRight: "10px",
+                                                        color: location.pathname === "/admin/form" ? "#D04A02" : "#000",
+                                                    }}
+                                                />
+                                                <span>
+                                                    <Typography
+                                                        style={{
+                                                            fontSize: "14px",
+                                                            fontWeight: 400,
+                                                            color:
+                                                                location.pathname === "/admin/form"
+                                                                    ? "#D04A02"
+                                                                    : "#000",
+                                                        }}
+                                                    >
+                                                        Customizations
+                                                    </Typography>
+                                                </span>
+                                            </div>
+                                            {hoveringCustomizations && (
+                                                <div
+                                                    style={{
+                                                        borderRadius: "50%",
+                                                        width: "20px",
+                                                        height: "20px",
+                                                        backgroundColor: "#2d2d2d",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center",
+                                                    }}
+                                                >
+                                                    <ArrowForwardIcon sx={{ fontSize: 16, color: "#fff" }} />
+                                                </div>
+                                            )}
+                                        </Button>
+                                        {isAdmin(user.role) && (
+                                            <Button
+                                                onClick={() => history("/business")}
+                                                sx={{
+                                                    paddingLeft: "17px",
+                                                    paddingY: "8px",
+                                                    paddingRight: "8px",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "start",
+                                                    width: "100%",
+                                                    "&:hover": {
+                                                        backgroundColor: alpha("#EB8C00", 0.2),
+                                                    },
+                                                    backgroundColor:
+                                                        location.pathname === "/business"
+                                                            ? alpha("#EB8C00", 0.2)
+                                                            : "transparent",
+                                                }}
+                                            >
+                                                <ManageAccountsIcon
+                                                    sx={{
+                                                        fontSize: 24,
+                                                        marginRight: "10px",
+                                                        color: location.pathname === "/business" ? "#D04A02" : "#000",
+                                                    }}
+                                                />
+                                                <span>
+                                                    <Typography
+                                                        style={{
+                                                            fontSize: "14px",
+                                                            fontWeight: 400,
+                                                            color:
+                                                                location.pathname === "/business" ? "#D04A02" : "#000",
+                                                        }}
+                                                    >
+                                                        User Management
+                                                    </Typography>
+                                                </span>
+                                            </Button>
+                                        )}
+                                    </>
+                                )}
+                            </>
+                        )}
+                        {location.pathname.split("/")[1] === "report" && (
+                            <>
+                                <Button
+                                    onClick={() => {
+                                        history("/");
+                                        setHoveringCustomizations(false);
+                                        setHoveringReports(false);
+                                        setHoveringWorkflows(false);
+                                    }}
+                                    sx={{
+                                        paddingLeft: "17px",
+                                        paddingY: "8px",
+                                        paddingRight: "8px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "space-between",
+                                        width: "100%",
+                                        "&:hover": {
+                                            backgroundColor: alpha("#EB8C00", 0.2),
+                                        },
+                                        marginBottom: "8px",
+                                    }}
+                                    onMouseEnter={() => setHoveringReports(true)}
+                                    onMouseLeave={() => setHoveringReports(false)}
+                                >
+                                    <div style={{ display: "flex" }}>
+                                        <div
+                                            style={{
+                                                borderRadius: "50%",
+                                                width: "20px",
+                                                height: "20px",
+                                                backgroundColor: "#2d2d2d",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                marginRight: "10px",
+                                            }}
+                                        >
+                                            <ArrowBackIcon sx={{ fontSize: 16, color: "#fff" }} />
+                                        </div>
+                                        <span>
+                                            <Typography
+                                                style={{
+                                                    fontSize: "14px",
+                                                    fontWeight: 400,
+                                                    color: "#000",
+                                                }}
+                                            >
+                                                Back to board
+                                            </Typography>
+                                        </span>
+                                    </div>
+                                </Button>
+                                <Divider
+                                    style={{
+                                        width: "100%",
+                                        marginRight: "8px",
+                                        color: "#44546F",
+                                        borderBottomWidth: "2px",
+                                    }}
+                                />
+                                <Typography
+                                    sx={{
+                                        fontWeight: 600,
+                                        fontSize: "14px",
+                                        marginLeft: "17px",
+                                        marignBottom: "8px",
+                                        marginTop: "12px",
+                                    }}
+                                >
+                                    Reports
+                                </Typography>
+                                <Button
+                                    onClick={() => history("/report")}
+                                    sx={{
+                                        marginTop: "8px",
+                                        paddingLeft: "17px",
+                                        paddingY: "8px",
+                                        paddingRight: "8px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "start",
+                                        width: "100%",
+                                        "&:hover": {
+                                            backgroundColor: alpha("#EB8C00", 0.2),
+                                        },
+                                        backgroundColor:
+                                            location.pathname === "/report" ? alpha("#EB8C00", 0.2) : "transparent",
+                                    }}
+                                >
+                                    <DashboardOutlinedIcon
+                                        sx={{
+                                            fontSize: 24,
+                                            marginRight: "10px",
+                                            color: location.pathname === "/report" ? "#D04A02" : "#000",
+                                        }}
+                                    />
+                                    <span>
+                                        <Typography
+                                            style={{
+                                                fontSize: "14px",
+                                                fontWeight: 400,
+                                                color: location.pathname === "/report" ? "#D04A02" : "#000",
+                                            }}
+                                        >
+                                            Dashboard
+                                        </Typography>
+                                    </span>
+                                </Button>
+                                <Button
+                                    onClick={() => history("/report/status-insights")}
+                                    sx={{
+                                        paddingLeft: "17px",
+                                        paddingY: "8px",
+                                        paddingRight: "8px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "start",
+                                        width: "100%",
+                                        "&:hover": {
+                                            backgroundColor: alpha("#EB8C00", 0.2),
+                                        },
+                                        backgroundColor:
+                                            location.pathname === "/report/status-insights"
+                                                ? alpha("#EB8C00", 0.2)
+                                                : "transparent",
+                                    }}
+                                >
+                                    <TimelineOutlinedIcon
+                                        sx={{
+                                            fontSize: 24,
+                                            marginRight: "10px",
+                                            color: location.pathname === "/report/status-insights" ? "#D04A02" : "#000",
+                                        }}
+                                    />
+                                    <span>
+                                        <Typography
+                                            style={{
+                                                fontSize: "14px",
+                                                fontWeight: 400,
+                                                color:
+                                                    location.pathname === "/report/status-insights"
+                                                        ? "#D04A02"
+                                                        : "#000",
+                                            }}
+                                        >
+                                            Status Insights
+                                        </Typography>
+                                    </span>
+                                </Button>
+                                <Button
+                                    onClick={() => history("/report/category-analysis")}
+                                    sx={{
+                                        paddingLeft: "17px",
+                                        paddingY: "8px",
+                                        paddingRight: "8px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "start",
+                                        width: "100%",
+                                        "&:hover": {
+                                            backgroundColor: alpha("#EB8C00", 0.2),
+                                        },
+                                        backgroundColor:
+                                            location.pathname === "/report/category-analysis"
+                                                ? alpha("#EB8C00", 0.2)
+                                                : "transparent",
+                                    }}
+                                >
+                                    <AnalyticsOutlinedIcon
+                                        sx={{
+                                            fontSize: 24,
+                                            marginRight: "10px",
+                                            color:
+                                                location.pathname === "/report/category-analysis" ? "#D04A02" : "#000",
+                                        }}
+                                    />
+                                    <span>
+                                        <Typography
+                                            style={{
+                                                fontSize: "14px",
+                                                fontWeight: 400,
+                                                color:
+                                                    location.pathname === "/report/category-analysis"
+                                                        ? "#D04A02"
+                                                        : "#000",
+                                            }}
+                                        >
+                                            Category Analysis
+                                        </Typography>
+                                    </span>
+                                </Button>
+                                <Button
+                                    onClick={() => history("/report/employee-involvement")}
+                                    sx={{
+                                        paddingLeft: "17px",
+                                        paddingY: "8px",
+                                        paddingRight: "8px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "start",
+                                        width: "100%",
+                                        "&:hover": {
+                                            backgroundColor: alpha("#EB8C00", 0.2),
+                                        },
+                                        backgroundColor:
+                                            location.pathname === "/report/employee-involvement"
+                                                ? alpha("#EB8C00", 0.2)
+                                                : "transparent",
+                                    }}
+                                >
+                                    <MyLocationOutlinedIcon
+                                        sx={{
+                                            fontSize: 24,
+                                            marginRight: "10px",
+                                            color:
+                                                location.pathname === "/report/employee-involvement"
+                                                    ? "#D04A02"
+                                                    : "#000",
+                                        }}
+                                    />
+                                    <span>
+                                        <Typography
+                                            style={{
+                                                fontSize: "14px",
+                                                fontWeight: 400,
+                                                color:
+                                                    location.pathname === "/report/employee-involvement"
+                                                        ? "#D04A02"
+                                                        : "#000",
+                                            }}
+                                        >
+                                            Employee Involvement
+                                        </Typography>
+                                    </span>
+                                </Button>
+                            </>
+                        )}
+                        {location.pathname.split("/")[1] === "admin" &&
+                            (location.pathname.split("/")[2] === "workflow" ||
+                                location.pathname.split("/")[2] === "status") && (
+                                <>
+                                    <Button
+                                        onClick={() => {
+                                            history("/");
+                                            setHoveringCustomizations(false);
+                                            setHoveringReports(false);
+                                            setHoveringWorkflows(false);
+                                        }}
+                                        sx={{
+                                            paddingLeft: "17px",
+                                            paddingY: "8px",
+                                            paddingRight: "8px",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "space-between",
+                                            width: "100%",
+                                            "&:hover": {
+                                                backgroundColor: alpha("#EB8C00", 0.2),
+                                            },
+                                            marginBottom: "8px",
+                                        }}
+                                        onMouseEnter={() => setHoveringReports(true)}
+                                        onMouseLeave={() => setHoveringReports(false)}
+                                    >
+                                        <div style={{ display: "flex" }}>
+                                            <div
+                                                style={{
+                                                    borderRadius: "50%",
+                                                    width: "20px",
+                                                    height: "20px",
+                                                    backgroundColor: "#2d2d2d",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+                                                    marginRight: "10px",
+                                                }}
+                                            >
+                                                <ArrowBackIcon sx={{ fontSize: 16, color: "#fff" }} />
+                                            </div>
+                                            <span>
+                                                <Typography
+                                                    style={{
+                                                        fontSize: "14px",
+                                                        fontWeight: 400,
+                                                        color: "#000",
+                                                    }}
+                                                >
+                                                    Back to board
+                                                </Typography>
+                                            </span>
+                                        </div>
+                                    </Button>
+                                    <Divider
+                                        style={{
+                                            width: "100%",
+                                            marginRight: "8px",
+                                            color: "#44546F",
+                                            borderBottomWidth: "2px",
+                                        }}
+                                    />
+                                    <Typography
+                                        sx={{
+                                            fontWeight: 600,
+                                            fontSize: "14px",
+                                            marginLeft: "17px",
+                                            marignBottom: "8px",
+                                            marginTop: "12px",
+                                        }}
+                                    >
+                                        Workflows
+                                    </Typography>
+                                    <Button
+                                        onClick={() => history("/admin/workflow")}
+                                        sx={{
+                                            marginTop: "8px",
+                                            paddingLeft: "17px",
+                                            paddingY: "8px",
+                                            paddingRight: "8px",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "start",
+                                            width: "100%",
+                                            "&:hover": {
+                                                backgroundColor: alpha("#EB8C00", 0.2),
+                                            },
+                                            backgroundColor:
+                                                location.pathname === "/admin/workflow"
+                                                    ? alpha("#EB8C00", 0.2)
+                                                    : "transparent",
+                                        }}
+                                    >
+                                        <ManageSearchOutlinedIcon
+                                            sx={{
+                                                fontSize: 24,
+                                                marginRight: "10px",
+                                                color: location.pathname === "/admin/workflow" ? "#D04A02" : "#000",
+                                            }}
+                                        />
+                                        <span>
+                                            <Typography
+                                                style={{
+                                                    fontSize: "14px",
+                                                    fontWeight: 400,
+                                                    color: location.pathname === "/admin/workflow" ? "#D04A02" : "#000",
+                                                }}
+                                            >
+                                                Management
+                                            </Typography>
+                                        </span>
+                                    </Button>
+                                    <Button
+                                        onClick={() => history("/admin/status")}
+                                        sx={{
+                                            paddingLeft: "17px",
+                                            paddingY: "8px",
+                                            paddingRight: "8px",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "start",
+                                            width: "100%",
+                                            "&:hover": {
+                                                backgroundColor: alpha("#EB8C00", 0.2),
+                                            },
+                                            backgroundColor:
+                                                location.pathname === "/admin/status"
+                                                    ? alpha("#EB8C00", 0.2)
+                                                    : "transparent",
+                                        }}
+                                    >
+                                        <CorporateFareOutlinedIcon
+                                            sx={{
+                                                fontSize: 24,
+                                                marginRight: "10px",
+                                                color: location.pathname === "/admin/status" ? "#D04A02" : "#000",
+                                            }}
+                                        />
+                                        <span>
+                                            <Typography
+                                                style={{
+                                                    fontSize: "14px",
+                                                    fontWeight: 400,
+                                                    color: location.pathname === "/admin/status" ? "#D04A02" : "#000",
+                                                }}
+                                            >
+                                                Columns and statuses
+                                            </Typography>
+                                        </span>
+                                    </Button>
+                                </>
+                            )}
+                        {location.pathname.split("/")[1] === "admin" &&
+                            !(
+                                location.pathname.split("/")[2] === "workflow" ||
+                                location.pathname.split("/")[2] === "status"
+                            ) && (
+                                <>
+                                    <Button
+                                        onClick={() => {
+                                            history("/");
+                                            setHoveringCustomizations(false);
+                                            setHoveringReports(false);
+                                            setHoveringWorkflows(false);
+                                        }}
+                                        sx={{
+                                            paddingLeft: "17px",
+                                            paddingY: "8px",
+                                            paddingRight: "8px",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "space-between",
+                                            width: "100%",
+                                            "&:hover": {
+                                                backgroundColor: alpha("#EB8C00", 0.2),
+                                            },
+                                            marginBottom: "8px",
+                                        }}
+                                        onMouseEnter={() => setHoveringReports(true)}
+                                        onMouseLeave={() => setHoveringReports(false)}
+                                    >
+                                        <div style={{ display: "flex" }}>
+                                            <div
+                                                style={{
+                                                    borderRadius: "50%",
+                                                    width: "20px",
+                                                    height: "20px",
+                                                    backgroundColor: "#2d2d2d",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+                                                    marginRight: "10px",
+                                                }}
+                                            >
+                                                <ArrowBackIcon sx={{ fontSize: 16, color: "#fff" }} />
+                                            </div>
+                                            <span>
+                                                <Typography
+                                                    style={{
+                                                        fontSize: "14px",
+                                                        fontWeight: 400,
+                                                        color: "#000",
+                                                    }}
+                                                >
+                                                    Back to board
+                                                </Typography>
+                                            </span>
+                                        </div>
+                                    </Button>
+                                    <Divider
+                                        style={{
+                                            width: "100%",
+                                            marginRight: "8px",
+                                            color: "#44546F",
+                                            borderBottomWidth: "2px",
+                                        }}
+                                    />
+                                    <Typography
+                                        sx={{
+                                            fontWeight: 600,
+                                            fontSize: "14px",
+                                            marginLeft: "17px",
+                                            marignBottom: "8px",
+                                            marginTop: "12px",
+                                        }}
+                                    >
+                                        Customizations
+                                    </Typography>
+                                    <Button
+                                        onClick={() => history("/admin/form")}
+                                        sx={{
+                                            marginTop: "8px",
+                                            paddingLeft: "17px",
+                                            paddingY: "8px",
+                                            paddingRight: "8px",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "start",
+                                            width: "100%",
+                                            "&:hover": {
+                                                backgroundColor: alpha("#EB8C00", 0.2),
+                                            },
+                                            backgroundColor:
+                                                location.pathname === "/admin/form"
+                                                    ? alpha("#EB8C00", 0.2)
+                                                    : "transparent",
+                                        }}
+                                    >
+                                        <DynamicFormOutlinedIcon
+                                            sx={{
+                                                fontSize: 24,
+                                                marginRight: "10px",
+                                                color: location.pathname === "/admin/form" ? "#D04A02" : "#000",
+                                            }}
+                                        />
+                                        <span>
+                                            <Typography
+                                                style={{
+                                                    fontSize: "14px",
+                                                    fontWeight: 400,
+                                                    color: location.pathname === "/admin/form" ? "#D04A02" : "#000",
+                                                }}
+                                            >
+                                                Form customization
+                                            </Typography>
+                                        </span>
+                                    </Button>
+                                </>
+                            )}
+                    </Box>
+                </SwipeableDrawer>
+            </Box>
+        )
+    );
 }
 
 export default Sidebar;
