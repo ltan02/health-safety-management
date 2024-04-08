@@ -455,6 +455,7 @@ function AdminManagement({ open, handleClose }) {
                                 statusName={statusName}
                                 handleStatusNameChange={handleStatusNameChange}
                                 handleAddStatus={handleAddStatus}
+                                states={states}
                             />
                         )}
                         {addTransitionModalOpen && (
