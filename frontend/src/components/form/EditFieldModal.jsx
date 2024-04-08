@@ -55,9 +55,17 @@ function EditFieldModal({
     );
   }, [fieldData]);
 
+  const hasDuplicatedTitle = (title) => {
+    return fieldsData.find((field) => field.props.name ===  title.toLowerCase().replace(" ", "_" ));
+  };
+
   const handleEdit = () => {
     if (title === "") {
       alert("Title is required");
+      return;
+    }
+    if(hasDuplicatedTitle(title)){
+      alert("Title already exists");
       return;
     }
     onHandleEdit({

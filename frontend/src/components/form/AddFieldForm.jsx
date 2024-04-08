@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
 import {
-    Button,
-    Modal,
-    Box,
-    TextField,
-    Select,
-    MenuItem,
-    Typography,
-    Container,
-    Grid,
-    FormControl,
-    IconButton, Tooltip
+  Button,
+  Modal,
+  Box,
+  TextField,
+  Select,
+  MenuItem,
+  Typography,
+  Container,
+  Grid,
+  FormControl,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 import { FIELD_DATA, FIELD_TYPES, VARIANT_TYPES } from "./form_data";
 import { CircularProgress } from "@mui/material";
@@ -18,7 +19,7 @@ import { CircularProgress } from "@mui/material";
 import { FIELD_ADD_FORM } from "./add_elements";
 import { set } from "lodash";
 import CloseIcon from "@mui/icons-material/Close";
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 function AddFieldForm({ handleAddNewField, getLastCoordinate, currentFields }) {
   const [fieldType, setFieldType] = useState([]);
@@ -32,20 +33,31 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate, currentFields }) {
   const [prompt, setPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isStatusModalOpen, setStatusModalOpen] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     setFieldType(Object.values(FIELD_DATA));
   }, []);
+
+  const isDuplicateTitle = (title) => {
+    return !!currentFields.find(
+      (field) => field.props.name === title.toLowerCase().replace(" ", "_")
+    );
+  };
 
   const handleSubmit = async (event) => {
     setIsLoading(true);
     try {
       event.preventDefault();
       if (fieldTitle === "") {
-        alert("Title is required");
+        setError("Title is required.");
         return;
       }
-
+      if (isDuplicateTitle(fieldTitle)) {
+        console.log(isDuplicateTitle(fieldTitle));
+        setError("This title is already in use.");
+        return;
+      }
       if (
         select === FIELD_TYPES.SELECTION_SINGLE ||
         select === FIELD_TYPES.SELECTION_MULTI
@@ -96,10 +108,18 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate, currentFields }) {
 
   const toggleStatusModal = () => {
     setStatusModalOpen(!isStatusModalOpen);
+    setError("");
   };
 
   return (
-    <Container style={{ height: "80vh", width: "80vh", overflow: "auto", border: "solid 2px #7D7D7D"}}>
+    <Container
+      style={{
+        height: "80vh",
+        width: "80vh",
+        overflow: "auto",
+        border: "solid 2px #7D7D7D",
+      }}
+    >
       <Typography variant="h6" fontWeight={600} align="left" sx={{ my: 5 }}>
         Select Field Type
       </Typography>
@@ -138,7 +158,7 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate, currentFields }) {
             left: "50%",
             transform: "translate(-50%, -50%)",
             width: 400,
-            height: 150,
+            height: 190,
             bgcolor: "white",
           }}
         >
@@ -164,9 +184,9 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate, currentFields }) {
             }}
           >
             <Typography variant="body1" align="center">
-              Field was added successfully!
+              {error !== "" ? error : "Field added successfully!"}
             </Typography>
-            <Box sx={{ display: "inline-block", mt: 2, alignItems: "center" }}>
+            <Box sx={{ mt: 2, alignItems: "center" }}>
               <Button
                 variant="contained"
                 onClick={toggleStatusModal}
@@ -234,16 +254,20 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate, currentFields }) {
             marginTop={2}
           >
             <FormControl fullWidth>
-                <Box sx = {{display: "flex", alignItems: "center"}}>
-              <Typography variant={VARIANT_TYPES.LABEL} fontWeight={600}>
-                {fieldTitle} {required ? "*" : ""}
-              </Typography>
-                    {(fieldDescription.length>0)? <Tooltip title={fieldDescription}>
-                        <IconButton sx={{color: "#FFB600", fontSize: "small"}}>
-                            <InfoOutlinedIcon />
-                        </IconButton>
-                    </Tooltip>:<></>}
-                </Box>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Typography variant={VARIANT_TYPES.LABEL} fontWeight={600}>
+                  {fieldTitle} {required ? "*" : ""}
+                </Typography>
+                {fieldDescription.length > 0 ? (
+                  <Tooltip title={fieldDescription}>
+                    <IconButton sx={{ color: "#FFB600", fontSize: "small" }}>
+                      <InfoOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
+                ) : (
+                  <></>
+                )}
+              </Box>
               {/*<Typography variant={VARIANT_TYPES.BODY}>*/}
               {/*  {fieldDescription}*/}
               {/*</Typography>*/}
@@ -311,17 +335,17 @@ function AddFieldForm({ handleAddNewField, getLastCoordinate, currentFields }) {
           </Box>
         )}
       </Container>
-        <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
-      <Button
-        onClick={handleSubmit}
-        variant="contained"
-        color="primary"
-        sx={{ mt: 1, marginBottom: 3}}
-        disabled={isLoading}
-      >
-        {isLoading ? <CircularProgress size={24} /> : "Create"}
-      </Button>
-        </Box>
+      <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+        <Button
+          onClick={handleSubmit}
+          variant="contained"
+          color="primary"
+          sx={{ mt: 1, marginBottom: 3 }}
+          disabled={isLoading}
+        >
+          {isLoading ? <CircularProgress size={24} /> : "Create"}
+        </Button>
+      </Box>
     </Container>
   );
 }
