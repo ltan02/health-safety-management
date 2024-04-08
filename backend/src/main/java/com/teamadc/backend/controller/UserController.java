@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+
 
 @RestController
 @RequestMapping("/users")
@@ -36,7 +40,7 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<User>> getUsers(
-            @RequestParam(required = false) Role role,
+            @RequestParam(required = false) String role,
             @RequestParam(required = false) String businessUnit) {
         List<User> users;
         try {
@@ -53,4 +57,17 @@ public class UserController {
         }
     }
 
+    @PutMapping("/{userId}/role")
+    public ResponseEntity<User> updateUserRole(@PathVariable String userId, @RequestBody String role) {
+        try {
+            User user = userService.getUserById(userId);
+            if (user == null) {
+                return ResponseEntity.notFound().build();
+            }
+            userService.updateUserRole(userId, role);
+            return ResponseEntity.ok(user);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 }

@@ -60,6 +60,16 @@ public class GroupService{
     }
 
     public Group addMember(String groupId, String memberId) throws InterruptedException, ExecutionException {
+        List<Group> groups = userRepository.findAll();
+        for (Group group : groups) {
+            if (group.getMembers().contains(memberId)) {
+                List<String> members = group.getMembers();
+                members.remove(memberId);
+                group.setMembers(members);
+                userRepository.save(group);
+                break;
+            }
+        }
         Group group = userRepository.findById(groupId);
         List<String> members = group.getMembers();
         members.add(memberId);
@@ -72,10 +82,24 @@ public class GroupService{
         List<String> members = group.getMembers();
         members.remove(memberId);
         group.setMembers(members);
+        Group defaultGroup = userRepository.findAll().stream().filter(g -> g.getName().equals("Employee")).findFirst().orElse(null);
+        if (defaultGroup != null) {
+            List<String> defaultMembers = defaultGroup.getMembers();
+            defaultMembers.add(memberId);
+            defaultGroup.setMembers(defaultMembers);
+            userRepository.save(defaultGroup);
+        }
         return userRepository.save(group);
     }
 
     public Group addMembers(String groupId, List<String> memberIds) throws InterruptedException, ExecutionException {
+        List<Group> groups = userRepository.findAll();
+        for (Group group : groups) {
+            List<String> members = group.getMembers();
+            members.removeAll(memberIds);
+            group.setMembers(members);
+            userRepository.save(group);
+        }
         Group group = userRepository.findById(groupId);
         List<String> members = group.getMembers();
         members.addAll(memberIds);

@@ -9,8 +9,6 @@ export default function DeleteGroupModal({
   groups,
   removeGroup,
 }) {
-    console.log(groups);
-    console.log(groupId);
   const groupData = groups.find((group) => group.id === groupId);
   return (
     <Modal
@@ -59,13 +57,13 @@ export default function DeleteGroupModal({
           >
             <Button
               variant="contained"
-              color="secondary"
+              color="primary"
               style={{ marginRight: "10px" }}
               onClick={() => removeGroup(groupId)}
             >
               Delete
             </Button>
-            <Button variant="contained" color="primary" onClick={onClose}>
+            <Button variant="outlined" onClick={onClose}>
               Cancel
             </Button>
           </Box>

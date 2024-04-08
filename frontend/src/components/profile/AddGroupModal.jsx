@@ -28,18 +28,20 @@ export default function AddGroupModal({ open, onClose }) {
     setGroupName(event.target.value);
   };
 
+  const formatGroupName = (name) => {
+    return name.replace(/\s/g, "_").toUpperCase();
+  };
 
   const handleSubmit = async () => {
-    console.log(groupName);
+    
     const res = await sendRequest({
       url: "/groups",
       method: "POST",
       body: {
-        name: groupName,
+        name: formatGroupName(groupName),
       },
     });
 
-    console.log(res);
     onClose();
   };
 

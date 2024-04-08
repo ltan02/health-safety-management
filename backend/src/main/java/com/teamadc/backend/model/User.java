@@ -10,7 +10,7 @@ public class User {
     @DocumentId
     private String id;
     private String email;
-    private Role role;
+    private String role;
     private String businessUnit;
     private String firstName;
     private String lastName;
@@ -21,7 +21,7 @@ public class User {
 
     public User() {}
 
-    public User(String id, String email, Role role, String businessUnit, String firstName, String lastName) {
+    public User(String id, String email, String role, String businessUnit, String firstName, String lastName) {
         this.id = id;
         this.email = email;
         this.role = role;
@@ -35,15 +35,15 @@ public class User {
     }
 
     public boolean checkIsAdmin() {
-        return this.role == Role.ADMIN;
+        return this.role == Role.ADMIN.name();
     }
 
     public boolean checkIsSafetyWarden() {
-        return this.role == Role.SAFETY_WARDEN;
+        return this.role == Role.SAFETY_WARDEN.name();
     }
 
     public boolean checkIsEmployee() {
-        return this.role == Role.EMPLOYEE;
+        return this.role == Role.EMPLOYEE.name();
     }
 
 }

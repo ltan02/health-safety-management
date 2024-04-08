@@ -41,7 +41,7 @@ public class UserService implements UserDetailsService {
                 return null;
             }
 
-            List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
+            List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
 
             return new org.springframework.security.core.userdetails.User(user.getEmail(), "{noop}", authorities);
         } catch (InterruptedException | ExecutionException e) {
@@ -49,10 +49,10 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public User registerUser(String id, String email, String firstName, String lastName, Role userRole) throws FirebaseAuthException, InterruptedException, ExecutionException {
+    public User registerUser(String id, String email, String firstName, String lastName, String userRole) throws FirebaseAuthException, InterruptedException, ExecutionException {
         logger.info(String.format("Attempting to register a new user with id: %s", id));
 
-        User newUser = new User(id, email, userRole, "demo", firstName, lastName);
+        User newUser = new User(id, email, firstName, lastName, userRole, null);
         userRepository.save(newUser);
 
         logger.info(String.format("Successfully registered user with id: %s", id));
@@ -68,14 +68,21 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
-    public List<User> getUsersByRole(Role role) throws InterruptedException, ExecutionException {
+    public List<User> getUsersByRole(String role) throws InterruptedException, ExecutionException {
         List<User> users = userRepository.findAll();
-        return users.stream().filter(user -> user.getRole() == role).toList();
+        return users.stream().filter(user -> user.getRole().equals(role)).toList();
     }
 
     public List<User> getUsersByBusinessUnit(String businessUnit) throws InterruptedException, ExecutionException {
         List<User> users = userRepository.findAll();
         return users.stream().filter(user -> user.getBusinessUnit().equals(businessUnit)).toList();
+    }
+
+    public User updateUserRole(String userId, String role) throws InterruptedException, ExecutionException {
+        User user = userRepository.findById(userId);
+        user.setRole(role.replace('"', ' ').trim());
+
+        return userRepository.save(user);
     }
 
 }
