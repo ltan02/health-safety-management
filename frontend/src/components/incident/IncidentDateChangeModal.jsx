@@ -63,7 +63,7 @@ export default function IncidentDateChangeModal({
         <Box sx={{ mb: 2, overflow: "auto", maxHeight: 180 }}>
           <TextField
             fullWidth
-            type="date"
+            type="datetime-local"
             variant="outlined"
             defaultValue={date}
             onChange={(e) => setNewDate(e.target.value)}
