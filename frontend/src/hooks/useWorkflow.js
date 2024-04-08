@@ -64,7 +64,7 @@ export default function useWorkflow() {
                 data: {
                     label:
                         fetchedStatuses.find((status) => status.id === state.statusId)?.name ??
-                        state.name.toUpperCase(),
+                        state?.name?.toUpperCase(),
                     statusId: state.statusId,
                 },
                 style:
@@ -120,7 +120,7 @@ export default function useWorkflow() {
                         rules:
                             transition?.roles || transition.rules === null
                                 ? []
-                                : transition.rules.map((rule, index) => {
+                                : transition.rules?.map((rule, index) => {
                                       return {
                                           type: rule.type,
                                           userIds: rule.userIds,
