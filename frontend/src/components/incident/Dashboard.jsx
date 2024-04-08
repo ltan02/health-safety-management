@@ -37,7 +37,7 @@ function Dashboard({ setViewModalOpen }) {
     const [commentData, setCommentData] = useState({});
     const [columnFlowMap, setColumnFlowMap] = useState({});
     const { flowMap, activeStateMap, activeTransitionMap } = useWorkflowNew();
-    const { transitions, fetchWorkflow } = useWorkflow();
+    const { states, transitions, fetchWorkflow } = useWorkflow();
 
     const [employees, setEmployees] = useState([]);
     const [addModal, setAddModal] = useState(false);
@@ -69,6 +69,10 @@ function Dashboard({ setViewModalOpen }) {
             employees_involved: "employeesInvolved",
         };
 
+        const startId = states.find((state) => state.data.label === "START")?.id;
+        const firstStateId = transitions.find((transition) => transition.source === startId)?.target;
+        const statusId = activeStateMap[firstStateId]?.statusId;
+
         const incident = {
             reporter: user.id,
             incidentDate: task.incidentDate,
@@ -76,7 +80,7 @@ function Dashboard({ setViewModalOpen }) {
             employeesInvolved: task.employees_involved,
             customFields: [],
             comments: [],
-            statusId: statuses.find((status) => status.name === "Pending Review")?.id,
+            statusId: statusId,
         };
 
         for (const key in task) {
@@ -107,7 +111,7 @@ function Dashboard({ setViewModalOpen }) {
                 const newCommentData = initialCommentData;
                 //since we do not have comment edit logic, if the size of the comments array is the same, we do not need to push the comment data
                 //this prevent us from pushing the same comment data multiple times
-                if (task.comments.length === newCommentData[task.id]?.length) {
+                if (task.comments?.length === newCommentData[task.id]?.length) {
                     return;
                 }
                 task.comments.map((comment) => {

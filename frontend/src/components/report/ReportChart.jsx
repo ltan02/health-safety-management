@@ -163,22 +163,32 @@ function ReportChart({
             })),
             highlightScope: { faded: "global", highlighted: "item" },
             faded: { innerRadius: 10, additionalRadius: -10, color: "gray" },
+            outerRadius: '75%',
+            cx: '66%',
+            cy: '35%'
           },
         ]}
-        height={height}
+        height={height+15}
         width={width}
         innerRadius={60}
-        outerRadius={100}
-        label={{
-          position: "outside",
-          fill: "#333",
-          fontSize: "14px",
-          fontFamily: "Arial, sans-serif",
+        outerRadius={150}
+        slotProps={{
+          legend: {
+            direction: 'row',
+            position: { vertical: 'bottom', horizontal: 'middle' },
+            padding: 0,
+            labelStyle: {
+              position: "outside",
+              fill: "#333",
+              fontSize: "65%",
+              fontFamily: "Arial, sans-serif",
+            }
+          }
         }}
         style={{ fontFamily: "Arial, sans-serif", fontSize: "10px" }}
       />
     </>
-  );
+);
 
   const customize = (
     <div
@@ -305,7 +315,6 @@ function ReportChart({
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              mt: 5,
             }}
           >
             {type === "Bar" && BarChartCard}

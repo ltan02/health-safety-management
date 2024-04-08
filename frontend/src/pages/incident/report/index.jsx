@@ -13,8 +13,7 @@ import { useWorkflowNew } from "../../../context/WorkflowContext";
 import useWorkflow from "../../../hooks/useWorkflow";
 import ViewWorkflowModal from "../../../components/workflows/ViewWorkflowModal";
 import AdminManagement from "../../admin/management";
-import LoadingBar from "../../../components/global/LoadingBar";
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 
 function IncidentReport() {
     const { filteredTasks, fetchTasks, setFilteredTasks, loading } = useTasks();
@@ -24,8 +23,8 @@ function IncidentReport() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { statuses } = useBoard();
     const { sendRequest } = useAxios();
-    const { transitions, fetchWorkflow } = useWorkflow();
-    const { fetchWorkflowNew } = useWorkflowNew();
+    const { states, transitions, fetchWorkflow } = useWorkflow();
+    const { fetchWorkflowNew, activeStateMap } = useWorkflowNew();
 
     const [viewModalOpen, setViewModalOpen] = useState(false);
     const [editModalOpen, setEditModalOpen] = useState(false);
@@ -41,7 +40,6 @@ function IncidentReport() {
     }, []);
     const [commentData, setCommentData] = useState({});
     const [employees, setEmployees] = useState([]);
-
 
     const styles = {
         styleHeader: {
@@ -71,6 +69,13 @@ function IncidentReport() {
             width: 400,
             flex: 1,
             renderCell: (params) => statuses.find((status) => status.id === params.value)?.name ?? "Unknown Status",
+        },
+        {
+            field: "reviewer",
+            headerName: "Reviewer",
+            width: 400,
+            flex: 1,
+            renderCell: (params) => <Profile user={params.value} />,
         },
     ];
 
@@ -102,6 +107,10 @@ function IncidentReport() {
             employees_involved: "employeesInvolved",
         };
 
+        const startId = states.find((state) => state.data.label === "START")?.id;
+        const firstStateId = transitions.find((transition) => transition.source === startId)?.target;
+        const statusId = activeStateMap[firstStateId]?.statusId;
+
         const incident = {
             reporter: user.id,
             incidentDate: task.incidentDate,
@@ -109,7 +118,7 @@ function IncidentReport() {
             employeesInvolved: task.employees_involved,
             customFields: [],
             comments: [],
-            statusId: statuses.find((status) => status.name === "Pending Review")?.id,
+            statusId: statusId,
         };
 
         for (const key in task) {

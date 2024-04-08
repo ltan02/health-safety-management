@@ -3,6 +3,7 @@ package com.teamadc.backend.controller;
 import com.teamadc.backend.dto.request.CommentRequest;
 import com.teamadc.backend.dto.request.CustomFieldRequest;
 import com.teamadc.backend.dto.request.IncidentRequest;
+import com.teamadc.backend.dto.request.MigrateIncidentRequest;
 import com.teamadc.backend.dto.response.BasicIncidentResponse;
 import com.teamadc.backend.model.Comment;
 import com.teamadc.backend.model.Incident;
@@ -67,7 +68,7 @@ public class IncidentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BasicIncidentResponse>> getIncidents(@RequestParam Optional<String> all) {
+    public ResponseEntity<List<Incident>> getIncidents(@RequestParam Optional<String> all) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = (String) authentication.getPrincipal();
 
@@ -79,12 +80,12 @@ public class IncidentController {
                 incidents = incidentService.getIncidents(uid);
             }
 
-            List<BasicIncidentResponse> response = new ArrayList<>();
-            for (Incident incident : incidents) {
-                response.add(new BasicIncidentResponse(incident.getId(), incident.getIncidentDate(), incident.getIncidentCategory(), incident.getReporter(), incident.getEmployeesInvolved(), incident.getStatusId(), incident.getReviewer()));
-            }
+//            List<BasicIncidentResponse> response = new ArrayList<>();
+//            for (Incident incident : incidents) {
+//                response.add(new BasicIncidentResponse(incident.getId(), incident.getIncidentDate(), incident.getIncidentCategory(), incident.getReporter(), incident.getEmployeesInvolved(), incident.getStatusId(), incident.getReviewer()));
+//            }
 
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(incidents);
         } catch (InterruptedException | ExecutionException e) {
             return ResponseEntity.internalServerError().build();
         }
@@ -254,6 +255,16 @@ public class IncidentController {
         try {
             Incident incident = incidentService.updateEmployeesInvolved(incidentId, request.getEmployeesInvolved());
             return ResponseEntity.ok(incident);
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PostMapping("/migrate")
+    public ResponseEntity<Void> migrateIncidents(@RequestBody MigrateIncidentRequest request) {
+        try {
+            incidentService.migrateIncidents(request.getFromStatusId(), request.getToStatusId());
+            return ResponseEntity.ok().build();
         } catch (InterruptedException | ExecutionException e) {
             return ResponseEntity.internalServerError().build();
         }

@@ -110,4 +110,14 @@ public class ColumnController {
         }
     }
 
+    @DeleteMapping("/delete-status/{statusId}")
+    public ResponseEntity<Void> deleteStatusFromColumns(@PathVariable String statusId) {
+        try {
+            columnService.deleteStatusFromColumns(statusId);
+            return ResponseEntity.ok().build();
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
 }

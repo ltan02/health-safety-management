@@ -1,4 +1,5 @@
 import { Modal, Box, Typography, Button, TextField } from "@mui/material";
+import { useState } from "react";
 
 const style = {
     position: "absolute",
@@ -11,12 +12,13 @@ const style = {
     p: 4,
     borderRadius: 1,
     outline: "none",
-    height: "40%",
     display: "flex",
     flexDirection: "column",
 };
 
-function AddStatusModal({ open, handleClose, statusName, handleStatusNameChange, handleAddStatus }) {
+function AddStatusModal({ open, handleClose, statusName, handleStatusNameChange, handleAddStatus, states }) {
+    const [showError, setShowError] = useState(false);
+
     return (
         <Modal
             open={open}
@@ -51,8 +53,24 @@ function AddStatusModal({ open, handleClose, statusName, handleStatusNameChange,
                 <Typography id="add-status-modal-title" variant="body2" sx={{ fontSize: "12px" }}>
                     Try a name that&apos;s easy to understand e.g. To do
                 </Typography>
+                {showError && (
+                    <Typography variant="body2" sx={{ color: "red", marginTop: "10px" }}>
+                        Status already exists. Please try a different name.
+                    </Typography>
+                )}
                 <div style={{ display: "flex", justifyContent: "end" }}>
-                    <Button onClick={handleAddStatus} variant="outlined" sx={{ mt: 2, mr: 2 }} disabled={statusName === ""}>
+                    <Button
+                        onClick={() => {
+                            if (states.some((state) => state.data.label === statusName)) {
+                                setShowError(true);
+                            } else {
+                                handleAddStatus();
+                            }
+                        }}
+                        variant="outlined"
+                        sx={{ mt: 2, mr: 2 }}
+                        disabled={statusName === ""}
+                    >
                         Add
                     </Button>
                     <Button onClick={handleClose} variant="outlined" sx={{ mt: 2 }}>

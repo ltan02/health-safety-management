@@ -1,5 +1,5 @@
 import { Modal, Box, Typography, Button } from "@mui/material";
-import WarningIcon from "@mui/icons-material/Warning";
+import ErrorIcon from "@mui/icons-material/Error";
 
 const style = {
     position: "absolute",
@@ -12,10 +12,9 @@ const style = {
     p: 4,
     borderRadius: 1,
     outline: "none",
-    height: "17.5%",
 };
 
-function SaveWorkflowModal({ open, handleClose, handleSaveChanges }) {
+function ConfirmDeleteIncidentModal({ open, handleClose, handleDelete }) {
     return (
         <Modal
             open={open}
@@ -25,9 +24,9 @@ function SaveWorkflowModal({ open, handleClose, handleSaveChanges }) {
         >
             <Box sx={style}>
                 <div style={{ display: "flex", alignItems: "center" }}>
-                    <WarningIcon sx={{ color: "warning", marginRight: 2 }} />
+                    <ErrorIcon sx={{ color: "#C9372C", marginRight: 2 }} />
                     <Typography id="save-changes-modal-title" variant="h6" component="h2">
-                        Save workflow for incident reports
+                        Delete incident?
                     </Typography>
                 </div>
 
@@ -35,15 +34,23 @@ function SaveWorkflowModal({ open, handleClose, handleSaveChanges }) {
                     id="save-changes-modal-description"
                     sx={{ fontWeight: 400, fontSize: "15px", marginTop: 2 }}
                 >
-                    Changes to this workflow will apply to all the incident reports.
+                    You&apos;re about to permanently delete this issue, its comments and attachments, and all of its
+                    data.
+                    <br />
+                    <br />
+                    If you&apos;re not sure, you can resolve or close this issue instead.
                 </Typography>
 
                 <div style={{ display: "flex", justifyContent: "end" }}>
-                    <Button onClick={handleSaveChanges} variant="contained" sx={{ mt: 3, mr: 2 }}>
-                        Save
-                    </Button>
                     <Button onClick={handleClose} variant="outlined" sx={{ mt: 3 }}>
                         Cancel
+                    </Button>
+                    <Button
+                        onClick={handleDelete}
+                        variant="contained"
+                        sx={{ mt: 3, ml: 2, backgroundColor: "#C9372C", color: "#FFF" }}
+                    >
+                        Delete
                     </Button>
                 </div>
             </Box>
@@ -51,4 +58,4 @@ function SaveWorkflowModal({ open, handleClose, handleSaveChanges }) {
     );
 }
 
-export default SaveWorkflowModal;
+export default ConfirmDeleteIncidentModal;

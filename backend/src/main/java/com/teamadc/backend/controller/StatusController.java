@@ -52,7 +52,7 @@ public class StatusController {
 
             List<StatusResponse> statusResponses = statuses.stream().map(status -> {
                 try {
-                    List<Incident> incidents = incidentService.getIncidentsByStatusId(uid, status.getId());
+                    List<Incident> incidents = incidentService.getIncidentsByStatusId(status.getId());
                     return new StatusResponse(status.getId(), status.getName(), incidents.size());
                 } catch (InterruptedException | ExecutionException e) {
                     return null;
@@ -67,14 +67,11 @@ public class StatusController {
 
     @GetMapping("/{statusId}")
     public ResponseEntity<StatusResponse> getStatusById(@PathVariable String statusId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String uid = (String) authentication.getPrincipal();
-
         try {
             logger.error("statusId: " + statusId);
             Status status = statusService.getStatusById(statusId);
 
-            List<Incident> incidents = incidentService.getIncidentsByStatusId(uid, statusId);
+            List<Incident> incidents = incidentService.getIncidentsByStatusId(statusId);
             StatusResponse statusResponse = new StatusResponse(status.getId(), status.getName(), incidents.size());
 
             return ResponseEntity.ok(statusResponse);

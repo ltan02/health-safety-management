@@ -11,67 +11,70 @@ export default function useTasks() {
     const { sendRequest } = useAxios();
     const { adminColumns, employeeColumns } = useBoard();
     const [loading, setLoading] = useState(true);
+
     const fetchTasks = useCallback(async () => {
+        setLoading(true);
         let url = "/incidents";
         if (isPrivileged(user.role)) {
-            url = "/incidents?all=true";
+            url += "?all=true";
         }
-        setLoading(true);
-        const incidents = await sendRequest({ url });
-        
 
-        const userIds = [...new Set(incidents.flatMap((incident) => [incident?.reporter]))].filter(Boolean);
-        const users = await Promise.all(userIds.map((id) => sendRequest({ url: `/users/${id}` })));
+        try {
+            const incidentsResponse = await sendRequest({ url });
+            const allUserIds = new Set(
+                incidentsResponse.flatMap((incident) =>
+                    [incident.reporter, incident.reviewer, ...incident.employeesInvolved].filter(Boolean),
+                ),
+            );
+            const usersResponse = await Promise.all([...allUserIds].map((id) => sendRequest({ url: `/users/${id}` })));
+            const userMap = usersResponse.reduce((acc, user) => ({ ...acc, [user.id]: user }), {});
 
-        const reviewerIds = [...new Set(incidents.flatMap((incident) => [incident?.reviewer]))].filter(Boolean); // filter(Boolean) removes null and undefined
-        const reviewers = await Promise.all(reviewerIds.map((id) => sendRequest({ url: `/users/${id}` })));
+            let newState = { ...tasks };
+            let taskIdToColumnMap = {};
 
-        const taskDetails = await Promise.all(
-            incidents.map((incident) => sendRequest({ url: `/incidents/${incident.id}` })),
-        );
-        const involvedEmployeeIds = taskDetails.flatMap((incident) => incident.employeesInvolved);
-        const involvedEmployees = await Promise.all(
-            involvedEmployeeIds.map((id) => sendRequest({ url: `/users/${id}` })),
-        );
+            incidentsResponse.forEach((incident) => {
+                const columnId =
+                    (isPrivileged(user.role) ? adminColumns : employeeColumns).find((col) =>
+                        col.statusIds.includes(incident.statusId),
+                    )?.id || "unknown";
 
-        const userMap = users.reduce((acc, user) => ({ ...acc, [user.id]: user }), {});
-        const reviewerMap = reviewers.reduce((acc, user) => ({ ...acc, [user?.id]: user }), {});
-        const employeeMap = involvedEmployees.reduce((acc, user) => ({ ...acc, [user.id]: user }), {});
+                if (!newState[columnId]) {
+                    newState[columnId] = [];
+                }
 
-        let newTasks = taskDetails.reduce((acc, incident) => {
-            const columns = isPrivileged(user.role) ? adminColumns : employeeColumns;
-            const columnId = columns.find((col) => col.statusIds.includes(incident.statusId))?.id || "unknown";
+                if (taskIdToColumnMap[incident.id] && taskIdToColumnMap[incident.id] !== columnId) {
+                    const oldColumnId = taskIdToColumnMap[incident.id];
+                    newState[oldColumnId] = newState[oldColumnId].filter((task) => task.id !== incident.id);
+                }
 
-            if (!acc[columnId]) {
-                acc[columnId] = [];
-            }
+                taskIdToColumnMap[incident.id] = columnId;
 
-            const incidentWithUserDetails = {
-                ...incident,
-                reporter: userMap[incident.reporter],
-                reviewer: reviewerMap[incident.reviewer],
-                employeesInvolved: incident.employeesInvolved.map((id) => employeeMap[id]),
-            };
+                const updatedIncident = {
+                    ...incident,
+                    reporter: userMap[incident.reporter],
+                    reviewer: userMap[incident.reviewer],
+                    employeesInvolved: incident.employeesInvolved.map((id) => userMap[id]),
+                };
 
-            acc[columnId].push(incidentWithUserDetails);
+                const existingIndex = newState[columnId].findIndex((item) => item.id === incident.id);
+                if (existingIndex > -1) {
+                    newState[columnId][existingIndex] = updatedIncident;
+                } else {
+                    newState[columnId].push(updatedIncident);
+                }
+            });
 
-            return acc;
-        }, {});
+            Object.keys(newState).forEach((key) => {
+                newState[key].sort((a, b) => new Date(a.incidentDate) - new Date(b.incidentDate));
+            });
 
-        const allStatuses = isPrivileged(user.role) ? adminColumns : employeeColumns;
-        allStatuses.forEach((column) => {
-            if (!(column.id in newTasks)) {
-                newTasks[column.id] = [];
-            }
-        });
-
-        Object.keys(newTasks).forEach((key) => {
-            newTasks[key] = newTasks[key].sort((a, b) => new Date(a.incidentDate) - new Date(b.incidentDate));
-        });
-
-        setTasks(newTasks);
-        setFilteredTasks(newTasks);
-        setLoading(false);
+            setTasks(newState);
+            setFilteredTasks(newState);
+        } catch (error) {
+            console.error("Failed to fetch tasks:", error);
+        } finally {
+            setLoading(false);
+        }
     }, [adminColumns, employeeColumns]);
 
     useEffect(() => {
@@ -81,31 +84,23 @@ export default function useTasks() {
     const filterTasks = useCallback(
         (query) => {
             if (!query) return setFilteredTasks(tasks);
-    
+
             const lowerCaseQuery = query.toLowerCase();
             const filtered = Object.keys(tasks).reduce((acc, status) => {
                 acc[status] = tasks[status].filter((task) => {
-                    // Check if the description includes the query
-                    if (task.customFields?.description?.toLowerCase().includes(lowerCaseQuery)) {
-                        return true;
-                    }
-                    // Check if the category includes the query
-                    if (task.incidentCategory?.toLowerCase().includes(lowerCaseQuery)) {
-                        return true;
-                    }
-                    // Check if the date includes the query (assuming date is in a format that can be converted to a string)
-                    if (task.incidentDate?.toLowerCase().includes(lowerCaseQuery)) {
-                        return true;
-                    }
-                    // If none of the above conditions are met, exclude the task
-                    return false;
+                    return (
+                        task.customFields?.description?.toLowerCase().includes(lowerCaseQuery) ||
+                        task.incidentCategory?.toLowerCase().includes(lowerCaseQuery) ||
+                        task.incidentDate?.toLowerCase().includes(lowerCaseQuery)
+                    );
                 });
                 return acc;
             }, {});
-    
+
             setFilteredTasks(filtered);
         },
         [tasks],
     );
+
     return { tasks, filteredTasks, filterTasks, setTasks, fetchTasks, setFilteredTasks, loading };
 }

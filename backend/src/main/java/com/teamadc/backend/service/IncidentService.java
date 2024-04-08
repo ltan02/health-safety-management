@@ -52,8 +52,8 @@ public class IncidentService {
          return incidentRepository.findAll();
     }
 
-    public List<Incident> getIncidentsByStatusId(String uid, String statusId) throws InterruptedException, ExecutionException {
-        List<Incident> incidents = this.getIncidents(uid);
+    public List<Incident> getIncidentsByStatusId(String statusId) throws InterruptedException, ExecutionException {
+        List<Incident> incidents = incidentRepository.findAll();
         return incidents.stream().filter(incident -> incident.getStatusId().equals(statusId)).toList();
     }
 
@@ -198,5 +198,15 @@ public class IncidentService {
                 .filter(Objects::nonNull)
                 .min(Comparator.naturalOrder())
                 .orElse(null); // Return null if no incidents are found or all dates are null
+    }
+
+    public void migrateIncidents(String fromStatusId, String toStatusId) throws InterruptedException, ExecutionException {
+        List<Incident> incidents = incidentRepository.findAll();
+        for (Incident incident : incidents) {
+            if (incident.getStatusId().equals(fromStatusId)) {
+                incident.setStatusId(toStatusId);
+                incidentRepository.save(incident);
+            }
+        }
     }
 }

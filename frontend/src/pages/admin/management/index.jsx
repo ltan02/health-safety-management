@@ -16,6 +16,9 @@ import SaveWorkflowModal from "../../../components/workflows/SaveWorkflowModal";
 import WorkflowSidebar from "../../../components/workflows/WorkflowSidebar";
 import AddRuleModal from "../../../components/workflows/AddRuleModal";
 import EditRuleModal from "../../../components/workflows/EditRuleModal";
+import InvalidStateSidebar from "../../../components/workflows/InvalidStateSidebar";
+import ErrorIcon from "@mui/icons-material/Error";
+import MigrateStatusWorkflowModal from "../../../components/workflows/MigrateStatusWorkflowModal";
 
 const edgeTypes = {
     customEdge: CustomEdge,
@@ -34,6 +37,9 @@ function AdminManagement({ open, handleClose }) {
     const [selectedNode, setSelectedNode] = React.useState(null);
     const [addRuleModalOpen, setAddRuleModalOpen] = React.useState(false);
     const [selectedRule, setSelectedRule] = React.useState(null);
+    const [invalidStates, setInvalidStates] = React.useState([]);
+    const [openErrorSidebar, setOpenErrorSidebar] = React.useState(false);
+    const [migrationMap, setMigrationMap] = React.useState({});
 
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges] = useEdgesState([]);
@@ -55,6 +61,9 @@ function AdminManagement({ open, handleClose }) {
         addUserRestrictionRule,
         updateTransitionRule,
         deleteRule,
+        updateName,
+        setLoadingWorkflow,
+        originalStates,
     } = useWorkflow();
 
     const onConnect = useCallback(
@@ -107,6 +116,10 @@ function AdminManagement({ open, handleClose }) {
         addState(statusName);
         setAddStatusModalOpen(false);
         setStatusName("");
+    };
+
+    const handleNameChange = (newName, id) => {
+        updateName(newName, id);
     };
 
     const handleAddTransition = () => {
@@ -198,7 +211,37 @@ function AdminManagement({ open, handleClose }) {
                 setSelectedNode(states.find((state) => state.id === selectedNode.id));
             }
         }
-    }, [transitions, states]);
+    }, [transitions, states, selectedNode]);
+
+    useEffect(() => {
+        const reachableNodes = new Set();
+        const isolatedNodes = [];
+
+        const traverse = (nodeId) => {
+            if (!reachableNodes.has(nodeId)) {
+                reachableNodes.add(nodeId);
+                edges.forEach((edge) => {
+                    if (edge.source === nodeId) {
+                        traverse(edge.target);
+                    }
+                });
+            }
+        };
+
+        // Assuming you have a START node with a specific ID or characteristic
+        const startNode = nodes.find((node) => node.data.label === "START");
+        if (startNode) {
+            traverse(startNode.id);
+        }
+
+        nodes.forEach((node) => {
+            if (!reachableNodes.has(node.id) && node.data.label !== "START") {
+                isolatedNodes.push(node.id);
+            }
+        });
+
+        setInvalidStates([...isolatedNodes]);
+    }, [nodes, edges]);
 
     return (
         <Modal
@@ -326,10 +369,27 @@ function AdminManagement({ open, handleClose }) {
                             </Button>
                         </div>
                         <div>
+                            {invalidStates.length > 0 && (
+                                <Button
+                                    onClick={() => setOpenErrorSidebar(true)}
+                                    variant="contained"
+                                    sx={{
+                                        height: "32px",
+                                        fontWeight: 500,
+                                        color: "#ffffff",
+                                        paddingX: "10px",
+                                        fontSize: "14px",
+                                        marginRight: "10px",
+                                    }}
+                                    startIcon={<ErrorIcon />}
+                                >
+                                    View errors
+                                </Button>
+                            )}
                             <Button
                                 onClick={() => setSaveChangesModalOpen(true)}
                                 variant="contained"
-                                disabled={!isChangesMade}
+                                disabled={!isChangesMade || invalidStates.length > 0}
                                 sx={{
                                     height: "32px",
                                     fontWeight: 500,
@@ -395,6 +455,7 @@ function AdminManagement({ open, handleClose }) {
                                 statusName={statusName}
                                 handleStatusNameChange={handleStatusNameChange}
                                 handleAddStatus={handleAddStatus}
+                                states={states}
                             />
                         )}
                         {addTransitionModalOpen && (
@@ -423,17 +484,43 @@ function AdminManagement({ open, handleClose }) {
                                 handleDiscardChanges={handleDiscardChanges}
                             />
                         )}
-                        {saveChangesModalOpen && (
-                            <SaveWorkflowModal
-                                open={saveChangesModalOpen}
-                                handleClose={() => setSaveChangesModalOpen(false)}
-                                handleSaveChanges={() => {
-                                    saveChanges();
-                                    setSaveChangesModalOpen(false);
-                                    handleClose();
-                                }}
-                            />
-                        )}
+                        {saveChangesModalOpen &&
+                            originalStates.filter(
+                                (originalState) => !states.find((state) => state.id === originalState.id),
+                            ).length === 0 && (
+                                <SaveWorkflowModal
+                                    open={saveChangesModalOpen}
+                                    handleClose={() => setSaveChangesModalOpen(false)}
+                                    handleSaveChanges={async () => {
+                                        setSaveChangesModalOpen(false);
+                                        try {
+                                            setLoadingWorkflow(true);
+                                            await saveChanges();
+                                        } catch (error) {
+                                            console.error(error);
+                                        } finally {
+                                            setLoadingWorkflow(false);
+                                        }
+                                        handleClose();
+                                    }}
+                                />
+                            )}
+                        {saveChangesModalOpen &&
+                            originalStates.filter(
+                                (originalState) => !states.find((state) => state.id === originalState.id),
+                            ).length > 0 && (
+                                <MigrateStatusWorkflowModal
+                                    open={saveChangesModalOpen}
+                                    handleClose={() => setSaveChangesModalOpen(false)}
+                                    statusesToMigrate={originalStates.filter(
+                                        (originalState) => !states.find((state) => state.id === originalState.id),
+                                    )}
+                                    states={states}
+                                    setMigrationMap={setMigrationMap}
+                                    migrationMap={migrationMap}
+                                    saveChanges={saveChanges}
+                                />
+                            )}
                         {addRuleModalOpen && (
                             <AddRuleModal
                                 open={addRuleModalOpen}
@@ -466,12 +553,15 @@ function AdminManagement({ open, handleClose }) {
                                 nodes={nodes}
                                 edges={edges}
                                 edgeTypes={edgeTypes}
-                                onNodeClick={(event, node) =>
-                                    setSelectedNode(states.find((state) => state.id === node.id))
-                                }
-                                onEdgeClick={(event, edge) =>
-                                    setSelectedNode(transitions.find((transition) => transition.id === edge.id))
-                                }
+                                onNodeClick={(event, node) => {
+                                    if (node.data.label === "START") return;
+                                    setOpenErrorSidebar(false);
+                                    setSelectedNode(states.find((state) => state.id === node.id));
+                                }}
+                                onEdgeClick={(event, edge) => {
+                                    setOpenErrorSidebar(false);
+                                    setSelectedNode(transitions.find((transition) => transition.id === edge.id));
+                                }}
                                 onNodesChange={handleStatesChange}
                                 onNodeDragStop={handleDragEnd}
                                 onConnect={handleEdgesUpdated}
@@ -498,6 +588,15 @@ function AdminManagement({ open, handleClose }) {
                                     setAddRuleModalOpen={setAddRuleModalOpen}
                                     setSelectedRule={setSelectedRule}
                                     deleteRule={handleDeleteRule}
+                                    handleNameChange={handleNameChange}
+                                    invalidStates={invalidStates}
+                                />
+                            )}
+                            {openErrorSidebar && (
+                                <InvalidStateSidebar
+                                    open={openErrorSidebar}
+                                    invalidStates={invalidStates}
+                                    states={states}
                                 />
                             )}
                         </Box>
