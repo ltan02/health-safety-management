@@ -199,4 +199,14 @@ public class IncidentService {
                 .min(Comparator.naturalOrder())
                 .orElse(null); // Return null if no incidents are found or all dates are null
     }
+
+    public void migrateIncidents(String fromStatusId, String toStatusId) throws InterruptedException, ExecutionException {
+        List<Incident> incidents = incidentRepository.findAll();
+        for (Incident incident : incidents) {
+            if (incident.getStatusId().equals(fromStatusId)) {
+                incident.setStatusId(toStatusId);
+                incidentRepository.save(incident);
+            }
+        }
+    }
 }
