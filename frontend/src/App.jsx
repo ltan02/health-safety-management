@@ -12,7 +12,7 @@ import Sidebar from "./components/global/Sidebar";
 import { useState } from "react";
 import EmployeeInvolvement from "./pages/report/EmployeeInvolvement.jsx";
 import { WorkflowProvider } from "./context/WorkflowContext.jsx";
-import ProfilePage from "./pages/profile/index.jsx";
+import ProfilePage from "./pages/profile/index.jsx";  
 
 const ReportOverview = lazy(() => import("./pages/report/index.jsx"));
 const Incident = lazy(() => import("./pages/incident"));
@@ -27,6 +27,7 @@ const LineReport = lazy(() => import("./pages/report/line/index.jsx"));
 const PieReport = lazy(() => import("./pages/report/pie/index.jsx"));
 const ScatterReport = lazy(() => import("./pages/report/scatter/index.jsx"));
 const StatusInsights = lazy(() => import("./pages/report/StatusInsights.jsx"));
+const UserManagement = lazy(() => import("./pages/userManagement/index.jsx"));
 const CategoryAnalysis = lazy(() =>
   import("./pages/report/CategoryAnalysis.jsx")
 );
@@ -86,7 +87,10 @@ function App() {
                       <Route path="incidents" element={<IncidentReport />} />
                       <Route path="profile">
                         <Route index element={<ProfilePage />} />
-                      </Route>
+                      </Route>  
+                      <Route path="business">
+                        <Route index element={<UserManagement/>} />
+                      </Route> 
                     </Route>
                     <Route path="report">
                       <Route index element={<ReportOverview />} />
@@ -107,6 +111,7 @@ function App() {
                         element={<EmployeeInvolvement />}
                       />
                     </Route>
+                     
                   </>
                 ) : (
                   <>

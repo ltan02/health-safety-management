@@ -4,7 +4,7 @@ import Button from "@mui/material/Button";
 import { useLocation } from "react-router-dom";
 import { useState } from "react";
 import { useAuthContext } from "../../context/AuthContext";
-import { isPrivileged } from "../../utils/permissions.js";
+import { isAdmin, isPrivileged } from "../../utils/permissions.js";
 import { Divider, Typography, alpha } from "@mui/material";
 import ViewWeekOutlinedIcon from "@mui/icons-material/ViewWeekOutlined";
 import DnsOutlinedIcon from "@mui/icons-material/DnsOutlined";
@@ -25,6 +25,7 @@ import DynamicFormOutlinedIcon from "@mui/icons-material/DynamicFormOutlined";
 import AnalyticsOutlinedIcon from "@mui/icons-material/AnalyticsOutlined";
 import MyLocationOutlinedIcon from "@mui/icons-material/MyLocationOutlined";
 import ChevronLeftOutlinedIcon from "@mui/icons-material/ChevronLeftOutlined";
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 
 function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
   const toggleDrawer = (open) => () => handleSidebarToggle(open);
@@ -336,6 +337,7 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
                         </div>
                       )}
                     </Button>
+                    
                     <Button
                       onClick={() => {
                         history("/admin/form");
@@ -404,6 +406,48 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
                         </div>
                       )}
                     </Button>
+                    {isAdmin(user.role) && (<Button
+                  onClick={() => history("/business")}
+                  sx={{
+                    paddingLeft: "17px",
+                    paddingY: "8px",
+                    paddingRight: "8px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "start",
+                    width: "100%",
+                    "&:hover": {
+                      backgroundColor: alpha("#EB8C00", 0.2),
+                    },
+                    backgroundColor:
+                      location.pathname === "/business"
+                        ? alpha("#EB8C00", 0.2)
+                        : "transparent",
+                  }}
+                >
+                  <ManageAccountsIcon
+                    sx={{
+                      fontSize: 24,
+                      marginRight: "10px",
+                      color:
+                        location.pathname === "/business" ? "#D04A02" : "#000",
+                    }}
+                  />
+                  <span>
+                    <Typography
+                      style={{
+                        fontSize: "14px",
+                        fontWeight: 400,
+                        color:
+                          location.pathname === "/business"
+                            ? "#D04A02"
+                            : "#000",
+                      }}
+                    >
+                      User Management
+                    </Typography>
+                  </span>
+                </Button>)}
                   </>
                 )}
               </>
@@ -941,6 +985,7 @@ function Sidebar({ isOpen, drawerWidth, handleSidebarToggle }) {
                       </Typography>
                     </span>
                   </Button>
+                  
                 </>
               )}
           </Box>
