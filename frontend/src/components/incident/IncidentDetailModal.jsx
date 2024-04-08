@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Modal, Box, IconButton, CircularProgress } from "@mui/material";
+import { Modal, Box, IconButton, CircularProgress, Menu, MenuItem } from "@mui/material";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import CloseIcon from "@mui/icons-material/Close";
 import useAxios from "../../hooks/useAxios";
 import { useAuthContext } from "../../context/AuthContext";
@@ -9,6 +10,7 @@ import StatusModal from "./StatusModal";
 import IncidentDetailField from "./IncidentDetailField";
 import IncidentDetailBasicField from "./IncidentDetailBasicField";
 import { v4 as uuid } from "uuid";
+import ConfirmDeleteIncidentModal from "./ConfirmDeleteIncidentModal";
 
 const modalStyle = {
     position: "absolute",
@@ -54,6 +56,42 @@ export default function IncidentDetailModal({
     const [openReporter, setOpenReporter] = useState(false);
     const [openDateChangeModal, setOpenDateChangeModal] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+    const [openDeleteModal, setOpenDeleteModal] = useState(false);
+
+    const handleClickMoreIcon = (event) => {
+        setMenuAnchorEl(event.currentTarget);
+    };
+
+    const handleCloseMenu = () => {
+        setMenuAnchorEl(null);
+    };
+
+    const handleDeleteIncident = () => {
+        handleCloseMenu();
+        setOpenDeleteModal(true);
+    };
+
+    const handleDelete = async () => {
+        await sendRequest({
+            url: `/incidents/${incident.id}`,
+            method: "DELETE",
+        });
+
+        setTasks((prevTasks) => {
+            const updatedTasks = { ...prevTasks };
+            const columns = isPrivileged(user.role) ? adminColumns : employeeColumns;
+
+            const columnId = columns.find((column) => column.statusIds.includes(incidentState)).id;
+
+            updatedTasks[columnId] = updatedTasks[columnId].filter((task) => task.id !== incident.id);
+
+            return updatedTasks;
+        });
+
+        onClose();
+        setOpenDeleteModal(false);
+    };
 
     useEffect(() => {
         Object.keys(incident?.customFields ?? {}).map((fieldName) => {
@@ -448,80 +486,101 @@ export default function IncidentDetailModal({
     };
 
     return (
-        <Modal open={open} onClose={onClose} aria-labelledby="issue-detail-modal" aria-describedby="issue-details">
-            <Box sx={modalStyle}>
-                <Box
-                    sx={{
-                        display: "flex",
-                        width: "100%",
-                        justifyContent: "flex-end",
-                    }}
-                >
-                    <IconButton onClick={onClose}>
-                        <CloseIcon />
-                    </IconButton>
-                </Box>
-                <StatusModal isStatusModalOpen={isStatusModalOpen} toggleStatusModal={toggleStatusModal} />
-                <Box
-                    sx={{
-                        display: "flex",
-                        width: "100%",
-                    }}
-                >
-                    <IncidentDetailField
-                        incident={incident}
-                        user={user}
-                        commentData={commentData}
-                        incidentId={incident.id}
-                        customField={customField}
-                        handleAddComment={handleAddComment}
-                        handleEditCustomField={handleEditCustomField}
-                        editingCustomField={editingCustomField}
-                        setCustomField={setCustomField}
-                        handleSaveChanges={handleSaveChanges}
-                        handleCancelChanges={handleCancelChanges}
-                        comment={comment}
-                        setComment={setComment}
-                        loading={loading || isLoading}
-                    />
-                    <IncidentDetailBasicField
-                        incident={incident}
-                        user={user}
-                        reviewer={reviewer}
-                        handleOpenEmployeesListModal={handleOpenEmployeesListModal}
-                        employees={employees}
-                        fetchEmployees={fetchEmployees}
-                        handleSwitchReviewer={handleSwitchReviewer}
-                        openReviewer={openReviewer}
-                        anchorEl={anchorEl}
-                        handleClose={handleClose}
-                        statuses={statuses}
-                        handleStateChange={handleStateChange}
-                        incidentState={incidentState}
-                        open={open}
-                        onClose={onClose}
-                        onRefresh={onRefresh}
-                        handleSwitchReporter={handleSwitchReporter}
-                        setOpenReporter={setOpenReporter}
-                        setOpenReviewer={setOpenReviewer}
-                        setOpenDateChangeModal={setOpenDateChangeModal}
-                        handleUpdateEmployeesInvolved={handleUpdateEmployeesInvolved}
-                        openReporter={openReporter}
-                        loading={loading}
-                        handleDateUpdate={handleDateUpdate}
-                        transitions={transitions}
-                        setViewModalOpen={setViewModalOpen}
-                    />
-                    <CircularProgress
+        <>
+            <Modal open={open} onClose={onClose} aria-labelledby="issue-detail-modal" aria-describedby="issue-details">
+                <Box sx={modalStyle}>
+                    <Box
                         sx={{
-                            position: "fixed",
-                            top: "10%",
-                            left: "90%",
-                            display: loading ? "block" : "none",
+                            display: "flex",
+                            width: "100%",
+                            justifyContent: "flex-end",
                         }}
-                    />
+                    >
+                        <IconButton onClick={handleClickMoreIcon}>
+                            <MoreHorizIcon />
+                        </IconButton>
+                        <Menu
+                            id="simple-menu"
+                            anchorEl={menuAnchorEl}
+                            keepMounted
+                            open={Boolean(menuAnchorEl)}
+                            onClose={handleCloseMenu}
+                        >
+                            <MenuItem onClick={handleDeleteIncident}>Delete Incident</MenuItem>
+                        </Menu>
+                        <IconButton onClick={onClose}>
+                            <CloseIcon />
+                        </IconButton>
+                    </Box>
+                    <StatusModal isStatusModalOpen={isStatusModalOpen} toggleStatusModal={toggleStatusModal} />
+                    <Box
+                        sx={{
+                            display: "flex",
+                            width: "100%",
+                        }}
+                    >
+                        <IncidentDetailField
+                            incident={incident}
+                            user={user}
+                            commentData={commentData}
+                            incidentId={incident.id}
+                            customField={customField}
+                            handleAddComment={handleAddComment}
+                            handleEditCustomField={handleEditCustomField}
+                            editingCustomField={editingCustomField}
+                            setCustomField={setCustomField}
+                            handleSaveChanges={handleSaveChanges}
+                            handleCancelChanges={handleCancelChanges}
+                            comment={comment}
+                            setComment={setComment}
+                            loading={loading || isLoading}
+                        />
+                        <IncidentDetailBasicField
+                            incident={incident}
+                            user={user}
+                            reviewer={reviewer}
+                            handleOpenEmployeesListModal={handleOpenEmployeesListModal}
+                            employees={employees}
+                            fetchEmployees={fetchEmployees}
+                            handleSwitchReviewer={handleSwitchReviewer}
+                            openReviewer={openReviewer}
+                            anchorEl={anchorEl}
+                            handleClose={handleClose}
+                            statuses={statuses}
+                            handleStateChange={handleStateChange}
+                            incidentState={incidentState}
+                            open={open}
+                            onClose={onClose}
+                            onRefresh={onRefresh}
+                            handleSwitchReporter={handleSwitchReporter}
+                            setOpenReporter={setOpenReporter}
+                            setOpenReviewer={setOpenReviewer}
+                            setOpenDateChangeModal={setOpenDateChangeModal}
+                            handleUpdateEmployeesInvolved={handleUpdateEmployeesInvolved}
+                            openReporter={openReporter}
+                            loading={loading}
+                            handleDateUpdate={handleDateUpdate}
+                            transitions={transitions}
+                            setViewModalOpen={setViewModalOpen}
+                        />
+                        <CircularProgress
+                            sx={{
+                                position: "fixed",
+                                top: "10%",
+                                left: "90%",
+                                display: loading ? "block" : "none",
+                            }}
+                        />
+                    </Box>
                 </Box>
-            </Box>
-        </Modal>
+            </Modal>
+            {openDeleteModal && (
+                <ConfirmDeleteIncidentModal
+                    open={openDeleteModal}
+                    handleClose={() => setOpenDeleteModal(false)}
+                    handleDelete={handleDelete}
+                />
+            )}
+        </>
     );
 }
