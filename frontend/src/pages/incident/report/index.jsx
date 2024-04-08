@@ -266,11 +266,13 @@ function IncidentReport() {
                     <IncidentDetailModal
                         open={isModalOpen}
                         selectedIncident={selectedIncident}
-                        incidentId={selectedIncident.id}
+                        incidentId={selectedIncident}
                         onClose={handleCloseModal}
                         setTasks={setFilteredTasks}
                         transitions={transitions}
                         setViewModalOpen={setViewModalOpen}
+                        commentData={commentData}
+                        setCommentData={setCommentData}
                     />
                 )}
             </div>
