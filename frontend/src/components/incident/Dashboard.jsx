@@ -179,7 +179,7 @@ function Dashboard({ setViewModalOpen }) {
                 );
                 const activeTask = filteredTasks[activeColumn].find((task) => task.id === activeId);
 
-                flowMap[activeTask.statusId].forEach((item) => {
+                (flowMap[activeTask.statusId] || []).forEach((item) => {
                     const toColumn = columns.find((column) =>
                         column.statusIds.includes(activeStateMap[item.toStateId].statusId),
                     );
