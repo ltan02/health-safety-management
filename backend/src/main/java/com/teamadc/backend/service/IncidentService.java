@@ -146,19 +146,23 @@ public class IncidentService {
             logger.error("Error fetching incidents", e);
             return new ArrayList<>(); // Return an empty list or handle appropriately
         }
-
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
         return allIncidents.stream()
                 .filter(incident -> {
-                    Date incidentDate = incident.getCreatedAt();
-                    if (start == null) {
-                        return (end == null) || !incidentDate.after(end);
+                    try {
+                        Date incidentDate = formatter.parse(incident.getIncidentDate());
+                        if (start == null) {
+                            return (end == null) || !incidentDate.after(end);
+                        }
+                        // If start is not null but end is, only check that the incident is on or after start
+                        if (end == null) {
+                            return !incidentDate.before(start);
+                        }
+                        // If both start and end are not null, check that the incident is within the range
+                        return !incidentDate.before(start) && !incidentDate.after(end);
+                    } catch (ParseException e) {
+                        return false;
                     }
-                    // If start is not null but end is, only check that the incident is on or after start
-                    if (end == null) {
-                        return !incidentDate.before(start);
-                    }
-                    // If both start and end are not null, check that the incident is within the range
-                    return !incidentDate.before(start) && !incidentDate.after(end);
                 })
                 .collect(Collectors.toList());
     }

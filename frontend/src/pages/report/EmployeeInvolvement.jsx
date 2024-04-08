@@ -143,6 +143,7 @@ function EmployeeInvolvement() {
                             slotProps={{ textField: { size: "small", fontSize: "14px" } }}
                             value={fromDate}
                             onChange={(newValue) => setFromDate(newValue)}
+                            maxDate={toDate}
                         />
                     </LocalizationProvider>
                 </div>
@@ -153,6 +154,7 @@ function EmployeeInvolvement() {
                             slotProps={{ textField: { size: "small", fontSize: "14px" } }}
                             value={toDate}
                             onChange={(newValue) => setToDate(newValue)}
+                            minDate={fromDate}
                         />
                     </LocalizationProvider>
                 </div>
