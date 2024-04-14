@@ -1,9 +1,4 @@
-import {
-  Grid,
-  Fab,
-  Divider,
-  Typography,
-} from "@mui/material";
+import { Grid, Fab, Divider, Typography } from "@mui/material";
 import Chatbot from "../../components/report/Chatbot.jsx";
 import ChatIcon from "@mui/icons-material/Chat";
 import Draggable from "react-draggable";
@@ -45,7 +40,7 @@ function ReportOverview() {
     window.location.reload();
   };
 
-  const [name, setName] = useState('');
+  const [name, setName] = useState("");
   const handleOpenEdit = (item, index) => {
     console.log("open edit");
     setSelectedVal(index);
@@ -128,8 +123,15 @@ function ReportOverview() {
 
   return (
     <div>
-      <Typography variant="h4" sx={{ mt: 5 }} fontWeight={600}>
+      <Typography variant="h4" sx={{ mt: 5, mb: 2 }} fontWeight={600}>
         Report Overview
+      </Typography>
+      <Typography variant="body" sx={{ mt: 2 }}>
+        This report overview page represents incident data through a series of
+        customizable graphs. Each graph is fully editable—allowing users to
+        modify the name, type, and data set by simply clicking on the graph. For
+        additional insights and information, users are encouraged to interact
+        with the integrated chatbot feature.
       </Typography>
       <Divider />
       {!loading && dashData.length !== 0 && boardFn}
