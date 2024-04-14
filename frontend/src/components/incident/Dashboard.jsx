@@ -183,6 +183,8 @@ function Dashboard({ setViewModalOpen }) {
                     const toColumn = columns.find((column) =>
                         column.statusIds.includes(activeStateMap[item.toStateId].statusId),
                     );
+                    if(!toColumn) return;
+
 
                     if (!newMap[toColumn.id]) {
                         newMap[toColumn.id] = [];
