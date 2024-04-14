@@ -18,23 +18,20 @@ import useAxios from "../../hooks/useAxios.js";
 import { categoryReports } from "../../pages/report/initialData.js";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs from "dayjs";
 
-function ReportChart({
-  type,
-  locked,
-  data,
-  height,
-  width,
-  handleSubmit,
-}) {
+function ReportChart({ type, locked, data, height, width, handleSubmit }) {
   const { sendRequest } = useAxios();
   const [report, setReport] = useState(categoryReports);
   const [reportType, setReportType] = useState({});
   const [field, setField] = useState(data.field);
   const [startDate, setStartDate] = useState(dayjs(data.start));
   const [endDate, setEndDate] = useState(dayjs(data.end));
+
+  const uppercase = (str) => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
 
   useEffect(() => {
     setEndDate(dayjs(data.end));
@@ -55,16 +52,32 @@ function ReportChart({
   };
   const handleStartChange = (newStartDate) => {
     if (typeof handleSubmit === "function")
-      handleSubmit(field, dayjs(newStartDate.format('YYYY-MM-DDTHH:mm')), endDate);
-    setStartDate(dayjs(newStartDate.format('YYYY-MM-DDTHH:mm')));
-    getReportAPI(field, dayjs(newStartDate.format('YYYY-MM-DDTHH:mm')), endDate);
+      handleSubmit(
+        field,
+        dayjs(newStartDate.format("YYYY-MM-DDTHH:mm")),
+        endDate
+      );
+    setStartDate(dayjs(newStartDate.format("YYYY-MM-DDTHH:mm")));
+    getReportAPI(
+      field,
+      dayjs(newStartDate.format("YYYY-MM-DDTHH:mm")),
+      endDate
+    );
   };
 
   const handleEndChange = (newEndDate) => {
     if (typeof handleSubmit === "function")
-      handleSubmit(field, startDate, dayjs(newEndDate.format('YYYY-MM-DDTHH:mm')));
-    setEndDate(dayjs(newEndDate.format('YYYY-MM-DDTHH:mm')));
-    getReportAPI(field, startDate, dayjs(newEndDate.format('YYYY-MM-DDTHH:mm')));
+      handleSubmit(
+        field,
+        startDate,
+        dayjs(newEndDate.format("YYYY-MM-DDTHH:mm"))
+      );
+    setEndDate(dayjs(newEndDate.format("YYYY-MM-DDTHH:mm")));
+    getReportAPI(
+      field,
+      startDate,
+      dayjs(newEndDate.format("YYYY-MM-DDTHH:mm"))
+    );
   };
 
   const modernPalette = [
@@ -85,13 +98,18 @@ function ReportChart({
             scaleType: "band",
             dataKey: "label",
             tick: { fontSize: "14px", fontFamily: "Arial, sans-serif" },
+            label: uppercase(reportType.type || ""),
           },
         ]}
         series={[{ dataKey: "value", color: modernPalette[0] }]}
         height={height}
+        yAxis={[
+          {
+            label: "Number of Tickets",
+          },
+        ]}
         width={width}
         // Styling properties
-        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
         barSize={20}
         style={{ fontFamily: "Arial, sans-serif" }}
       />
@@ -106,6 +124,7 @@ function ReportChart({
             data: report.map((v) => v.label),
             scaleType: "point",
             tick: { fontSize: "14px", fontFamily: "Arial, sans-serif" },
+            label: uppercase(reportType.type || ""),
           },
         ]}
         series={[
@@ -114,6 +133,11 @@ function ReportChart({
             stroke: modernPalette[2],
             strokeWidth: 2,
             pointStyle: { fill: modernPalette[2] },
+          },
+        ]}
+        yAxis={[
+          {
+            label: "Number of Tickets",
           },
         ]}
         height={height}
@@ -130,9 +154,15 @@ function ReportChart({
       <ScatterChart
         height={height}
         width={width}
+        xAxis={[{ label: uppercase(reportType.type || "") }]}
         series={[
           {
-            data: report.map((v) => ({ x: v.id, y: v.value, id: v.id })),
+            data: report.map((v) => ({
+              x: v.id,
+              y: v.value,
+              id: v.id,
+              label: v.label,
+            })),
             fill: modernPalette[2],
           },
         ]}
@@ -140,6 +170,11 @@ function ReportChart({
         style={{ fontFamily: "Arial, sans-serif" }}
         pointSize={10}
         pointStyle={{ stroke: "#fff", strokeWidth: 2 }}
+        yAxis={[
+          {
+            label: "Number of Tickets",
+          },
+        ]}
       />
     </>
   );
@@ -157,32 +192,32 @@ function ReportChart({
             })),
             highlightScope: { faded: "global", highlighted: "item" },
             faded: { innerRadius: 20, additionalRadius: -5, color: "gray" },
-            outerRadius: '75%',
-            innerRadius: '20%',
-            cx: '66%',
-            cy: '35%'
+            outerRadius: "75%",
+            innerRadius: "20%",
+            cx: "66%",
+            cy: "35%",
           },
         ]}
-        height={height+15}
+        height={height + 15}
         width={width}
         outerRadius={150}
         slotProps={{
           legend: {
-            direction: 'row',
-            position: { vertical: 'bottom', horizontal: 'middle' },
+            direction: "row",
+            position: { vertical: "bottom", horizontal: "middle" },
             padding: 0,
             labelStyle: {
               position: "outside",
               fill: "#333",
               fontSize: "65%",
               fontFamily: "Arial, sans-serif",
-            }
-          }
+            },
+          },
         }}
         style={{ fontFamily: "Arial, sans-serif", fontSize: "10px" }}
       />
     </>
-);
+  );
 
   const customize = (
     <div
@@ -243,9 +278,7 @@ function ReportChart({
       </Grid>
     </div>
   );
-  const uppercase = (str) => {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  };
+
   const chartDataByType = (type, field) => {
     switch (type) {
       case "Bar":
@@ -320,10 +353,10 @@ function ReportChart({
     let url = `/reports/${value}`;
 
     const params = [];
-    const formatStart = start.format('YYYY-MM-DDTHH:mm')
-    const formatEnd = end.format('YYYY-MM-DDTHH:mm')
-    if (!(formatStart === 'Invalid Date')) params.push(`start=${formatStart}`);
-    if (!(formatEnd === 'Invalid Date')) params.push(`end=${formatEnd}`);
+    const formatStart = start.format("YYYY-MM-DDTHH:mm");
+    const formatEnd = end.format("YYYY-MM-DDTHH:mm");
+    if (!(formatStart === "Invalid Date")) params.push(`start=${formatStart}`);
+    if (!(formatEnd === "Invalid Date")) params.push(`end=${formatEnd}`);
     if (params.length > 0) {
       url += "?" + params.join("&");
     }
