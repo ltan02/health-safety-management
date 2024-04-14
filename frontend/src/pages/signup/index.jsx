@@ -131,6 +131,7 @@ function SignUp() {
               variant="outlined"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              onSubmit={handleSubmit}
             />
             {errors.missingEmail && (
               <Alert severity="error">Email is required</Alert>
@@ -190,7 +191,7 @@ function SignUp() {
             {errors.general && <Alert severity="error">{errors.general}</Alert>}
 
             <Button
-              onClick={handleSubmit}
+            type="submit"
               color="primary"
               variant="contained"
               fullWidth

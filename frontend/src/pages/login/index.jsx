@@ -44,7 +44,8 @@ function Login() {
     }
   }, [navigate, user]);
 
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
     setShowMissingEmail(false);
     setShowMissingPassword(false);
     setShowInvalidDetails(false);
@@ -114,7 +115,7 @@ function Login() {
               Login to continue
             </Typography>
           </div>
-          <form noValidate autoComplete="off">
+          <form noValidate autoComplete="off" onSubmit={handleSubmit}>
             <TextField
               label="Email"
               type="email"
@@ -167,10 +168,10 @@ function Login() {
             )}
 
             <Button
-              onClick={handleSubmit}
               color="primary"
               variant="contained"
               fullWidth
+              type="submit"
               style={{ marginTop: "20px", height: "45px" }}
             >
               Login
