@@ -449,6 +449,7 @@ export const FIELD_ELEMENT = {
         color="primary"
         sx={{ mt: 1 }}
         onClick={onClick}
+        disabled={value.isLoading || props.disabled}
       >
         Generate
       </Button>

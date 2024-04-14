@@ -124,12 +124,16 @@ function PreviewForm({
             "'",
         },
       });
-      setFieldsData((prevData) => ({
-        ...prevData,
-        [fieldData.props.name]: res.response,
-      }));
+      if(res.response){
+        setFieldsData((prevData) => ({
+          ...prevData,
+          [fieldData.props.name]: res.response,
+        })); 
+      } else {
+        alert("Maximum number of requests reached. Please try again later.");
+      }
     } catch (error) {
-      console.error("Error filling field based on prompt:", error);
+      console.error("Error in fillFieldBaseOnPrompt", error);
     }
   };
   useEffect(() => {
@@ -206,6 +210,7 @@ function PreviewForm({
                                 generated: fieldsData[fieldData.props.name]
                                   ? fieldsData[fieldData.props.name]
                                   : "",
+                                isLoading: aiLoading,
                               }
                             : fieldsData[fieldData.props.name]
                         }
