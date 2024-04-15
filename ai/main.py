@@ -127,37 +127,40 @@ model2 = GenerativeModel("gemini-1.0-pro")
 
 
 def newChat(chatsession):
-    prompt = """
+    prompt = f"""
     You are now acting as a querying assistant for PricewaterhouseCoopers (PwC), a global leader in professional 
     services, specializing in Assurance, Tax, and Advisory services.
-    
-    Your task is to answer queries by generating SQL queries for a table called 'incidents.incidents_main'
-    
-    The incidentCategory for each incident will be one of - """ + str(categories) + """. If a user asks a category 
-    related question, first match their query to the closest category and then query that category.
 
-    IMPORTANT - When the user asks a date or timeperiod related question, remember that the incidentDate field in the 'Data' field 
-    is an ISO formatted string with format yyyy-MM-dd'T'HH:mm, so use the SUBSTR() function to get dates - do not cast 
-    them to the DATE format. 
-    
-    IMPORTANT - When comparing timeperiods, always convert both sides to strings first - for example the clause 
-    incidentDate >= CURRENT_DATE() - 7 should be written as incidentDate >= cast(CURRENT_DATE() - 7 as string);
-    
-    For non-incident-related queries like 'What's the weather like today?', reply with: 'Query not related to incidents,
-    please try again with an incident-related question.'
-    
-    The schema of the table is """ + schema + """. Once the schema is read, respond with Done Reading 
-    (and nothing else). Make sure to match field and subfield names in the SQL query.
-    
-    IMPORTANT - For queries related to fields comments or statusHistory, you must use JSON_EXTRACT_SCALAR function like 
-    below -
-    
-     SELECT
+    Your task is to answer queries by generating SQL queries for a table called 'incidents.incidents_main'
+
+    An example SQL query for getting all information from the table is: SELECT * FROM incidents.incidents_main;
+
+    The incidentCategory for each incident will be one of - {categories}. When a user asks a category-related question, first match their query to the closest category and then query that category.
+
+    IMPORTANT: For date or time period related questions, remember that the 'incidentDate' field is an ISO formatted string (yyyy-MM-dd'T'HH:mm:ss). Use functions like SUBSTR() to extract date parts - do not cast them to the DATE format directly.
+
+    When comparing time periods, ensure that both sides are strings. For example, the clause should be written as:
+    incidentDate >= CAST(FORMAT_TIMESTAMP('%Y-%m-%d', CURRENT_TIMESTAMP() - INTERVAL 7 DAY) AS STRING);
+
+    For non-incident-related queries such as 'What's the weather like today?', respond with: 'Query not related to incidents, please try again with an incident-related question.'
+
+    The schema of the table is {schema}. Once the schema is read, simply respond with 'Done Reading' and nothing else. Ensure you use correct field and subfield names in the SQL query.
+
+    IMPORTANT: For queries related to fields like 'comments' or 'statusHistory', you must use JSON_EXTRACT_SCALAR function as shown below:
+
+    SELECT
         JSON_EXTRACT_SCALAR(comments, '$.<field to be queried>')
-     FROM
-         `incidents.incidents_main`,
-         UNNEST(comments) AS comments;
-    
+    FROM
+        incidents.incidents_main,
+        UNNEST(comments) AS comments;
+
+    Ensure all SQL queries:
+    - Do not contain syntax errors.
+    - Are complete with necessary clauses.
+    - End with a semicolon.
+    - Do not include unnecessary characters or formatting symbols like backticks unless needed for identifiers.
+
+    Please review your queries for correctness before sending them for execution.
     """
 
     t = []
@@ -244,12 +247,12 @@ async def get_chat_response(chat_prompt: ChatPrompt, uuid: str = Header(None)) -
             text_response.append(chunk.text)
 
         query = "".join(text_response)
-        pattern = r"SELECT.*?;"
+        matches = re.findall(r"SELECT[\s\S]*?(?=$)", query, re.DOTALL)
+        query = matches[0] if matches else "SELECT * FROM incidents.incidents_main;"
+        query = re.sub(r"[`;\s]+$", "", query)
+        if not query.strip().endswith(';'):
+            query += ';'
 
-        matches = re.findall(pattern, query, re.DOTALL)
-        query = matches[0] if matches else "No match found"
-
-        print(query)
         query_job = client.query(query)
         results = query_job.result()
 
@@ -270,8 +273,5 @@ async def get_chat_response(chat_prompt: ChatPrompt, uuid: str = Header(None)) -
         return {"response": "".join(text_response2)}
 
     except Exception as e:
+        print(e)
         return {"response": "Please try again with a different query."}
-
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8010)
