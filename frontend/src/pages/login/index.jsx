@@ -6,9 +6,6 @@ import {
   Typography,
   TextField,
   Button,
-  Box,
-  Grid,
-  Link,
 } from "@mui/material";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import InputAdornment from "@mui/material/InputAdornment";
@@ -20,7 +17,7 @@ import InputLabel from "@mui/material/InputLabel";
 import Alert from "@mui/material/Alert";
 import { useAuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import pwcLogo from "../../assets/pwcLogo.svg";
+import logo from "../../assets/react.svg";
 
 function Login() {
   const navigate = useNavigate();
@@ -97,7 +94,7 @@ function Login() {
             }}
           >
             <img
-              src={pwcLogo}
+              src={logo}
               alt="logo"
               style={{
                 marginTop: "1.5rem",

@@ -9,7 +9,7 @@ import Popover from "@mui/material/Popover";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuthContext } from "../../context/AuthContext";
-import pwcLogo from "../../assets/pwcLogo.svg";
+import logo from "../../assets/react.svg";
 import Profile from "../users/Profile";
 
 function Header() {
@@ -45,7 +45,7 @@ function Header() {
                     zIndex: 5,
                 }}
             >
-                <img src={pwcLogo} alt="logo" style={{ height: "3rem", width: "auto", paddingLeft: "15px" }}></img>
+                <img src={logo} alt="logo" style={{ height: "3rem", width: "auto", paddingLeft: "15px" }}></img>
                 <Button sx={{ borderRadius: "50%" }} aria-describedby={id} onClick={handleProfileClick}>
                     <Profile user={user} />
                 </Button>

@@ -19,7 +19,7 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../../context/AuthContext";
-import pwcLogo from "../../assets/pwcLogo.svg";
+import logo from "../../assets/react.svg";
 
 function SignUp() {
   const navigate = useNavigate();
@@ -103,7 +103,7 @@ function SignUp() {
             }}
           >
             <img
-              src={pwcLogo}
+              src={logo}
               alt="logo"
               style={{
                 marginTop: "1.5rem",

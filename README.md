@@ -1,8 +1,8 @@
-# Health and Safety SaaS Solution for PwC
+# Health and Safety SaaS Solution
 
 ## Introduction
 
-This project is a comprehensive Health and Safety SaaS solution, developed specifically for PricewaterhouseCoopers (PwC). It aims to streamline health and safety incident management within organizations, leveraging advanced cloud technologies for data categorization and analysis to improve workplace safety.
+This project is a comprehensive Health and Safety SaaS solution. It aims to streamline health and safety incident management within organizations, leveraging advanced cloud technologies for data categorization and analysis to improve workplace safety.
 
 ## Tech Stack
 
