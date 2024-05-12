@@ -1,4 +1,4 @@
-# Health and Safety SaaS Solution
+# Health and Safety Management Solution
 
 ## Introduction
 
